@@ -1,0 +1,8 @@
+# https://docs.pytest.org/en/stable/customize.html
+[tool.pytest.ini_options]
+addopts = "--alluredir allure-results"
+markers = [
+    "positive",
+    "negative",
+    "all_tests"
+    ]

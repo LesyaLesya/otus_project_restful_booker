@@ -1,0 +1,13 @@
+env/
+venv/
+.env
+.venv
+.git/
+.idea/
+.mypy_cache/
+.pytest_cache/
+README.md
+allure-report/
+allure-results/
+__pycache__/
+.DS_Store
