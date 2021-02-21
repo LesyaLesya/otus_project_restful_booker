@@ -2,7 +2,7 @@
 
 Проект по автоматизации тестирования API ресурса restful-booker на курсе "Python QA Engineer " от OTUS.
 
-Restful-booker - открытое API для тренировки работы запросами.
+Restful-booker - открытое API для тренировки работы с запросами.
 
 [Ссылка на документацию API restful-booker](https://restful-booker.herokuapp.com/apidoc/index.html) 
 
