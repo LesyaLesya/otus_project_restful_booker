@@ -1,4 +1,4 @@
-""" Модуль с тестами get запросов - GetBookingIds """
+""" Модуль с тестами get запросов - GetBookingIds. """
 
 
 from typing import Dict

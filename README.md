@@ -6,13 +6,17 @@ Restful-booker - открытое API для тренировки работы �
 
 [Ссылка на документацию API restful-booker](https://restful-booker.herokuapp.com/apidoc/index.html) 
 
-В директории tests/ находятся файлы с тестами на методы API. Каждый файл - на отдельный метод.
-- tests/test_create_booking.py - CreateBooking
-- tests/test_delete_booking.py - DeleteBooking
-- tests/test_get_booking.py - GetBooking
-- tests/test_get_booking_ids.py - GetBookingIds
-- tests/test_partial_update_booking.py - PartialUpdateBooking
-- tests/test_update_booking.py - UpdateBooking
++ В директории tests/ находятся файлы с тестами на методы API. Каждый файл - на отдельный метод.
+  
+  - tests/test_create_booking.py - CreateBooking
+  - tests/test_delete_booking.py - DeleteBooking
+  - tests/test_get_booking.py - GetBooking
+  - tests/test_get_booking_ids.py - GetBookingIds
+  - tests/test_partial_update_booking.py - PartialUpdateBooking
+  - tests/test_update_booking.py - UpdateBooking
+
++ В файле conftest описан базовый класс создания ApiClient с методами GET, POST, PUT, PATCH, DELETE.
+Создание экземпляра класса завернуто в фикстуру с областью видимости session (чтобы все тесты проходили с одним экземпляром класса в одной сессии), которая передается в тесты.
 ____
 
 ## Список необходимых предустановленных приложений и утилит
@@ -46,6 +50,8 @@ source venv/bin/activate
 pip install -U pip
 pip install -r requirements.txt
 ```
+
+- Выбрать интерпретатор для проекта
 ____
 
 ## Запуск тестов
@@ -86,6 +92,8 @@ pytest -n 2 -m all_tests tests/ --login=admin --passw=password123
 
 ### __В Docker__
 
+- Запустить Docker
+
 - В файле run_docker_allure.sh указать путь до исполняемого файла allure на вашей машине.
 
 - В файле run_docker_allure.sh по желанию изменить параметры запуска, например количество потоков или маркер.
@@ -98,17 +106,27 @@ pytest -n 2 -m all_tests tests/ --login=admin --passw=password123
 
 ### __В Jenkins__
 
+- Запустить Docker и Jenkins
+
 - Зайти в свой Jenkins
+
 - Создать PipeLine
+
 - Добавить в сборку параметры:
   + LOGIN - значение по-умолчанию admin
   + PASSW - значение по-умолчанию password123
   + NODES - значение по-умолчанию 1
   + MARKER с вариантами на выбор all_tests, positive, negative
+  
 - Выбрать Pipeline script from SCM
+
 - Выбрать SCM - Git
+
 - Указать ссылку на репозиторий на Github
+
 - Проверить название ветки - */main
-- Сохранить
+
+- Сохранить пайплайн
+
 - Собрать с необходимыми параметрами
 ____

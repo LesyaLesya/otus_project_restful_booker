@@ -1,4 +1,4 @@
-""" Модуль с тестами post запросов - CreateBooking """
+""" Модуль с тестами post запросов - CreateBooking. """
 
 
 from typing import Union, Dict, Any

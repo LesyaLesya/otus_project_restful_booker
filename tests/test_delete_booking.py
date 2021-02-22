@@ -1,4 +1,4 @@
-""" Модуль с тестами delete запросов - DeleteBooking """
+""" Модуль с тестами delete запросов - DeleteBooking. """
 
 
 import pytest
@@ -23,8 +23,11 @@ def test_delete_by_id_positive(booker_api: conftest.ApiClient,
     полученный вызовом get запроса на получение всех сущностей
 
     """
-    get_all_ids: requests.models.Response = booker_api.get()
-    id_to_delete: str = get_all_ids.json()[param]['bookingid']
+    with allure.step("Получаем список всех сущностей"):
+        get_all_ids: requests.models.Response = booker_api.get()
+
+    with allure.step("Определяем id последних двух элементов в полученном спике"):
+        id_to_delete: str = get_all_ids.json()[param]['bookingid']
 
     with allure.step(f"Отправляем delete запрос с id {id_to_delete}"):
         response: requests.models.Response = \

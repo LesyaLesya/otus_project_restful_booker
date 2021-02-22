@@ -1,4 +1,4 @@
-""" Модуль с вспомогательными функциями """
+""" Модуль с вспомогательными функциями. """
 
 
 from typing import Dict, Any
@@ -26,7 +26,7 @@ def return_dict_with_firstname(param: Any) -> Dict[str, Any]:
 def return_dict_with_lastname(param: Any) -> Dict[str, Any]:
     """
     Функция, возвращающая словарь с параметризованным
-    значением для ключа lasstname.
+    значением для ключа lastname.
 
     """
     data: Dict[str, Any] = {
