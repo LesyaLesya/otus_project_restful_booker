@@ -11,7 +11,7 @@ import conftest
 @allure.story("Получение существующей сущности по id")
 @pytest.mark.all_tests
 @pytest.mark.positive
-@pytest.mark.parametrize("param", ["8", "13", "10"])
+@pytest.mark.parametrize("param", ["17", "13", "10"])
 def test_get_by_id_positive(booker_api: conftest.ApiClient,
                             param: str) -> None:
     """
