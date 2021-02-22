@@ -6,7 +6,7 @@ docker build -t tests .
 
 # Запускаем контейнер под именем my_container из image tests
 # В параметрах передаем логин, пароль, количество потоков для запуска и маркер
-docker run --name my_container tests --login=admin --passw=password123 -n 2 -m all_tests
+docker run --name my_container tests --login $1 --passw $2 -n 2 -m all_tests
 
 # Копируем из контейнера созданный allure-report
 docker cp my_container:/app/allure-results .

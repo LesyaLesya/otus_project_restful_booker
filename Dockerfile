@@ -15,6 +15,3 @@ COPY . .
 
 # Предустановка команды pytest и allure-отчет
 ENTRYPOINT ["pytest", "--alluredir", "allure-results"]
-
-# Этот параметр можно переопределить при создании контейнера
-CMD ["--login", "admin", "--passw", "password123"]

@@ -101,16 +101,14 @@ pytest -n 2 -m all_tests tests/ --login=admin --passw=password123
 - Запустить тесты и получить отчет командой в Terminal:
 
 ```
-./run_docker_allure.sh 
+./run_docker_allure.sh admin password123
 ```
 
 ### __В Jenkins__
 
 - Запустить Docker и Jenkins
 
-- Зайти в свой Jenkins
-
-- Создать PipeLine
+- В Jenkins создать PipeLine
 
 - Добавить в сборку параметры:
   + LOGIN - значение по-умолчанию admin
