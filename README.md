@@ -21,11 +21,10 @@ ____
 
 ## Список необходимых предустановленных приложений и утилит
 
-- Python3
-- PyCharm
-- Docker
-- Allure
-- Jenkins
+- Python3 - для запуска через консоль/ide
+- Docker - для запуска тестов в контейнере и для Jenkins
+- Allure - для получения отчета при запуске через консоль/ide/docker
+- Jenkins - для запуска в Jenkins
 ____
 
 ## Установка проекта
@@ -38,20 +37,20 @@ git clone https://github.com/LesyaLesya/otus_project_restful_booker.git
 
 - Перейти в директорию скачанного репозитория
 
-- Установить и активировать виртуальное окружение
+- Установить и активировать виртуальное окружение (для запуска тестов через консоль/ide)
 
 ```
 python3 -m venv venv
 source venv/bin/activate
 ```
-- Обновить PIP и установить зависимости
+- Обновить PIP и установить зависимости (для запуска тестов через консоль/ide)
 
 ```
 pip install -U pip
 pip install -r requirements.txt
 ```
 
-- Выбрать интерпретатор для проекта
+- Выбрать интерпретатор для проекта (для запуска тестов через консоль/ide)
 ____
 
 ## Запуск тестов
@@ -94,14 +93,14 @@ pytest -n 2 -m all_tests tests/ --login=admin --passw=password123
 
 - Запустить Docker
 
-- В файле run_docker_allure.sh указать путь до исполняемого файла allure на вашей машине.
+- В файле run_test_in_docker_with_allure.sh указать путь до исполняемого файла allure на вашей машине.
 
-- В файле run_docker_allure.sh по желанию изменить параметры запуска, например количество потоков или маркер.
+- В файле run_test_in_docker_with_allure.sh по желанию изменить параметры запуска, например количество потоков или маркер.
 
 - Запустить тесты и получить отчет командой в Terminal:
 
 ```
-./run_docker_allure.sh admin password123
+./run_test_in_docker_with_allure.sh admin password123
 ```
 
 ### __В Jenkins__
