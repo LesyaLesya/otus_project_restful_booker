@@ -12,7 +12,8 @@ import helpers
 @allure.feature("PUT - UpdateBooking")
 @allure.story("Обновление всех параметров сущности")
 @pytest.mark.positive
-def test_put_all_fields(booker_api: conftest.ApiClient) -> None:
+def test_put_all_fields(booker_api: conftest.ApiClient,
+                        fixture_check_200_status_code: str) -> None:
     """Тестовая функция для проверки вызова put запроса с передаваемым телом.
     Проверяется обновление всех значений.
     Обращение напрямую к определенному id в урле.
@@ -25,7 +26,7 @@ def test_put_all_fields(booker_api: conftest.ApiClient) -> None:
         response: requests.models.Response =\
             booker_api.put(path="30", data=json.dumps(data))
 
-    with allure.step("Проверяем, что код ответа 200"):
+    with allure.step(fixture_check_200_status_code):
         assert response.status_code == 200, f"Код ответа - {response.status_code}"
 
     with allure.step(f"Проверяем, что firstname - '{data['firstname']}'"):
@@ -86,7 +87,8 @@ def test_put_not_all_fields(booker_api: conftest.ApiClient,
 @pytest.mark.negative
 @pytest.mark.parametrize("param", ["321342", "&*&^(&", "0"])
 def test_put_invalid_id(booker_api: conftest.ApiClient,
-                        param: str) -> None:
+                        param: str,
+                        fixture_check_405_status_code: str) -> None:
     """Тестовая функция для проверки вызова put запроса с передаваемым телом.
     Негативная проверка обращение к несуществующему урлу.
 
@@ -99,5 +101,5 @@ def test_put_invalid_id(booker_api: conftest.ApiClient,
         response: requests.models.Response =\
             booker_api.put(path=param, data=json.dumps(data))
 
-    with allure.step("Проверяем, что код ответа 405"):
+    with allure.step(fixture_check_405_status_code):
         assert response.status_code == 405, f"Код ответа - {response.status_code}"

@@ -11,7 +11,8 @@ import conftest
 @pytest.mark.positive
 @pytest.mark.parametrize("param", ["2", "9", "10"])
 def test_get_by_id_positive(booker_api: conftest.ApiClient,
-                            param: str) -> None:
+                            param: str,
+                            fixture_check_200_status_code: str) -> None:
     """Тестовая функция для проверки вызова get запроса.
     Проверяются позитивные варианты для id через параметризацию.
 
@@ -21,7 +22,7 @@ def test_get_by_id_positive(booker_api: conftest.ApiClient,
     with allure.step(f"Отправляем get запрос с id {param}"):
         response: requests.models.Response = booker_api.get(path=param)
 
-    with allure.step("Проверяем, что код ответа 200"):
+    with allure.step(fixture_check_200_status_code):
         assert response.status_code == 200, f"Код ответа - {response.status_code}"
 
     with allure.step(f"Проверяем длину тела ответа сущности с id {param}"):

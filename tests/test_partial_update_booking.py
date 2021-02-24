@@ -14,7 +14,8 @@ import helpers
 @pytest.mark.positive
 @pytest.mark.parametrize("book_id, first, last", [("4", "Peter", "Jackson"), ("9", "Emma", "Star")])
 def test_patch_part_fields(booker_api: conftest.ApiClient,
-                           book_id: str, first: str, last: str) -> None:
+                           book_id: str, first: str, last: str,
+                           fixture_check_200_status_code: str) -> None:
     """Тестовая функция для проверки вызова patch запроса с передаваемым телом.
     Проверяются позитивные варианты через параметризацию -
     обновление значений "firstname", "lastname".
@@ -35,7 +36,7 @@ def test_patch_part_fields(booker_api: conftest.ApiClient,
         response: requests.models.Response =\
             booker_api.patch(path=book_id, data=json.dumps(data))
 
-    with allure.step("Проверяем, что код ответа 200"):
+    with allure.step(fixture_check_200_status_code):
         assert response.status_code == 200, f"Код ответа - {response.status_code}"
 
     with allure.step(f"Проверяем, что firstname - '{first}'"):
@@ -68,7 +69,8 @@ def test_patch_part_fields(booker_api: conftest.ApiClient,
 @allure.feature("PATCH - PartialUpdateBooking")
 @allure.story("Обновление всех параметров сущности")
 @pytest.mark.positive
-def test_patch_all_fields(booker_api: conftest.ApiClient) -> None:
+def test_patch_all_fields(booker_api: conftest.ApiClient,
+                          fixture_check_200_status_code: str) -> None:
     """Тестовая функция для проверки вызова patch запроса с передаваемым телом.
     Проверяется обновление всех полей сущности.
     Обращение напрямую к определенному id в урле.
@@ -81,7 +83,7 @@ def test_patch_all_fields(booker_api: conftest.ApiClient) -> None:
         response: requests.models.Response = \
             booker_api.patch(path="15", data=json.dumps(data))
 
-    with allure.step("Проверяем, что код ответа 200"):
+    with allure.step(fixture_check_200_status_code):
         assert response.status_code == 200, f"Код ответа - {response.status_code}"
 
     with allure.step(f"Проверяем, что firstname - '{data['firstname']}'"):
@@ -120,7 +122,8 @@ def test_patch_all_fields(booker_api: conftest.ApiClient) -> None:
 @pytest.mark.positive
 @pytest.mark.parametrize("book_id", ["10", "22"])
 def test_patch_empty_body(booker_api: conftest.ApiClient,
-                          book_id: str) -> None:
+                          book_id: str,
+                          fixture_check_200_status_code: str) -> None:
     """Тестовая функция для проверки вызова patch запроса с передаваемым телом.
     Проверяется передача пустого тела.
     Обращение напрямую к определенному id в урле.
@@ -135,7 +138,7 @@ def test_patch_empty_body(booker_api: conftest.ApiClient,
     with allure.step("Отправляем patch запрос с пустым телом"):
         response: requests.models.Response = booker_api.patch(path=book_id, data={})
 
-    with allure.step("Проверяем, что код ответа 200"):
+    with allure.step(fixture_check_200_status_code):
         assert response.status_code == 200, f"Код ответа - {response.status_code}"
 
     with allure.step(f"Проверяем, что firstname - '{data_for_id['firstname']}'"):
@@ -172,7 +175,8 @@ def test_patch_empty_body(booker_api: conftest.ApiClient,
 @pytest.mark.negative
 @pytest.mark.parametrize("param", ["213123", "tests"])
 def test_patch_invalid_id(booker_api: conftest.ApiClient,
-                          param: str) -> None:
+                          param: str,
+                          fixture_check_405_status_code: str) -> None:
     """Тестовая функция для проверки вызова patch запроса с передаваемым телом.
     Проверяются негативные варианты через параметризацию -
     обращение к несуществующему id в урле.
@@ -186,5 +190,5 @@ def test_patch_invalid_id(booker_api: conftest.ApiClient,
         response: requests.models.Response =\
             booker_api.patch(path=param, data=json.dumps(data))
 
-    with allure.step("Проверяем, что код ответа 405"):
+    with allure.step(fixture_check_405_status_code):
         assert response.status_code == 405, f"Код ответа - {response.status_code}"

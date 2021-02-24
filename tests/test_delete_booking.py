@@ -38,7 +38,8 @@ def test_delete_by_id_positive(booker_api: conftest.ApiClient,
 @pytest.mark.negative
 @pytest.mark.parametrize("param", ["abc", "123112"])
 def test_delete_by_id_negative(booker_api: conftest.ApiClient,
-                               param: str) -> None:
+                               param: str,
+                               fixture_check_405_status_code: str) -> None:
     """Тестовая функция для проверки вызова delete запроса.
     Проверяются негативные варианты через параметризацию
     - несуществующие id.
@@ -49,5 +50,5 @@ def test_delete_by_id_negative(booker_api: conftest.ApiClient,
     with allure.step(f"Отправляем delete запрос с id {param}"):
         response: requests.models.Response = booker_api.delete(path=param)
 
-    with allure.step("Проверяем, что код ответа 405"):
+    with allure.step(fixture_check_405_status_code):
         assert response.status_code == 405, f"Код ответа - {response.status_code}"

@@ -14,7 +14,8 @@ import helpers
 @pytest.mark.positive
 @pytest.mark.parametrize("param", ["Susan", "Maria-Elena", "Имя Имя", ""])
 def test_post_firstname_positive(booker_api: conftest.ApiClient,
-                                 param: str) -> None:
+                                 param: str,
+                                 fixture_check_200_status_code: str) -> None:
     """Тестовая функция для проверки вызова post запроса.
     Проверяются позитивные варианты для "firstname" через параметризацию.
 
@@ -27,7 +28,7 @@ def test_post_firstname_positive(booker_api: conftest.ApiClient,
     with allure.step(f"Отправляем post запрос с firstname - '{param}'"):
         response: requests.models.Response = booker_api.post(data=json.dumps(data))
 
-    with allure.step("Проверяем, что код ответа 200"):
+    with allure.step(fixture_check_200_status_code):
         assert response.status_code == 200, f"Код ответа - {response.status_code}"
 
     with allure.step(f"Проверяем, что firstname - '{param}'"):
@@ -40,7 +41,8 @@ def test_post_firstname_positive(booker_api: conftest.ApiClient,
 @pytest.mark.negative
 @pytest.mark.parametrize("param", [123, True])
 def test_post_firstname_negative(booker_api: conftest.ApiClient,
-                                 param: Union[int, bool]) -> None:
+                                 param: Union[int, bool],
+                                 fixture_check_500_status_code: str) -> None:
     """Тестовая функция для проверки вызова post запроса.
     Проверяются негативные варианты для "firstname" через параметризацию -
     число, булево значение.
@@ -53,7 +55,7 @@ def test_post_firstname_negative(booker_api: conftest.ApiClient,
     with allure.step(f"Отправляем post запрос с firstname - '{param}'"):
         response: requests.models.Response = booker_api.post(data=json.dumps(data))
 
-    with allure.step("Проверяем, что код ответа 500"):
+    with allure.step(fixture_check_500_status_code):
         assert response.status_code == 500, f"Код ответа - {response.status_code}"
 
 
@@ -62,7 +64,8 @@ def test_post_firstname_negative(booker_api: conftest.ApiClient,
 @pytest.mark.positive
 @pytest.mark.parametrize("param", ["Иванов", "Brown", "W", "Last-name", ""])
 def test_post_lastname(booker_api: conftest.ApiClient,
-                       param: str) -> None:
+                       param: str,
+                       fixture_check_200_status_code: str) -> None:
     """Тестовая функция для проверки вызова post запроса.
     Проверяются позитивные варианты для "lastname" через параметризацию.
 
@@ -74,7 +77,7 @@ def test_post_lastname(booker_api: conftest.ApiClient,
     with allure.step(f"Отправляем post запрос с lastname - '{param}'"):
         response: requests.models.Response = booker_api.post(data=json.dumps(data))
 
-    with allure.step("Проверяем, что код ответа 200"):
+    with allure.step(fixture_check_200_status_code):
         assert response.status_code == 200, f"Код ответа - {response.status_code}"
 
     with allure.step(f"Проверяем, что lastname - '{param}'"):
@@ -87,7 +90,8 @@ def test_post_lastname(booker_api: conftest.ApiClient,
 @pytest.mark.positive
 @pytest.mark.parametrize("param", [123, 1, 566778])
 def test_post_totalprice(booker_api: conftest.ApiClient,
-                         param: int) -> None:
+                         param: int,
+                         fixture_check_200_status_code: str) -> None:
     """Тестовая функция для проверки вызова post запроса.
     Проверяются позитивные варианты для "totalprice" через параметризацию.
 
@@ -99,7 +103,7 @@ def test_post_totalprice(booker_api: conftest.ApiClient,
     with allure.step(f"Отправляем post запрос с totalprice - '{param}'"):
         response: requests.models.Response = booker_api.post(data=json.dumps(data))
 
-    with allure.step("Проверяем, что код ответа 200"):
+    with allure.step(fixture_check_200_status_code):
         assert response.status_code == 200, f"Код ответа - {response.status_code}"
 
     with allure.step(f"Проверяем, что totalprice - '{param}'"):
@@ -112,7 +116,8 @@ def test_post_totalprice(booker_api: conftest.ApiClient,
 @pytest.mark.positive
 @pytest.mark.parametrize("param", [True, False])
 def test_post_depositpaid(booker_api: conftest.ApiClient,
-                          param: bool) -> None:
+                          param: bool,
+                          fixture_check_200_status_code: str) -> None:
     """Тестовая функция для проверки вызова post запроса.
     Проверяются позитивные варианты для "depositpaid" через параметризацию.
 
@@ -124,7 +129,7 @@ def test_post_depositpaid(booker_api: conftest.ApiClient,
     with allure.step(f"Отправляем post запрос с depositpaid - '{param}'"):
         response: requests.models.Response = booker_api.post(data=json.dumps(data))
 
-    with allure.step("Проверяем, что код ответа 200"):
+    with allure.step(fixture_check_200_status_code):
         assert response.status_code == 200, f"Код ответа - {response.status_code}"
 
     with allure.step(f"Проверяем, что depositpaid - '{param}'"):
@@ -137,7 +142,8 @@ def test_post_depositpaid(booker_api: conftest.ApiClient,
 @pytest.mark.positive
 @pytest.mark.parametrize("param", ["1900-11-11", "2021-02-11", "2030-06-01"])
 def test_post_checkin_positive(booker_api: conftest.ApiClient,
-                               param: str) -> None:
+                               param: str,
+                               fixture_check_200_status_code: str) -> None:
     """Тестовая функция для проверки вызова post запроса.
     Проверяются позитивные варианты для "checkin" через параметризацию.
 
@@ -149,7 +155,7 @@ def test_post_checkin_positive(booker_api: conftest.ApiClient,
     with allure.step(f"Отправляем post запрос с checkin - '{param}'"):
         response: requests.models.Response = booker_api.post(data=json.dumps(data))
 
-    with allure.step("Проверяем, что код ответа 200"):
+    with allure.step(fixture_check_200_status_code):
         assert response.status_code == 200, f"Код ответа - {response.status_code}"
 
     with allure.step(f"Проверяем, что checkin - '{param}'"):
@@ -162,7 +168,8 @@ def test_post_checkin_positive(booker_api: conftest.ApiClient,
 @pytest.mark.negative
 @pytest.mark.parametrize("param", ["00-00-00", "tests", " "])
 def test_post_checkin_negative(booker_api: conftest.ApiClient,
-                               param: str) -> None:
+                               param: str,
+                               fixture_check_200_status_code: str) -> None:
     """Тестовая функция для проверки вызова post запроса.
     Проверяются негативные варианты для "checkin" через параметризацию -
     неправильный формат даты / не дата.
@@ -175,7 +182,7 @@ def test_post_checkin_negative(booker_api: conftest.ApiClient,
     with allure.step(f"Отправляем post запрос с checkin - '{param}'"):
         response: requests.models.Response = booker_api.post(data=json.dumps(data))
 
-    with allure.step("Проверяем, что код ответа 200"):
+    with allure.step(fixture_check_200_status_code):
         assert response.status_code == 200, f"Код ответа - {response.status_code}"
 
     with allure.step("Проверяем, что текст ответа - Invalid date"):
@@ -187,7 +194,8 @@ def test_post_checkin_negative(booker_api: conftest.ApiClient,
 @pytest.mark.positive
 @pytest.mark.parametrize("param", ["1871-01-01", "2021-02-11", "2041-12-31"])
 def test_post_checkout(booker_api: conftest.ApiClient,
-                       param: str) -> None:
+                       param: str,
+                       fixture_check_200_status_code: str) -> None:
     """Тестовая функция для проверки вызова post запроса.
     Проверяются позитивные варианты для "checkout" через параметризацию.
 
@@ -199,7 +207,7 @@ def test_post_checkout(booker_api: conftest.ApiClient,
     with allure.step(f"Отправляем post запрос с checkout - '{param}'"):
         response: requests.models.Response = booker_api.post(data=json.dumps(data))
 
-    with allure.step("Проверяем, что код ответа 200"):
+    with allure.step(fixture_check_200_status_code):
         assert response.status_code == 200, f"Код ответа - {response.status_code}"
 
     with allure.step(f"Проверяем, что checkout - '{param}'"):
@@ -212,7 +220,8 @@ def test_post_checkout(booker_api: conftest.ApiClient,
 @pytest.mark.positive
 @pytest.mark.parametrize("param", ["что-то", "dinner, breakfast", ""])
 def test_post_additionalneeds(booker_api: conftest.ApiClient,
-                              param: str) -> None:
+                              param: str,
+                              fixture_check_200_status_code: str) -> None:
     """Тестовая функция для проверки вызова post запроса.
     Проверяются позитивные варианты для "additionalneeds" через параметризацию.
 
@@ -224,7 +233,7 @@ def test_post_additionalneeds(booker_api: conftest.ApiClient,
     with allure.step(f"Отправляем post запрос с additionalneeds - '{param}'"):
         response: requests.models.Response = booker_api.post(data=json.dumps(data))
 
-    with allure.step("Проверяем, что код ответа 200"):
+    with allure.step(fixture_check_200_status_code):
         assert response.status_code == 200, f"Код ответа - {response.status_code}"
 
     with allure.step(f"Проверяем, что additionalneeds - '{param}'"):
@@ -235,7 +244,8 @@ def test_post_additionalneeds(booker_api: conftest.ApiClient,
 @allure.feature("POST - CreateBooking")
 @allure.story("Создание сущности с пустым телом запроса")
 @pytest.mark.negative
-def test_post_empty_body(booker_api: conftest.ApiClient) -> None:
+def test_post_empty_body(booker_api: conftest.ApiClient,
+                         fixture_check_500_status_code: str) -> None:
     """Тестовая функция для проверки вызова post запроса.
     Проверяется передача пустого тела запроса.
 
@@ -245,5 +255,5 @@ def test_post_empty_body(booker_api: conftest.ApiClient) -> None:
     with allure.step("Отправляем post запрос с пустым телом запроса"):
         response: requests.models.Response = booker_api.post(data={})
 
-    with allure.step("Проверяем, что код ответа 500"):
+    with allure.step(fixture_check_500_status_code):
         assert response.status_code == 500, f"Код ответа - {response.status_code}"
