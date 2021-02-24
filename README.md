@@ -62,7 +62,7 @@ ____
 В Terminal выполнить команду:
 
 ```
-pytest -n 2 -m all_tests tests/ --login=admin --passw=password123
+pytest -n 2 (-m positive|negative) tests/ --login=admin --passw=password123
 ```
 где:
 
@@ -70,9 +70,9 @@ pytest -n 2 -m all_tests tests/ --login=admin --passw=password123
 
 - -m - маркер, какие тесты запускать.
 Варианты: all_tests, positive, negative.
-  + all_tests - запускаются все тесты
   + postive - запускаются позитивные тесты
   + negative - запускаются негативные тесты
+  + если не добавлять маркер - запускаются все тесты
   
 - --login - логин, необходимый для получения auth token, который используется в запросах PUT, PATCH, DELETE. Значение по-умолчанию admin (запускать с ним).
 
