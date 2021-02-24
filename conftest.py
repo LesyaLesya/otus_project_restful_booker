@@ -138,39 +138,3 @@ def booker_api(request) -> ApiClient:
     login: str = request.config.getoption("--login")
     passw: str = request.config.getoption("--passw")
     return ApiClient(url, login, passw)
-
-
-@allure.step('Проверка кода ответа 200')
-def check_200_status_code() -> str:
-    """Возвращает строку с указанием, какой код ответа проверяем."""
-    return "Проверяем, что код ответа 200"
-
-
-@allure.step('Проверка кода ответа 500')
-def check_500_status_code() -> str:
-    """Возвращает строку с указанием, какой код ответа проверяем."""
-    return "Проверяем, что код ответа 500"
-
-
-@allure.step('Проверка кода ответа 405')
-def check_405_status_code() -> str:
-    """Возвращает строку с указанием, какой код ответа проверяем."""
-    return "Проверяем, что код ответа 405"
-
-
-@pytest.fixture
-def fixture_check_200_status_code() -> str:
-    """Фикстура, вызывающая функцию, возвращающую строку с кодом ответа 200."""
-    return check_200_status_code()
-
-
-@pytest.fixture
-def fixture_check_500_status_code() -> str:
-    """Фикстура, вызывающая функцию, возвращающую строку с кодом ответа 500."""
-    return check_500_status_code()
-
-
-@pytest.fixture
-def fixture_check_405_status_code() -> str:
-    """Фикстура, вызывающая функцию, возвращающую строку с кодом ответа 405."""
-    return check_405_status_code()

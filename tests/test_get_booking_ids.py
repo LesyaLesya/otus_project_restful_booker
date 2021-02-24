@@ -5,13 +5,13 @@ import pytest
 import requests
 import allure  # type: ignore
 import conftest
+from helpers import allure_steps
 
 
 @allure.feature("GET - GetBookingIds")
 @allure.story("Получение списка всех сущностей")
 @pytest.mark.positive
-def test_get_all_bookings(booker_api: conftest.ApiClient,
-                          fixture_check_200_status_code: str) -> None:
+def test_get_all_bookings(booker_api: conftest.ApiClient) -> None:
     """Тестовая функция для проверки вызова get запроса.
     Проверяется получение всех сущностей.
 
@@ -20,7 +20,7 @@ def test_get_all_bookings(booker_api: conftest.ApiClient,
     with allure.step("Отправляем get запрос"):
         response: requests.models.Response = booker_api.get()
 
-    with allure.step(fixture_check_200_status_code):
+    with allure.step(allure_steps.check_200_status_code()):
         assert response.status_code == 200, f"Код ответа - {response.status_code}"
 
     with allure.step("Проверяем, что в ответе непустой список"):
@@ -32,8 +32,7 @@ def test_get_all_bookings(booker_api: conftest.ApiClient,
 @pytest.mark.positive
 @pytest.mark.parametrize("param", ["Sam", "Susan"])
 def test_get_by_firstname_positive(booker_api: conftest.ApiClient,
-                                   param: str,
-                                   fixture_check_200_status_code: str) -> None:
+                                   param: str) -> None:
     """Тестовая функция для проверки вызова get запроса с передаваемым в урле параметром.
     Проверяются позитивные варианты через параметризацию -
     для передачи параметра firstname в урле.
@@ -46,7 +45,7 @@ def test_get_by_firstname_positive(booker_api: conftest.ApiClient,
     with allure.step(f"Отправляем get запрос с параметром - {payload}"):
         response: requests.models.Response = booker_api.get(params=payload)
 
-    with allure.step(fixture_check_200_status_code):
+    with allure.step(allure_steps.check_200_status_code()):
         assert response.status_code == 200, f"Код ответа - {response.status_code}"
 
     with allure.step(f"Проверяем, что у '{param}' есть бронь"):
@@ -58,8 +57,7 @@ def test_get_by_firstname_positive(booker_api: conftest.ApiClient,
 @pytest.mark.negative
 @pytest.mark.parametrize("param", ["Тест", "13"])
 def test_get_by_firstname_negative(booker_api: conftest.ApiClient,
-                                   param: str,
-                                   fixture_check_200_status_code: str) -> None:
+                                   param: str) -> None:
     """Тестовая функция для проверки вызова get запроса с передаваемым в урле параметром.
     Проверяются негативные варианты через параметризацию -
     для передачи параметра firstname в урле -
@@ -73,7 +71,7 @@ def test_get_by_firstname_negative(booker_api: conftest.ApiClient,
     with allure.step(f"Отправляем get запрос с параметром - {payload}"):
         response: requests.models.Response = booker_api.get(params=payload)
 
-    with allure.step(fixture_check_200_status_code):
+    with allure.step(allure_steps.check_200_status_code()):
         assert response.status_code == 200, f"Код ответа - {response.status_code}"
 
     with allure.step(f"Проверяем, что у '{param}' нет брони"):
@@ -85,8 +83,7 @@ def test_get_by_firstname_negative(booker_api: conftest.ApiClient,
 @pytest.mark.positive
 @pytest.mark.parametrize("param", ["Иванов", "Brown"])
 def test_get_by_lastname_positive(booker_api: conftest.ApiClient,
-                                  param: str,
-                                  fixture_check_200_status_code: str) -> None:
+                                  param: str) -> None:
     """Тестовая функция для проверки вызова get запроса с передаваемым в урле параметром.
     Проверяются позитивные варианты через параметризацию -
     для передачи параметра lastname в урле.
@@ -99,7 +96,7 @@ def test_get_by_lastname_positive(booker_api: conftest.ApiClient,
     with allure.step(f"Отправляем get запрос с параметром - {payload}"):
         response: requests.models.Response = booker_api.get(params=payload)
 
-    with allure.step(fixture_check_200_status_code):
+    with allure.step(allure_steps.check_200_status_code()):
         assert response.status_code == 200, f"Код ответа - {response.status_code}"
 
     with allure.step(f"Проверяем, что у '{param}' есть бронь"):
@@ -111,8 +108,7 @@ def test_get_by_lastname_positive(booker_api: conftest.ApiClient,
 @pytest.mark.negative
 @pytest.mark.parametrize("param", ["0", "'$$@*:;"])
 def test_get_by_lastname_negative(booker_api: conftest.ApiClient,
-                                  param: str,
-                                  fixture_check_200_status_code: str) -> None:
+                                  param: str) -> None:
     """Тестовая функция для проверки вызова get запроса с передаваемым в урле параметром.
     Проверяются негативные варианты через параметризацию -
     для передачи параметра lastname в урле - несуществующая фамилия.
@@ -125,7 +121,7 @@ def test_get_by_lastname_negative(booker_api: conftest.ApiClient,
     with allure.step(f"Отправляем get запрос с параметром - {payload}"):
         response: requests.models.Response = booker_api.get(params=payload)
 
-    with allure.step(fixture_check_200_status_code):
+    with allure.step(allure_steps.check_200_status_code()):
         assert response.status_code == 200, f"Код ответа - {response.status_code}"
 
     with allure.step(f"Проверяем, что у '{param}' нет брони"):
@@ -137,8 +133,7 @@ def test_get_by_lastname_negative(booker_api: conftest.ApiClient,
 @pytest.mark.positive
 @pytest.mark.parametrize("first, last", [("Sam", "Jackson"), ("Susan", "Brown")])
 def test_get_by_fullname_positive(booker_api: conftest.ApiClient,
-                                  first: str, last: str,
-                                  fixture_check_200_status_code: str) -> None:
+                                  first: str, last: str) -> None:
     """Тестовая функция для проверки вызова get запроса с передаваемым в урле 2 параметрами.
     Проверяются позитивные варианты через параметризацию -
     для передачи параметров firstname и lastname в урле.
@@ -152,7 +147,7 @@ def test_get_by_fullname_positive(booker_api: conftest.ApiClient,
     with allure.step(f"Отправляем get запрос с параметром - {payload}"):
         response: requests.models.Response = booker_api.get(params=payload)
 
-    with allure.step(fixture_check_200_status_code):
+    with allure.step(allure_steps.check_200_status_code()):
         assert response.status_code == 200, f"Код ответа - {response.status_code}"
 
     with allure.step(f"Проверяем, что у '{first} {last}' есть бронь"):
@@ -164,8 +159,7 @@ def test_get_by_fullname_positive(booker_api: conftest.ApiClient,
 @pytest.mark.negative
 @pytest.mark.parametrize("first, last", [("Eric", "0"), ("Test", "Jones")])
 def test_get_by_fullname_negative(booker_api: conftest.ApiClient,
-                                  first: str, last: str,
-                                  fixture_check_200_status_code: str) -> None:
+                                  first: str, last: str) -> None:
     """Тестовая функция для проверки вызова get запроса с передаваемым в урле 2 параметрами.
     Проверяются негативные варианты через параметризацию -
     для передачи параметров firstname и lastname в урле -
@@ -180,7 +174,7 @@ def test_get_by_fullname_negative(booker_api: conftest.ApiClient,
     with allure.step(f"Отправляем get запрос с параметром - {payload}"):
         response: requests.models.Response = booker_api.get(params=payload)
 
-    with allure.step(fixture_check_200_status_code):
+    with allure.step(allure_steps.check_200_status_code()):
         assert response.status_code == 200, f"Код ответа - {response.status_code}"
 
     with allure.step(f"Проверяем, что у '{first} {last}' нет брони"):

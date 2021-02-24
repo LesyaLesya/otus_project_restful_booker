@@ -4,28 +4,31 @@ import pytest
 import requests
 import allure  # type: ignore
 import conftest
+from helpers import body_id_data, allure_steps
 
 
 @allure.feature("GET - GetBooking")
 @allure.story("Получение существующей сущности по id")
 @pytest.mark.positive
-@pytest.mark.parametrize("param", ["2", "9", "21"])
+@pytest.mark.parametrize("param", [1, 5, -5])
 def test_get_by_id_positive(booker_api: conftest.ApiClient,
-                            param: str,
-                            fixture_check_200_status_code: str) -> None:
+                            param: int) -> None:
     """Тестовая функция для проверки вызова get запроса.
     Проверяются позитивные варианты для id через параметризацию.
 
     :param booker_api: фикстура, создающая и возвращающая экземпляр класса ApiClient
-    :param param: передаваемые в урле id сущностей
+    :param param: передаваемые индексы сущностей для определения их id
     """
-    with allure.step(f"Отправляем get запрос с id {param}"):
-        response: requests.models.Response = booker_api.get(path=param)
+    with allure.step(allure_steps.get_id_with_param(param)):
+        id_to_do_request: str = body_id_data.get_id_of_entity(booker_api, param)
 
-    with allure.step(fixture_check_200_status_code):
+    with allure.step(f"Отправляем get запрос с id {id_to_do_request}"):
+        response: requests.models.Response = booker_api.get(path=id_to_do_request)
+
+    with allure.step(allure_steps.check_200_status_code()):
         assert response.status_code == 200, f"Код ответа - {response.status_code}"
 
-    with allure.step(f"Проверяем длину тела ответа сущности с id {param}"):
+    with allure.step(f"Проверяем длину тела ответа сущности с id {id_to_do_request}"):
         assert len(response.json()) != 0, "Такой сущности не существует"
 
 

@@ -1,6 +1,7 @@
-"""Модуль с вспомогательными функциями."""
+"""Модуль с вспомогательными функциями для id и тела запросов."""
 
 from typing import Dict, Any
+import requests
 
 
 def return_dict_with_firstname(param: Any) -> Dict[str, Any]:
@@ -121,3 +122,10 @@ def return_dict() -> Dict[str, Any]:
         },
         "additionalneeds": "Nothing"}
     return data
+
+
+def get_id_of_entity(booker_api, idx: int) -> str:
+    """Возвращает id сущности по переданному в параметрах индексу."""
+    get_all_ids: requests.models.Response = booker_api.get()
+    id_to_do_request: str = get_all_ids.json()[idx]['bookingid']
+    return id_to_do_request

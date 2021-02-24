@@ -6,27 +6,29 @@ import pytest
 import requests
 import allure   # type: ignore
 import conftest
-import helpers
+from helpers import body_id_data, allure_steps
 
 
 @allure.feature("PUT - UpdateBooking")
 @allure.story("Обновление всех параметров сущности")
 @pytest.mark.positive
-def test_put_all_fields(booker_api: conftest.ApiClient,
-                        fixture_check_200_status_code: str) -> None:
+def test_put_all_fields(booker_api: conftest.ApiClient) -> None:
     """Тестовая функция для проверки вызова put запроса с передаваемым телом.
     Проверяется обновление всех значений.
     Обращение напрямую к определенному id в урле.
 
     :param booker_api: фикстура, создающая и возвращающая экземпляр класса ApiClient
     """
-    data: Dict[str, Any] = helpers.return_dict()
+    data: Dict[str, Any] = body_id_data.return_dict()
 
-    with allure.step(f"Отправляем put запрос с телом - {data}"):
+    with allure.step(allure_steps.get_id()):
+        id_to_do_request: str = body_id_data.get_id_of_entity(booker_api, -1)
+
+    with allure.step(f"Отправляем put запрос с телом - {data} и id {id_to_do_request}"):
         response: requests.models.Response =\
-            booker_api.put(path="16", data=json.dumps(data))
+            booker_api.put(path=id_to_do_request, data=json.dumps(data))
 
-    with allure.step(fixture_check_200_status_code):
+    with allure.step(allure_steps.check_200_status_code()):
         assert response.status_code == 200, f"Код ответа - {response.status_code}"
 
     with allure.step(f"Проверяем, что firstname - '{data['firstname']}'"):
@@ -74,9 +76,12 @@ def test_put_not_all_fields(booker_api: conftest.ApiClient,
     :param booker_api: фикстура, создающая и возвращающая экземпляр класса ApiClient
     :param data: передаваемое тело запроса
     """
-    with allure.step(f"Отправляем put запрос с телом - {data}"):
+    with allure.step(allure_steps.get_id()):
+        id_to_do_request: str = body_id_data.get_id_of_entity(booker_api, -5)
+
+    with allure.step(f"Отправляем put запрос с телом - {data} и id {id_to_do_request}"):
         response: requests.models.Response =\
-            booker_api.put(path="19", data=json.dumps(data))
+            booker_api.put(path=id_to_do_request, data=json.dumps(data))
 
     with allure.step("Проверяем, что код ответа 400"):
         assert response.status_code == 400, f"Код ответа - {response.status_code}"
@@ -87,19 +92,18 @@ def test_put_not_all_fields(booker_api: conftest.ApiClient,
 @pytest.mark.negative
 @pytest.mark.parametrize("param", ["321342", "&*&^(&", "0"])
 def test_put_invalid_id(booker_api: conftest.ApiClient,
-                        param: str,
-                        fixture_check_405_status_code: str) -> None:
+                        param: str) -> None:
     """Тестовая функция для проверки вызова put запроса с передаваемым телом.
     Негативная проверка обращение к несуществующему урлу.
 
     :param booker_api: фикстура, создающая и возвращающая экземпляр класса ApiClient
     :param param: передаваемый в урле id
     """
-    data: Dict[str, Any] = helpers.return_dict()
+    data: Dict[str, Any] = body_id_data.return_dict()
 
     with allure.step(f"Отправляем put запрос с id {param}"):
         response: requests.models.Response =\
             booker_api.put(path=param, data=json.dumps(data))
 
-    with allure.step(fixture_check_405_status_code):
+    with allure.step(allure_steps.check_405_status_code()):
         assert response.status_code == 405, f"Код ответа - {response.status_code}"
