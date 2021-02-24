@@ -4,7 +4,7 @@ import pytest
 import requests
 import allure  # type: ignore
 import conftest
-from helpers import body_id_data, allure_steps
+from helpers import body_id_data, allure_steps  # type: ignore
 
 
 @allure.feature("DELETE - DeleteBooking")
@@ -22,11 +22,11 @@ def test_delete_by_id_positive(booker_api: conftest.ApiClient,
     with allure.step(allure_steps.get_id_with_param(param)):
         id_to_do_request: str = body_id_data.get_id_of_entity(booker_api, param)
 
-    with allure.step(f"Отправляем delete запрос с id {id_to_do_request}"):
+    with allure.step(allure_steps.send_delete_request(id_to_do_request)):
         response: requests.models.Response = \
             booker_api.delete(path=id_to_do_request)
 
-    with allure.step("Проверяем, что код ответа 201"):
+    with allure.step(allure_steps.check_201_status_code()):
         assert response.status_code == 201, f"Код ответа - {response.status_code}"
 
 
@@ -43,7 +43,7 @@ def test_delete_by_id_negative(booker_api: conftest.ApiClient,
     :param booker_api: фикстура, создающая и возвращающая экземпляр класса ApiClient
     :param param: передаваемый в урле id
     """
-    with allure.step(f"Отправляем delete запрос с id {param}"):
+    with allure.step(allure_steps.send_delete_request(param)):
         response: requests.models.Response = booker_api.delete(path=param)
 
     with allure.step(allure_steps.check_405_status_code()):

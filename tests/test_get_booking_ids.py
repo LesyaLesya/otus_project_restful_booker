@@ -5,7 +5,7 @@ import pytest
 import requests
 import allure  # type: ignore
 import conftest
-from helpers import allure_steps
+from helpers import allure_steps  # type: ignore
 
 
 @allure.feature("GET - GetBookingIds")
@@ -42,7 +42,7 @@ def test_get_by_firstname_positive(booker_api: conftest.ApiClient,
     """
     payload: Dict[str, str] = {"firstname": param}
 
-    with allure.step(f"Отправляем get запрос с параметром - {payload}"):
+    with allure.step(allure_steps.send_get_request_with_param(payload)):
         response: requests.models.Response = booker_api.get(params=payload)
 
     with allure.step(allure_steps.check_200_status_code()):
@@ -68,7 +68,7 @@ def test_get_by_firstname_negative(booker_api: conftest.ApiClient,
     """
     payload: Dict[str, str] = {"firstname": param}
 
-    with allure.step(f"Отправляем get запрос с параметром - {payload}"):
+    with allure.step(allure_steps.send_get_request_with_param(payload)):
         response: requests.models.Response = booker_api.get(params=payload)
 
     with allure.step(allure_steps.check_200_status_code()):
@@ -93,7 +93,7 @@ def test_get_by_lastname_positive(booker_api: conftest.ApiClient,
     """
     payload: Dict[str, str] = {"lastname": param}
 
-    with allure.step(f"Отправляем get запрос с параметром - {payload}"):
+    with allure.step(allure_steps.send_get_request_with_param(payload)):
         response: requests.models.Response = booker_api.get(params=payload)
 
     with allure.step(allure_steps.check_200_status_code()):
@@ -118,7 +118,7 @@ def test_get_by_lastname_negative(booker_api: conftest.ApiClient,
     """
     payload: Dict[str, str] = {"lastname": param}
 
-    with allure.step(f"Отправляем get запрос с параметром - {payload}"):
+    with allure.step(allure_steps.send_get_request_with_param(payload)):
         response: requests.models.Response = booker_api.get(params=payload)
 
     with allure.step(allure_steps.check_200_status_code()):
@@ -144,7 +144,7 @@ def test_get_by_fullname_positive(booker_api: conftest.ApiClient,
     """
     payload: Dict[str, str] = {"firstname": first, "lastname": last}
 
-    with allure.step(f"Отправляем get запрос с параметром - {payload}"):
+    with allure.step(allure_steps.send_get_request_with_param(payload)):
         response: requests.models.Response = booker_api.get(params=payload)
 
     with allure.step(allure_steps.check_200_status_code()):
@@ -171,7 +171,7 @@ def test_get_by_fullname_negative(booker_api: conftest.ApiClient,
     """
     payload: Dict[str, str] = {"firstname": first, "lastname": last}
 
-    with allure.step(f"Отправляем get запрос с параметром - {payload}"):
+    with allure.step(allure_steps.send_get_request_with_param(payload)):
         response: requests.models.Response = booker_api.get(params=payload)
 
     with allure.step(allure_steps.check_200_status_code()):

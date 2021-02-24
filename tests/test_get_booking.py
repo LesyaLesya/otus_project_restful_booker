@@ -4,13 +4,13 @@ import pytest
 import requests
 import allure  # type: ignore
 import conftest
-from helpers import body_id_data, allure_steps
+from helpers import body_id_data, allure_steps  # type: ignore
 
 
 @allure.feature("GET - GetBooking")
 @allure.story("Получение существующей сущности по id")
 @pytest.mark.positive
-@pytest.mark.parametrize("param", [1, 5, -5])
+@pytest.mark.parametrize("param", [1, 2, -5])
 def test_get_by_id_positive(booker_api: conftest.ApiClient,
                             param: int) -> None:
     """Тестовая функция для проверки вызова get запроса.
@@ -22,7 +22,7 @@ def test_get_by_id_positive(booker_api: conftest.ApiClient,
     with allure.step(allure_steps.get_id_with_param(param)):
         id_to_do_request: str = body_id_data.get_id_of_entity(booker_api, param)
 
-    with allure.step(f"Отправляем get запрос с id {id_to_do_request}"):
+    with allure.step(allure_steps.send_get_request(id_to_do_request)):
         response: requests.models.Response = booker_api.get(path=id_to_do_request)
 
     with allure.step(allure_steps.check_200_status_code()):
@@ -45,10 +45,10 @@ def test_get_by_id_negative(booker_api: conftest.ApiClient,
     :param booker_api: фикстура, создающая и возвращающая экземпляр класса ApiClient
     :param param: передаваемые в урле id сущностей
     """
-    with allure.step(f"Отправляем get запрос с id {param}"):
+    with allure.step(allure_steps.send_get_request(param)):
         response: requests.models.Response = booker_api.get(path=param)
 
-    with allure.step("Проверяем, что код ответа 404"):
+    with allure.step(allure_steps.check_404_status_code()):
         assert response.status_code == 404, f"Код ответа - {response.status_code}"
 
     with allure.step("Проверяем, что текст ответа - Not found"):

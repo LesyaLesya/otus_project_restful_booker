@@ -6,7 +6,7 @@ import pytest
 import requests
 import allure   # type: ignore
 import conftest
-from helpers import allure_steps, body_id_data
+from helpers import allure_steps, body_id_data  # type: ignore
 
 
 @allure.feature("POST - CreateBooking")
@@ -30,7 +30,7 @@ def test_post_firstname_positive(booker_api: conftest.ApiClient,
     with allure.step(allure_steps.check_200_status_code()):
         assert response.status_code == 200, f"Код ответа - {response.status_code}"
 
-    with allure.step(f"Проверяем, что firstname - '{param}'"):
+    with allure.step(allure_steps.check_firstname(param)):
         assert response.json()["booking"]["firstname"] == param, \
             f"Имя -  '{response.json()['booking']['firstname']}'"
 
@@ -77,7 +77,7 @@ def test_post_lastname(booker_api: conftest.ApiClient,
     with allure.step(allure_steps.check_200_status_code()):
         assert response.status_code == 200, f"Код ответа - {response.status_code}"
 
-    with allure.step(f"Проверяем, что lastname - '{param}'"):
+    with allure.step(allure_steps.check_lastname(param)):
         assert response.json()["booking"]["lastname"] == param, \
             f"Фамилия - '{response.json()['booking']['lastname']}'"
 
@@ -102,7 +102,7 @@ def test_post_totalprice(booker_api: conftest.ApiClient,
     with allure.step(allure_steps.check_200_status_code()):
         assert response.status_code == 200, f"Код ответа - {response.status_code}"
 
-    with allure.step(f"Проверяем, что totalprice - '{param}'"):
+    with allure.step(allure_steps.check_totalprice(param)):
         assert response.json()["booking"]["totalprice"] == param, \
             f"Общая сумма - '{response.json()['booking']['totalprice']}'"
 
@@ -127,7 +127,7 @@ def test_post_depositpaid(booker_api: conftest.ApiClient,
     with allure.step(allure_steps.check_200_status_code()):
         assert response.status_code == 200, f"Код ответа - {response.status_code}"
 
-    with allure.step(f"Проверяем, что depositpaid - '{param}'"):
+    with allure.step(allure_steps.check_depositpaid(param)):
         assert response.json()["booking"]["depositpaid"] == param, \
             f"Статус внесения депозита - '{response.json()['booking']['depositpaid']}'"
 
@@ -152,7 +152,7 @@ def test_post_checkin_positive(booker_api: conftest.ApiClient,
     with allure.step(allure_steps.check_200_status_code()):
         assert response.status_code == 200, f"Код ответа - {response.status_code}"
 
-    with allure.step(f"Проверяем, что checkin - '{param}'"):
+    with allure.step(allure_steps.check_checkin(param)):
         assert response.json()["booking"]["bookingdates"]["checkin"] == param, \
             f"Дата заезда - '{response.json()['booking']['bookingdates']['checkin']}'"
 
@@ -202,7 +202,7 @@ def test_post_checkout(booker_api: conftest.ApiClient,
     with allure.step(allure_steps.check_200_status_code()):
         assert response.status_code == 200, f"Код ответа - {response.status_code}"
 
-    with allure.step(f"Проверяем, что checkout - '{param}'"):
+    with allure.step(allure_steps.check_checkout(param)):
         assert response.json()["booking"]["bookingdates"]["checkout"] == param, \
             f"Дата выезда - '{response.json()['booking']['bookingdates']['checkout']}'"
 
@@ -227,7 +227,7 @@ def test_post_additionalneeds(booker_api: conftest.ApiClient,
     with allure.step(allure_steps.check_200_status_code()):
         assert response.status_code == 200, f"Код ответа - {response.status_code}"
 
-    with allure.step(f"Проверяем, что additionalneeds - '{param}'"):
+    with allure.step(allure_steps.check_addneeds(param)):
         assert response.json()["booking"]["additionalneeds"] == param, \
             f"Дополнительные пожелания - '{response.json()['booking']['additionalneeds']}'"
 

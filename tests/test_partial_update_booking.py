@@ -6,7 +6,7 @@ import pytest
 import requests
 import allure   # type: ignore
 import conftest
-from helpers import body_id_data, allure_steps
+from helpers import body_id_data, allure_steps  # type: ignore
 
 
 @allure.feature("PATCH - PartialUpdateBooking")
@@ -34,35 +34,35 @@ def test_patch_part_fields(booker_api: conftest.ApiClient,
 
     data: Dict[str, str] = {"firstname": first, "lastname": last}
 
-    with allure.step(f"Отправляем patch запрос с data - {data} и id {id_to_do_request}"):
+    with allure.step(allure_steps.send_patch_request(data, id_to_do_request)):
         response: requests.models.Response =\
             booker_api.patch(path=id_to_do_request, data=json.dumps(data))
 
     with allure.step(allure_steps.check_200_status_code()):
         assert response.status_code == 200, f"Код ответа - {response.status_code}"
 
-    with allure.step(f"Проверяем, что firstname - '{first}'"):
+    with allure.step(allure_steps.check_firstname(first)):
         assert response.json()["firstname"] == first, \
             f"Имя - '{response.json()['firstname']}'"
 
-    with allure.step(f"Проверяем, что lastname - '{last}'"):
+    with allure.step(allure_steps.check_lastname(last)):
         assert response.json()["lastname"] == last, \
             f"Фамилия - '{response.json()['lastname']}'"
 
-    with allure.step(f"Проверяем, что totalprice - '{data_for_id['totalprice']}'"):
+    with allure.step(allure_steps.check_totalprice(data_for_id['totalprice'])):
         assert response.json()["totalprice"] == data_for_id["totalprice"], \
             f"Итоговая цена - '{response.json()['totalprice']}'"
 
-    with allure.step(f"Проверяем, что depositpaid - '{data_for_id['depositpaid']}'"):
+    with allure.step(allure_steps.check_depositpaid(data_for_id['depositpaid'])):
         assert response.json()["depositpaid"] == data_for_id["depositpaid"], \
             f"Депозит - '{response.json()['depositpaid']}'"
 
-    with allure.step(f"Проверяем, что checkin - '{data_for_id['bookingdates']['checkin']}'"):
+    with allure.step(allure_steps.check_checkin(data_for_id['bookingdates']['checkin'])):
         assert response.json()["bookingdates"]["checkin"] == \
             data_for_id["bookingdates"]["checkin"], \
             f"Дата заезда - '{response.json()['bookingdates']['checkin']}'"
 
-    with allure.step(f"Проверяем, что checkout - '{data_for_id['bookingdates']['checkout']}'"):
+    with allure.step(allure_steps.check_checkout(data_for_id['bookingdates']['checkout'])):
         assert response.json()["bookingdates"]["checkout"] == \
             data_for_id["bookingdates"]["checkout"], \
             f"Дата выезда - '{response.json()['bookingdates']['checkout']}'"
@@ -83,40 +83,40 @@ def test_patch_all_fields(booker_api: conftest.ApiClient) -> None:
     with allure.step(allure_steps.get_id()):
         id_to_do_request: str = body_id_data.get_id_of_entity(booker_api, -1)
 
-    with allure.step(f"Отправляем patch запрос с data - {data} и id {id_to_do_request}"):
+    with allure.step(allure_steps.send_patch_request(data, id_to_do_request)):
         response: requests.models.Response = \
             booker_api.patch(path=id_to_do_request, data=json.dumps(data))
 
     with allure.step(allure_steps.check_200_status_code()):
         assert response.status_code == 200, f"Код ответа - {response.status_code}"
 
-    with allure.step(f"Проверяем, что firstname - '{data['firstname']}'"):
+    with allure.step(allure_steps.check_firstname(data['firstname'])):
         assert response.json()["firstname"] == data['firstname'], \
             f"Имя - '{response.json()['firstname']}'"
 
-    with allure.step(f"Проверяем, что lastname - '{data['lastname']}'"):
+    with allure.step(allure_steps.check_lastname(data['lastname'])):
         assert response.json()["lastname"] == data['lastname'], \
             f"Фамилия - '{response.json()['lastname']}'"
 
-    with allure.step(f"Проверяем, что totalprice - '{data['totalprice']}'"):
+    with allure.step(allure_steps.check_totalprice(data['totalprice'])):
         assert response.json()["totalprice"] == data['totalprice'], \
             f"Итоговая цена - '{response.json()['totalprice']}'"
 
-    with allure.step(f"Проверяем, что depositpaid - '{data['depositpaid']}'"):
+    with allure.step(allure_steps.check_depositpaid(data['depositpaid'])):
         assert response.json()["depositpaid"] == data['depositpaid'], \
             f"Депозит - '{response.json()['depositpaid']}'"
 
-    with allure.step(f"Проверяем, что checkin - '{data['bookingdates']['checkin']}'"):
+    with allure.step(allure_steps.check_checkin(data['bookingdates']['checkin'])):
         assert response.json()["bookingdates"]["checkin"] == \
                data['bookingdates']['checkin'], \
                f"Дата заезда - '{response.json()['bookingdates']['checkin']}'"
 
-    with allure.step(f"Проверяем, что checkout - '{data['bookingdates']['checkout']}'"):
+    with allure.step(allure_steps.check_checkout(data['bookingdates']['checkout'])):
         assert response.json()["bookingdates"]["checkout"] == \
                data['bookingdates']['checkout'], \
                f"Дата выезда - '{response.json()['bookingdates']['checkout']}'"
 
-    with allure.step(f"Проверяем, что additionalneeds - '{data['additionalneeds']}'"):
+    with allure.step(allure_steps.check_addneeds(data['additionalneeds'])):
         assert response.json()["additionalneeds"] == data['additionalneeds'], \
                f"Пожелания - '{response.json()['additionalneeds']}'"
 
@@ -147,30 +147,28 @@ def test_patch_empty_body(booker_api: conftest.ApiClient,
     with allure.step(allure_steps.check_200_status_code()):
         assert response.status_code == 200, f"Код ответа - {response.status_code}"
 
-    with allure.step(f"Проверяем, что firstname - '{data_for_id['firstname']}'"):
+    with allure.step(allure_steps.check_firstname(data_for_id['firstname'])):
         assert response.json()["firstname"] == data_for_id["firstname"], \
             f"Имя - '{response.json()['firstname']}'"
 
-    with allure.step(f"Проверяем, что lastname - '{data_for_id['lastname']}'"):
+    with allure.step(allure_steps.check_lastname(data_for_id['lastname'])):
         assert response.json()["lastname"] == data_for_id["lastname"], \
             f"Фамилия - '{response.json()['lastname']}'"
 
-    with allure.step(f"Проверяем, что totalprice - '{data_for_id['totalprice']}'"):
+    with allure.step(allure_steps.check_totalprice(data_for_id['totalprice'])):
         assert response.json()["totalprice"] == data_for_id["totalprice"], \
             f"Итоговая цена - '{response.json()['totalprice']}'"
 
-    with allure.step(f"Проверяем, что depositpaid - '{data_for_id['depositpaid']}'"):
+    with allure.step(allure_steps.check_depositpaid(data_for_id['depositpaid'])):
         assert response.json()["depositpaid"] == data_for_id["depositpaid"], \
             f"Депозит - '{response.json()['depositpaid']}'"
 
-    with allure.step(f"Проверяем, что checkin - "
-                     f"'{data_for_id['bookingdates']['checkin']}'"):
+    with allure.step(allure_steps.check_checkin(data_for_id['bookingdates']['checkin'])):
         assert response.json()["bookingdates"]["checkin"] == \
             data_for_id["bookingdates"]["checkin"], \
             f"Дата заезда - '{response.json()['bookingdates']['checkin']}'"
 
-    with allure.step(f"Проверяем, что checkout - "
-                     f"'{data_for_id['bookingdates']['checkout']}'"):
+    with allure.step(allure_steps.check_checkout(data_for_id['bookingdates']['checkout'])):
         assert response.json()["bookingdates"]["checkout"] == \
             data_for_id["bookingdates"]["checkout"], \
             f"Дата выезда - '{response.json()['bookingdates']['checkout']}'"
