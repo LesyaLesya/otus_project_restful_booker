@@ -12,7 +12,7 @@ pipeline {
             steps {
                 echo 'Running tests in container'
                 sh '''
-                   if [ -m "" ]
+                   if [ $MARKER == "" ]
                    then
                    /usr/local/bin/docker run --name my_container tests --login ${LOGIN} --passw ${PASSW} -n ${NODES}
                    else
