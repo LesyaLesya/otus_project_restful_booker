@@ -12,7 +12,7 @@ import helpers
 @allure.feature("PATCH - PartialUpdateBooking")
 @allure.story("Обновление части параметров сущности")
 @pytest.mark.positive
-@pytest.mark.parametrize("book_id, first, last", [("4", "Peter", "Jackson"), ("9", "Emma", "Star")])
+@pytest.mark.parametrize("book_id, first, last", [("7", "Peter", "Jackson"), ("9", "Emma", "Star")])
 def test_patch_part_fields(booker_api: conftest.ApiClient,
                            book_id: str, first: str, last: str,
                            fixture_check_200_status_code: str) -> None:
@@ -81,7 +81,7 @@ def test_patch_all_fields(booker_api: conftest.ApiClient,
 
     with allure.step(f"Отправляем patch запрос с data - {data}"):
         response: requests.models.Response = \
-            booker_api.patch(path="15", data=json.dumps(data))
+            booker_api.patch(path="16", data=json.dumps(data))
 
     with allure.step(fixture_check_200_status_code):
         assert response.status_code == 200, f"Код ответа - {response.status_code}"
@@ -120,7 +120,7 @@ def test_patch_all_fields(booker_api: conftest.ApiClient,
 @allure.feature("PATCH - PartialUpdateBooking")
 @allure.story("Обновление сущности передачей пустого тела")
 @pytest.mark.positive
-@pytest.mark.parametrize("book_id", ["10", "22"])
+@pytest.mark.parametrize("book_id", ["9", "23"])
 def test_patch_empty_body(booker_api: conftest.ApiClient,
                           book_id: str,
                           fixture_check_200_status_code: str) -> None:

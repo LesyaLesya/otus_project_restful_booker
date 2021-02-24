@@ -1,4 +1,4 @@
 #!/bin/bash
 
-/Applications/allure/bin/allure serve allure-results
+$1 serve allure-results
 

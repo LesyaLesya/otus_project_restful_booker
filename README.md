@@ -86,21 +86,22 @@ pytest -n 2 -m all_tests tests/ --login=admin --passw=password123
 - В Terminal выполнить команду:
 
 ```
-./run_docker_allure.sh 
+./run_allure_report.sh ${path_to_allure_bin}
+Пример: ./run_allure_report.sh /Applications/allure/bin/allure
 ```
 
 ### __В Docker__
 
 - Запустить Docker
 
-- В файле run_test_in_docker_with_allure.sh указать путь до исполняемого файла allure на вашей машине.
-
-- В файле run_test_in_docker_with_allure.sh по желанию изменить параметры запуска, например количество потоков или маркер.
+- В файле run_test_in_docker_with_allure.sh по желанию изменить параметры запуска, например количество потоков или добавить маркер.
 
 - Запустить тесты и получить отчет командой в Terminal:
 
 ```
-./run_test_in_docker_with_allure.sh admin password123
+./run_test_in_docker_with_allure.sh admin password123 ${path_to_allure_bin}
+
+Пример: ./run_test_in_docker_with_allure.sh admin password123 /Applications/allure/bin/allure
 ```
 
 ### __В Jenkins__
