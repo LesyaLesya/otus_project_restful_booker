@@ -135,7 +135,7 @@ def test_get_by_lastname_negative(booker_api: conftest.ApiClient,
 @allure.feature("GET - GetBookingIds")
 @allure.story("Получение списка сущностей по существующим 'firstname' и 'lastname'")
 @pytest.mark.positive
-@pytest.mark.parametrize("first, last", [("Sam", "Иванов"), ("Susan", "Brown")])
+@pytest.mark.parametrize("first, last", [("Sam", "Jackson"), ("Susan", "Brown")])
 def test_get_by_fullname_positive(booker_api: conftest.ApiClient,
                                   first: str, last: str,
                                   fixture_check_200_status_code: str) -> None:
