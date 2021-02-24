@@ -12,7 +12,6 @@ import helpers
 
 @allure.feature("PUT - UpdateBooking")
 @allure.story("Обновление всех параметров сущности")
-@pytest.mark.all_tests
 @pytest.mark.positive
 def test_put_all_fields(booker_api: conftest.ApiClient) -> None:
     """
@@ -66,7 +65,6 @@ def test_put_all_fields(booker_api: conftest.ApiClient) -> None:
 
 @allure.feature("PUT - UpdateBooking")
 @allure.story("Обновление части параметров сущности")
-@pytest.mark.all_tests
 @pytest.mark.negative
 @pytest.mark.parametrize("data", [{"firstname": "John", "lastname": "Smith"}, {}])
 def test_put_not_all_fields(booker_api: conftest.ApiClient,
@@ -90,7 +88,6 @@ def test_put_not_all_fields(booker_api: conftest.ApiClient,
 
 @allure.feature("PUT - UpdateBooking")
 @allure.story("Обновление параметров несуществующей сущности")
-@pytest.mark.all_tests
 @pytest.mark.negative
 @pytest.mark.parametrize("param", ["321342", "&*&^(&", "0"])
 def test_put_invalid_id(booker_api: conftest.ApiClient,

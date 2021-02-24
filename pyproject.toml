@@ -3,6 +3,5 @@
 addopts = "--alluredir allure-results"
 markers = [
     "positive",
-    "negative",
-    "all_tests"
+    "negative"
     ]
