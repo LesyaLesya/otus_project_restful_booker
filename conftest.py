@@ -1,5 +1,4 @@
-""" Модуль с фикстурами. """
-
+"""Модуль с фикстурами."""
 
 import json
 from typing import Any, Dict
@@ -9,11 +8,7 @@ import allure  # type: ignore
 
 
 def pytest_addoption(parser) -> None:
-    """
-    Функция получения аргументов из командной строки
-    для их дальнейшего переиспользования.
-
-    """
+    """Получение аргументов из командной строки."""
     parser.addoption(
         "--url",
         action="store",
@@ -32,23 +27,23 @@ def pytest_addoption(parser) -> None:
 
 
 class ApiClient:
-    """ Класс для выполнения запросов к API. """
+    """Класс для выполнения запросов к API."""
+
     host: str
     login: str
     passw: str
     session: requests.sessions.Session
     @allure.step("Создание экземпляра класса ApiClient")
     def __init__(self, host: str, login: str, passw: str) -> None:
-        """
-        Конструктор класса.
+        """Конструктор класса.
         При инициализации также создается объект requests.Session(),
         вызывается приватный метод для получения auth token.
 
         :param host: адрес хоста
         :param login: логин для получения auth token
         :param passw: пароль для получения auth token
-
         """
+
         self.host = host
         self.__login = login
         self.__passw = passw
@@ -57,11 +52,8 @@ class ApiClient:
 
     @allure.step("Получение auth токена")
     def __get_token(self) -> str:
-        """
-        Приватный метод передачи в post-запросе учетных данных
-        и получения в ответ auth token.
+        """Метод передачи в запросе учетных данных и получения auth token."""
 
-        """
         payload: Dict[str, str] = {"username": self.__login, "password": self.__passw}
         with allure.step(f"Выполнение post запроса с данными {payload}"):
             response: requests.models.Response = \
@@ -72,24 +64,22 @@ class ApiClient:
 
     @allure.step("Выполнение get запроса")
     def get(self, path: str = "", params: Dict[str, str] = None) -> requests.models.Response:
-        """
-        Функция, возвращающая вызов get запроса к API.
+        """Возвращает вызов get запроса к API.
 
         :param path: адрес хоста
         :param params: параметры, передаваемые в урле
-
         """
+
         url: str = f"{self.host}/booking/{path}"
         return self.session.get(url=url, params=params)
 
     @allure.step("Выполнение post запроса")
     def post(self, data: Dict[str, Any] = None) -> requests.models.Response:
-        """
-        Функция, возвращающая вызов post запроса к API.
+        """Возвращает вызов post запроса к API.
 
         :param data: передаваемое тело запроса
-
         """
+
         url: str = f"{self.host}/booking"
         headers: Dict[str, str] = {"Content-Type": "application/json",
                                    "Accept": "application/json"}
@@ -98,14 +88,13 @@ class ApiClient:
     @allure.step("Выполнение patch запроса")
     def patch(self, path: str = "",
               data: Dict[str, Any] = None) -> requests.models.Response:
-        """
-        Функция, возвращающая вызов patch запроса к API.
+        """Возвращает вызов patch запроса к API.
         Требует передачу в заголовке Cookie auth token.
 
         :param path: адрес хоста
         :param data: передаваемое тело запроса
-
         """
+
         url: str = f"{self.host}/booking/{path}"
         headers: Dict[str, str] = {"Content-Type": "application/json",
                                    "Accept": "application/json",
@@ -115,14 +104,13 @@ class ApiClient:
     @allure.step("Выполнение put запроса")
     def put(self, path: str = "",
             data: Dict[str, Any] = None) -> requests.models.Response:
-        """
-        Функция, возвращающая вызов put запроса к API.
+        """Возвращает вызов put запроса к API.
         Требует передачу в заголовке Cookie auth token.
 
         :param path: адрес хоста
         :param data: передаваемое тело запроса
-
         """
+
         url: str = f"{self.host}/booking/{path}"
         headers: Dict[str, str] = {"Content-Type": "application/json",
                                    "Accept": "application/json",
@@ -131,13 +119,12 @@ class ApiClient:
 
     @allure.step("Выполнение delete запроса")
     def delete(self, path: str = "") -> requests.models.Response:
-        """
-        Функция, возвращающая вызов delete запроса к API.
+        """Возвращает вызов delete запроса к API.
         Требует передачу в заголовке Cookie auth token.
 
         :param path: адрес хоста
-
         """
+
         url: str = f"{self.host}/booking/{path}"
         headers: Dict[str, str] = {"Content-Type": "application/json",
                                    "Cookie": f"token={self.__token}"}
@@ -146,10 +133,7 @@ class ApiClient:
 
 @pytest.fixture(scope="session")
 def booker_api(request) -> ApiClient:
-    """
-    Фикстура, создающая и возвращающая экземпляр класса ApiClient.
-
-    """
+    """Фикстура, создающая и возвращающая экземпляр класса ApiClient."""
     url: str = request.config.getoption("--url")
     login: str = request.config.getoption("--login")
     passw: str = request.config.getoption("--passw")

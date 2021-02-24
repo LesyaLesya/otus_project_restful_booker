@@ -1,5 +1,4 @@
-""" Модуль с тестами put запросов - UpdateBooking. """
-
+"""Модуль с тестами put запросов - UpdateBooking."""
 
 from typing import Dict, Any
 import json
@@ -14,13 +13,11 @@ import helpers
 @allure.story("Обновление всех параметров сущности")
 @pytest.mark.positive
 def test_put_all_fields(booker_api: conftest.ApiClient) -> None:
-    """
-    Тестовая функция для проверки вызова put запроса с передаваемым телом.
+    """Тестовая функция для проверки вызова put запроса с передаваемым телом.
     Проверяется обновление всех значений.
     Обращение напрямую к определенному id в урле.
 
     :param booker_api: фикстура, создающая и возвращающая экземпляр класса ApiClient
-
     """
     data: Dict[str, Any] = helpers.return_dict()
 
@@ -69,14 +66,12 @@ def test_put_all_fields(booker_api: conftest.ApiClient) -> None:
 @pytest.mark.parametrize("data", [{"firstname": "John", "lastname": "Smith"}, {}])
 def test_put_not_all_fields(booker_api: conftest.ApiClient,
                             data: Dict[str, str]) -> None:
-    """
-    Тестовая функция для проверки вызова put запроса с передаваемым телом.
+    """Тестовая функция для проверки вызова put запроса с передаваемым телом.
     Негативная проверка передачи в теле части значений / пустого тела.
     Обращение напрямую к определенному id в урле.
 
     :param booker_api: фикстура, создающая и возвращающая экземпляр класса ApiClient
     :param data: передаваемое тело запроса
-
     """
     with allure.step(f"Отправляем put запрос с телом - {data}"):
         response: requests.models.Response =\
@@ -92,13 +87,11 @@ def test_put_not_all_fields(booker_api: conftest.ApiClient,
 @pytest.mark.parametrize("param", ["321342", "&*&^(&", "0"])
 def test_put_invalid_id(booker_api: conftest.ApiClient,
                         param: str) -> None:
-    """
-    Тестовая функция для проверки вызова put запроса с передаваемым телом.
+    """Тестовая функция для проверки вызова put запроса с передаваемым телом.
     Негативная проверка обращение к несуществующему урлу.
 
     :param booker_api: фикстура, создающая и возвращающая экземпляр класса ApiClient
     :param param: передаваемый в урле id
-
     """
     data: Dict[str, Any] = helpers.return_dict()
 

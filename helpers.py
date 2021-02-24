@@ -1,15 +1,10 @@
-""" Модуль с вспомогательными функциями. """
-
+"""Модуль с вспомогательными функциями."""
 
 from typing import Dict, Any
 
 
 def return_dict_with_firstname(param: Any) -> Dict[str, Any]:
-    """
-    Функция, возвращающая словарь с параметризованным
-    значением для ключа firstname.
-
-    """
+    """Возвращает словарь с параметризованным значением для ключа firstname."""
     data: Dict[str, Any] = {
         "firstname": param,
         "lastname": "Brown",
@@ -24,11 +19,7 @@ def return_dict_with_firstname(param: Any) -> Dict[str, Any]:
 
 
 def return_dict_with_lastname(param: Any) -> Dict[str, Any]:
-    """
-    Функция, возвращающая словарь с параметризованным
-    значением для ключа lastname.
-
-    """
+    """Возвращает словарь с параметризованным значением для ключа lastname."""
     data: Dict[str, Any] = {
         "firstname": "Sam",
         "lastname": param,
@@ -43,11 +34,7 @@ def return_dict_with_lastname(param: Any) -> Dict[str, Any]:
 
 
 def return_dict_with_totalprice(param: Any) -> Dict[str, Any]:
-    """
-    Функция, возвращающая словарь с параметризованным
-    значением для ключа totalprice.
-
-    """
+    """Возвращает словарь с параметризованным значением для ключа totalprice."""
     data: Dict[str, Any] = {
         "firstname": "Sam",
         "lastname": "Jackson",
@@ -62,11 +49,7 @@ def return_dict_with_totalprice(param: Any) -> Dict[str, Any]:
 
 
 def return_dict_with_depositpaid(param: Any) -> Dict[str, Any]:
-    """
-    Функция, возвращающая словарь с параметризованным
-    значением для ключа depositpaid.
-
-    """
+    """Возвращает словарь с параметризованным значением для ключа depositpaid."""
     data: Dict[str, Any] = {
         "firstname": "Sam",
         "lastname": "Jackson",
@@ -81,11 +64,7 @@ def return_dict_with_depositpaid(param: Any) -> Dict[str, Any]:
 
 
 def return_dict_with_chekin(param: Any) -> Dict[str, Any]:
-    """
-    Функция, возвращающая словарь с параметризованным
-    значением для ключа checkin.
-
-    """
+    """Возвращает словарь с параметризованным значением для ключа checkin."""
     data: Dict[str, Any] = {
         "firstname": "Sam",
         "lastname": "Jackson",
@@ -100,11 +79,7 @@ def return_dict_with_chekin(param: Any) -> Dict[str, Any]:
 
 
 def return_dict_with_chekout(param: Any) -> Dict[str, Any]:
-    """
-    Функция, возвращающая словарь с параметризованным
-    значением для ключа checkout.
-
-    """
+    """Возвращает словарь с параметризованным значением для ключа checkout."""
     data: Dict[str, Any] = {
         "firstname": "Sam",
         "lastname": "Jackson",
@@ -119,11 +94,7 @@ def return_dict_with_chekout(param: Any) -> Dict[str, Any]:
 
 
 def return_dict_with_addneeds(param: Any) -> Dict[str, Any]:
-    """
-    Функция, возвращающая словарь с параметризованным
-    значением для ключа additionalneeds.
-
-    """
+    """Возвращает словарь с параметризованным значением для ключа additionalneeds."""
     data: Dict[str, Any] = {
         "firstname": "Sam",
         "lastname": "Jackson",
@@ -138,11 +109,7 @@ def return_dict_with_addneeds(param: Any) -> Dict[str, Any]:
 
 
 def return_dict() -> Dict[str, Any]:
-    """
-    Функция, возвращающая словарь для использования в запросах
-    без параметризации значений ключей.
-
-    """
+    """Возвращает словарь без параметризации значений ключей."""
     data: Dict[str, Any] = {
         "firstname": "Leena",
         "lastname": "White",

@@ -1,5 +1,4 @@
-""" Модуль с тестами patch запросов - PartialUpdateBooking. """
-
+"""Модуль с тестами patch запросов - PartialUpdateBooking."""
 
 from typing import Dict, Any
 import json
@@ -16,8 +15,7 @@ import helpers
 @pytest.mark.parametrize("book_id, first, last", [("4", "Peter", "Jackson"), ("9", "Emma", "Star")])
 def test_patch_part_fields(booker_api: conftest.ApiClient,
                            book_id: str, first: str, last: str) -> None:
-    """
-    Тестовая функция для проверки вызова patch запроса с передаваемым телом.
+    """Тестовая функция для проверки вызова patch запроса с передаваемым телом.
     Проверяются позитивные варианты через параметризацию -
     обновление значений "firstname", "lastname".
     Обращение напрямую к определенному id в урле.
@@ -26,7 +24,6 @@ def test_patch_part_fields(booker_api: conftest.ApiClient,
     :param first: передаваемый в теле запроса firstname
     :param last: передаваемый в теле запроса lastname
     :param book_id: передаваемый id
-
     """
     with allure.step(f"Получаем все данные по id {book_id}"):
         get_request: requests.models.Response = booker_api.get(path=book_id)
@@ -72,13 +69,11 @@ def test_patch_part_fields(booker_api: conftest.ApiClient,
 @allure.story("Обновление всех параметров сущности")
 @pytest.mark.positive
 def test_patch_all_fields(booker_api: conftest.ApiClient) -> None:
-    """
-    Тестовая функция для проверки вызова patch запроса с передаваемым телом.
+    """Тестовая функция для проверки вызова patch запроса с передаваемым телом.
     Проверяется обновление всех полей сущности.
     Обращение напрямую к определенному id в урле.
 
     :param booker_api: фикстура, создающая и возвращающая экземпляр класса ApiClient
-
     """
     data: Dict[str, Any] = helpers.return_dict()
 
@@ -126,14 +121,12 @@ def test_patch_all_fields(booker_api: conftest.ApiClient) -> None:
 @pytest.mark.parametrize("book_id", ["10", "22"])
 def test_patch_empty_body(booker_api: conftest.ApiClient,
                           book_id: str) -> None:
-    """
-    Тестовая функция для проверки вызова patch запроса с передаваемым телом.
+    """Тестовая функция для проверки вызова patch запроса с передаваемым телом.
     Проверяется передача пустого тела.
     Обращение напрямую к определенному id в урле.
 
     :param booker_api: фикстура, создающая и возвращающая экземпляр класса ApiClient
     :param book_id: передаваемый в урле id
-
     """
     with allure.step(f"Получаем все данные по id {book_id}"):
         get_request: requests.models.Response = booker_api.get(path=book_id)
@@ -180,14 +173,12 @@ def test_patch_empty_body(booker_api: conftest.ApiClient,
 @pytest.mark.parametrize("param", ["213123", "tests"])
 def test_patch_invalid_id(booker_api: conftest.ApiClient,
                           param: str) -> None:
-    """
-    Тестовая функция для проверки вызова patch запроса с передаваемым телом.
+    """Тестовая функция для проверки вызова patch запроса с передаваемым телом.
     Проверяются негативные варианты через параметризацию -
     обращение к несуществующему id в урле.
 
     :param booker_api: фикстура, создающая и возвращающая экземпляр класса ApiClient
     :param param: передеваемый в урле id
-
     """
     data: Dict[str, Any] = helpers.return_dict()
 

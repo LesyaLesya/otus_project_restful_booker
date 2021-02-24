@@ -1,5 +1,4 @@
-""" Модуль с тестами get запросов - GetBookingIds. """
-
+"""Модуль с тестами get запросов - GetBookingIds."""
 
 from typing import Dict
 import pytest
@@ -12,12 +11,10 @@ import conftest
 @allure.story("Получение списка всех сущностей")
 @pytest.mark.positive
 def test_get_all_bookings(booker_api: conftest.ApiClient) -> None:
-    """
-    Тестовая функция для проверки вызова get запроса.
+    """Тестовая функция для проверки вызова get запроса.
     Проверяется получение всех сущностей.
 
     :param booker_api: фикстура, создающая и возвращающая экземпляр класса ApiClient
-
     """
     with allure.step("Отправляем get запрос"):
         response: requests.models.Response = booker_api.get()
@@ -35,14 +32,12 @@ def test_get_all_bookings(booker_api: conftest.ApiClient) -> None:
 @pytest.mark.parametrize("param", ["Sam", "Susan"])
 def test_get_by_firstname_positive(booker_api: conftest.ApiClient,
                                    param: str) -> None:
-    """
-    Тестовая функция для проверки вызова get запроса с передаваемым в урле параметром.
+    """Тестовая функция для проверки вызова get запроса с передаваемым в урле параметром.
     Проверяются позитивные варианты через параметризацию -
     для передачи параметра firstname в урле.
 
     :param booker_api: фикстура, создающая и возвращающая экземпляр класса ApiClient
     :param param: передаваемый в урле параметр firstname
-
     """
     payload: Dict[str, str] = {"firstname": param}
 
@@ -62,15 +57,13 @@ def test_get_by_firstname_positive(booker_api: conftest.ApiClient,
 @pytest.mark.parametrize("param", ["Тест", "13"])
 def test_get_by_firstname_negative(booker_api: conftest.ApiClient,
                                    param: str) -> None:
-    """
-    Тестовая функция для проверки вызова get запроса с передаваемым в урле параметром.
+    """Тестовая функция для проверки вызова get запроса с передаваемым в урле параметром.
     Проверяются негативные варианты через параметризацию -
     для передачи параметра firstname в урле -
     несуществующее имя.
 
     :param booker_api: фикстура, создающая и возвращающая экземпляр класса ApiClient
     :param param: передаваемый в урле параметр firstname
-
     """
     payload: Dict[str, str] = {"firstname": param}
 
@@ -90,14 +83,12 @@ def test_get_by_firstname_negative(booker_api: conftest.ApiClient,
 @pytest.mark.parametrize("param", ["Иванов", "Brown"])
 def test_get_by_lastname_positive(booker_api: conftest.ApiClient,
                                   param: str) -> None:
-    """
-    Тестовая функция для проверки вызова get запроса с передаваемым в урле параметром.
+    """Тестовая функция для проверки вызова get запроса с передаваемым в урле параметром.
     Проверяются позитивные варианты через параметризацию -
     для передачи параметра lastname в урле.
 
     :param booker_api: фикстура, создающая и возвращающая экземпляр класса ApiClient
     :param param: передаваемый в урле параметр lastname
-
     """
     payload: Dict[str, str] = {"lastname": param}
 
@@ -117,14 +108,12 @@ def test_get_by_lastname_positive(booker_api: conftest.ApiClient,
 @pytest.mark.parametrize("param", ["0", "'$$@*:;"])
 def test_get_by_lastname_negative(booker_api: conftest.ApiClient,
                                   param: str) -> None:
-    """
-    Тестовая функция для проверки вызова get запроса с передаваемым в урле параметром.
+    """Тестовая функция для проверки вызова get запроса с передаваемым в урле параметром.
     Проверяются негативные варианты через параметризацию -
     для передачи параметра lastname в урле - несуществующая фамилия.
 
     :param booker_api: фикстура, создающая и возвращающая экземпляр класса ApiClient
     :param param: передаваемый в урле параметр lastname
-
     """
     payload: Dict[str, str] = {"lastname": param}
 
@@ -144,15 +133,13 @@ def test_get_by_lastname_negative(booker_api: conftest.ApiClient,
 @pytest.mark.parametrize("first, last", [("Sam", "Иванов"), ("Susan", "Brown")])
 def test_get_by_fullname_positive(booker_api: conftest.ApiClient,
                                   first: str, last: str) -> None:
-    """
-    Тестовая функция для проверки вызова get запроса с передаваемым в урле 2 параметрами.
+    """Тестовая функция для проверки вызова get запроса с передаваемым в урле 2 параметрами.
     Проверяются позитивные варианты через параметризацию -
     для передачи параметров firstname и lastname в урле.
 
     :param booker_api: фикстура, создающая и возвращающая экземпляр класса ApiClient
     :param first: передаваемый в урле параметр firstname
     :param last: передаваемый в урле параметр lastname
-
     """
     payload: Dict[str, str] = {"firstname": first, "lastname": last}
 
@@ -172,8 +159,7 @@ def test_get_by_fullname_positive(booker_api: conftest.ApiClient,
 @pytest.mark.parametrize("first, last", [("Eric", "0"), ("Test", "Jones")])
 def test_get_by_fullname_negative(booker_api: conftest.ApiClient,
                                   first: str, last: str) -> None:
-    """
-    Тестовая функция для проверки вызова get запроса с передаваемым в урле 2 параметрами.
+    """Тестовая функция для проверки вызова get запроса с передаваемым в урле 2 параметрами.
     Проверяются негативные варианты через параметризацию -
     для передачи параметров firstname и lastname в урле -
     несуществующие сочетания имени и фамилиии.
@@ -181,7 +167,6 @@ def test_get_by_fullname_negative(booker_api: conftest.ApiClient,
     :param booker_api: фикстура, создающая и возвращающая экземпляр класса ApiClient
     :param first: передаваемый в урле параметр firstname
     :param last: передаваемый в урле параметр lastname
-
     """
     payload: Dict[str, str] = {"firstname": first, "lastname": last}
 

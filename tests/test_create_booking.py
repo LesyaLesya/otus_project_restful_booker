@@ -1,5 +1,4 @@
-""" Модуль с тестами post запросов - CreateBooking. """
-
+"""Модуль с тестами post запросов - CreateBooking."""
 
 from typing import Union, Dict, Any
 import json
@@ -16,13 +15,11 @@ import helpers
 @pytest.mark.parametrize("param", ["Susan", "Maria-Elena", "Имя Имя", ""])
 def test_post_firstname_positive(booker_api: conftest.ApiClient,
                                  param: str) -> None:
-    """
-    Тестовая функция для проверки вызова post запроса.
+    """Тестовая функция для проверки вызова post запроса.
     Проверяются позитивные варианты для "firstname" через параметризацию.
 
     :param booker_api: фикстура, создающая и возвращающая экземпляр класса ApiClient
     :param param: передаваемые в теле запроса варианты для "firstname"
-
     """
 
     data: Dict[str, Any] = helpers.return_dict_with_firstname(param)
@@ -44,14 +41,12 @@ def test_post_firstname_positive(booker_api: conftest.ApiClient,
 @pytest.mark.parametrize("param", [123, True])
 def test_post_firstname_negative(booker_api: conftest.ApiClient,
                                  param: Union[int, bool]) -> None:
-    """
-    Тестовая функция для проверки вызова post запроса.
+    """Тестовая функция для проверки вызова post запроса.
     Проверяются негативные варианты для "firstname" через параметризацию -
     число, булево значение.
 
     :param booker_api: фикстура, создающая и возвращающая экземпляр класса ApiClient
     :param param: передаваемые в теле запроса варианты для "firstname"
-
     """
     data: Dict[str, Any] = helpers.return_dict_with_firstname(param)
 
@@ -68,13 +63,11 @@ def test_post_firstname_negative(booker_api: conftest.ApiClient,
 @pytest.mark.parametrize("param", ["Иванов", "Brown", "W", "Last-name", ""])
 def test_post_lastname(booker_api: conftest.ApiClient,
                        param: str) -> None:
-    """
-    Тестовая функция для проверки вызова post запроса.
+    """Тестовая функция для проверки вызова post запроса.
     Проверяются позитивные варианты для "lastname" через параметризацию.
 
     :param booker_api: фикстура, создающая и возвращающая экземпляр класса ApiClient
     :param param: передаваемые в теле запроса варианты для "lastname"
-
     """
     data: Dict[str, Any] = helpers.return_dict_with_lastname(param)
 
@@ -95,13 +88,11 @@ def test_post_lastname(booker_api: conftest.ApiClient,
 @pytest.mark.parametrize("param", [123, 1, 566778])
 def test_post_totalprice(booker_api: conftest.ApiClient,
                          param: int) -> None:
-    """
-    Тестовая функция для проверки вызова post запроса.
+    """Тестовая функция для проверки вызова post запроса.
     Проверяются позитивные варианты для "totalprice" через параметризацию.
 
     :param booker_api: фикстура, создающая и возвращающая экземпляр класса ApiClient
     :param param: передаваемые в теле запроса варианты для "totalprice"
-
     """
     data: Dict[str, Any] = helpers.return_dict_with_totalprice(param)
 
@@ -122,13 +113,11 @@ def test_post_totalprice(booker_api: conftest.ApiClient,
 @pytest.mark.parametrize("param", [True, False])
 def test_post_depositpaid(booker_api: conftest.ApiClient,
                           param: bool) -> None:
-    """
-    Тестовая функция для проверки вызова post запроса.
+    """Тестовая функция для проверки вызова post запроса.
     Проверяются позитивные варианты для "depositpaid" через параметризацию.
 
     :param booker_api: фикстура, создающая и возвращающая экземпляр класса ApiClient
     :param param: передаваемые в теле запроса варианты для "depositpaid"
-
     """
     data: Dict[str, Any] = helpers.return_dict_with_depositpaid(param)
 
@@ -149,13 +138,11 @@ def test_post_depositpaid(booker_api: conftest.ApiClient,
 @pytest.mark.parametrize("param", ["1900-11-11", "2021-02-11", "2030-06-01"])
 def test_post_checkin_positive(booker_api: conftest.ApiClient,
                                param: str) -> None:
-    """
-    Тестовая функция для проверки вызова post запроса.
+    """Тестовая функция для проверки вызова post запроса.
     Проверяются позитивные варианты для "checkin" через параметризацию.
 
     :param booker_api: фикстура, создающая и возвращающая экземпляр класса ApiClient
     :param param: передаваемые в теле запроса варианты для "checkin"
-
     """
     data: Dict[str, Any] = helpers.return_dict_with_chekin(param)
 
@@ -176,14 +163,12 @@ def test_post_checkin_positive(booker_api: conftest.ApiClient,
 @pytest.mark.parametrize("param", ["00-00-00", "tests", " "])
 def test_post_checkin_negative(booker_api: conftest.ApiClient,
                                param: str) -> None:
-    """
-    Тестовая функция для проверки вызова post запроса.
+    """Тестовая функция для проверки вызова post запроса.
     Проверяются негативные варианты для "checkin" через параметризацию -
     неправильный формат даты / не дата.
 
     :param booker_api: фикстура, создающая и возвращающая экземпляр класса ApiClient
     :param param: передаваемые в теле запроса варианты для "checkin"
-
     """
     data: Dict[str, Any] = helpers.return_dict_with_chekin(param)
 
@@ -203,13 +188,11 @@ def test_post_checkin_negative(booker_api: conftest.ApiClient,
 @pytest.mark.parametrize("param", ["1871-01-01", "2021-02-11", "2041-12-31"])
 def test_post_checkout(booker_api: conftest.ApiClient,
                        param: str) -> None:
-    """
-    Тестовая функция для проверки вызова post запроса.
+    """Тестовая функция для проверки вызова post запроса.
     Проверяются позитивные варианты для "checkout" через параметризацию.
 
     :param booker_api: фикстура, создающая и возвращающая экземпляр класса ApiClient
     :param param: передаваемые в теле запроса варианты для "checkout"
-
     """
     data: Dict[str, Any] = helpers.return_dict_with_chekout(param)
 
@@ -230,13 +213,11 @@ def test_post_checkout(booker_api: conftest.ApiClient,
 @pytest.mark.parametrize("param", ["что-то", "dinner, breakfast", ""])
 def test_post_additionalneeds(booker_api: conftest.ApiClient,
                               param: str) -> None:
-    """
-    Тестовая функция для проверки вызова post запроса.
+    """Тестовая функция для проверки вызова post запроса.
     Проверяются позитивные варианты для "additionalneeds" через параметризацию.
 
     :param booker_api: фикстура, создающая и возвращающая экземпляр класса ApiClient
     :param param: передаваемые в теле запроса варианты для "additionalneeds"
-
     """
     data: Dict[str, Any] = helpers.return_dict_with_addneeds(param)
 
@@ -255,12 +236,10 @@ def test_post_additionalneeds(booker_api: conftest.ApiClient,
 @allure.story("Создание сущности с пустым телом запроса")
 @pytest.mark.negative
 def test_post_empty_body(booker_api: conftest.ApiClient) -> None:
-    """
-    Тестовая функция для проверки вызова post запроса.
+    """Тестовая функция для проверки вызова post запроса.
     Проверяется передача пустого тела запроса.
 
     :param booker_api: фикстура, создающая и возвращающая экземпляр класса ApiClient
-
     """
 
     with allure.step("Отправляем post запрос с пустым телом запроса"):

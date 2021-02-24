@@ -1,5 +1,4 @@
-""" Модуль с тестами get запросов - GetBooking. """
-
+"""Модуль с тестами get запросов - GetBooking."""
 
 import pytest
 import requests
@@ -13,13 +12,11 @@ import conftest
 @pytest.mark.parametrize("param", ["2", "9", "10"])
 def test_get_by_id_positive(booker_api: conftest.ApiClient,
                             param: str) -> None:
-    """
-    Тестовая функция для проверки вызова get запроса.
+    """Тестовая функция для проверки вызова get запроса.
     Проверяются позитивные варианты для id через параметризацию.
 
     :param booker_api: фикстура, создающая и возвращающая экземпляр класса ApiClient
     :param param: передаваемые в урле id сущностей
-
     """
     with allure.step(f"Отправляем get запрос с id {param}"):
         response: requests.models.Response = booker_api.get(path=param)
@@ -37,14 +34,12 @@ def test_get_by_id_positive(booker_api: conftest.ApiClient,
 @pytest.mark.parametrize("param", ["10000", "hello", "0"])
 def test_get_by_id_negative(booker_api: conftest.ApiClient,
                             param: str) -> None:
-    """
-    Тестовая функция для проверки вызова get запроса.
+    """Тестовая функция для проверки вызова get запроса.
     Проверяются негативные варианты для id через параметризацию -
     несуществующий id.
 
     :param booker_api: фикстура, создающая и возвращающая экземпляр класса ApiClient
     :param param: передаваемые в урле id сущностей
-
     """
     with allure.step(f"Отправляем get запрос с id {param}"):
         response: requests.models.Response = booker_api.get(path=param)

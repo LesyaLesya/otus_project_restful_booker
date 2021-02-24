@@ -1,5 +1,4 @@
-""" Модуль с тестами delete запросов - DeleteBooking. """
-
+"""Модуль с тестами delete запросов - DeleteBooking."""
 
 import pytest
 import requests
@@ -13,14 +12,12 @@ import conftest
 @pytest.mark.parametrize("param", [-1, -2])
 def test_delete_by_id_positive(booker_api: conftest.ApiClient,
                                param: int) -> None:
-    """
-    Тестовая функция для проверки вызова delete запроса.
+    """Тестовая функция для проверки вызова delete запроса.
     Проверяются позитивные варианты через параметризацию - существующие id.
 
     :param booker_api: фикстура, создающая и возвращающая экземпляр класса ApiClient
     :param param: передаваемый в урле id - индекс сущности,
     полученный вызовом get запроса на получение всех сущностей
-
     """
     with allure.step("Получаем список всех сущностей"):
         get_all_ids: requests.models.Response = booker_api.get()
@@ -42,14 +39,12 @@ def test_delete_by_id_positive(booker_api: conftest.ApiClient,
 @pytest.mark.parametrize("param", ["abc", "123112"])
 def test_delete_by_id_negative(booker_api: conftest.ApiClient,
                                param: str) -> None:
-    """
-    Тестовая функция для проверки вызова delete запроса.
+    """Тестовая функция для проверки вызова delete запроса.
     Проверяются негативные варианты через параметризацию
     - несуществующие id.
 
     :param booker_api: фикстура, создающая и возвращающая экземпляр класса ApiClient
     :param param: передаваемый в урле id
-
     """
     with allure.step(f"Отправляем delete запрос с id {param}"):
         response: requests.models.Response = booker_api.delete(path=param)
