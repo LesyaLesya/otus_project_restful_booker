@@ -120,7 +120,7 @@ def test_patch_all_fields(booker_api: conftest.ApiClient,
 @allure.feature("PATCH - PartialUpdateBooking")
 @allure.story("Обновление сущности передачей пустого тела")
 @pytest.mark.positive
-@pytest.mark.parametrize("book_id", ["9", "23"])
+@pytest.mark.parametrize("book_id", ["9", "20"])
 def test_patch_empty_body(booker_api: conftest.ApiClient,
                           book_id: str,
                           fixture_check_200_status_code: str) -> None:

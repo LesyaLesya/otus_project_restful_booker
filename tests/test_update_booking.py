@@ -24,7 +24,7 @@ def test_put_all_fields(booker_api: conftest.ApiClient,
 
     with allure.step(f"Отправляем put запрос с телом - {data}"):
         response: requests.models.Response =\
-            booker_api.put(path="30", data=json.dumps(data))
+            booker_api.put(path="16", data=json.dumps(data))
 
     with allure.step(fixture_check_200_status_code):
         assert response.status_code == 200, f"Код ответа - {response.status_code}"
@@ -76,7 +76,7 @@ def test_put_not_all_fields(booker_api: conftest.ApiClient,
     """
     with allure.step(f"Отправляем put запрос с телом - {data}"):
         response: requests.models.Response =\
-            booker_api.put(path="1", data=json.dumps(data))
+            booker_api.put(path="19", data=json.dumps(data))
 
     with allure.step("Проверяем, что код ответа 400"):
         assert response.status_code == 400, f"Код ответа - {response.status_code}"

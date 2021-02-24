@@ -9,7 +9,7 @@ import conftest
 @allure.feature("GET - GetBooking")
 @allure.story("Получение существующей сущности по id")
 @pytest.mark.positive
-@pytest.mark.parametrize("param", ["2", "9", "1"])
+@pytest.mark.parametrize("param", ["2", "9", "21"])
 def test_get_by_id_positive(booker_api: conftest.ApiClient,
                             param: str,
                             fixture_check_200_status_code: str) -> None:
