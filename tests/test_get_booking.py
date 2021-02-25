@@ -10,7 +10,7 @@ from helpers import body_id_data, allure_steps  # type: ignore
 @allure.feature("GET - GetBooking")
 @allure.story("Получение существующей сущности по id")
 @pytest.mark.positive
-@pytest.mark.parametrize("param", [1, 2, -5])
+@pytest.mark.parametrize("param", [1, 2, 0])
 def test_get_by_id_positive(booker_api: conftest.ApiClient,
                             param: int) -> None:
     """Тестовая функция для проверки вызова get запроса.

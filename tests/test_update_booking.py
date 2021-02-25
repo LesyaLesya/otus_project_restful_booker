@@ -77,7 +77,7 @@ def test_put_not_all_fields(booker_api: conftest.ApiClient,
     :param data: передаваемое тело запроса
     """
     with allure.step(allure_steps.get_id()):
-        id_to_do_request: str = body_id_data.get_id_of_entity(booker_api, -5)
+        id_to_do_request: str = body_id_data.get_id_of_entity(booker_api, 0)
 
     with allure.step(allure_steps.send_put_request(data, id_to_do_request)):
         response: requests.models.Response =\
