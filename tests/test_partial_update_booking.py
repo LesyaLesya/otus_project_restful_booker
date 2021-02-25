@@ -12,7 +12,7 @@ from helpers import body_id_data, allure_steps  # type: ignore
 @allure.feature("PATCH - PartialUpdateBooking")
 @allure.story("Обновление части параметров сущности")
 @pytest.mark.positive
-@pytest.mark.parametrize("param, first, last", [(0, "Peter", "Jackson"), (-2, "Emma", "Star")])
+@pytest.mark.parametrize("param, first, last", [(0, "Peter", "Jackson"), (1, "Emma", "Star")])
 def test_patch_part_fields(booker_api: conftest.ApiClient,
                            param: int, first: str, last: str) -> None:
     """Тестовая функция для проверки вызова patch запроса с передаваемым телом.
