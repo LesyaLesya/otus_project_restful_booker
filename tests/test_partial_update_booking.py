@@ -32,7 +32,7 @@ def test_patch_part_fields(booker_api: conftest.ApiClient,
         get_request: requests.models.Response = booker_api.get(path=id_to_do_request)
         data_for_id: Dict[str, Any] = get_request.json()
 
-    data: Dict[str, str] = {"firstname": first, "lastname": last}
+    data: Dict[str, str] = {"firstname": "Peter", "lastname": last}
 
     with allure.step(allure_steps.send_patch_request(data, id_to_do_request)):
         response: requests.models.Response =\
