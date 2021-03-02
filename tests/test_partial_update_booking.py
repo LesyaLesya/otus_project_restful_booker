@@ -24,8 +24,7 @@ def test_patch_part_fields(booker_api: conftest.ApiClient,
     :param first: передаваемый в теле запроса firstname
     :param last: передаваемый в теле запроса lastname
     """
-    with allure.step(allure_steps.create_test_entity()):
-        id_to_do_request: str = body_id_data.create_test_entity(booker_api)
+    id_to_do_request: str = body_id_data.create_test_entity(booker_api)
 
     with allure.step("Получаем все данные сущности"):
         data_for_id: Dict[str, Any] = body_id_data.TestDictForRequests().return_dict_other()
@@ -76,8 +75,7 @@ def test_patch_all_fields(booker_api: conftest.ApiClient) -> None:
 
     :param booker_api: фикстура, создающая и возвращающая экземпляр класса ApiClient
     """
-    with allure.step(allure_steps.create_test_entity()):
-        id_to_do_request: str = body_id_data.create_test_entity(booker_api)
+    id_to_do_request: str = body_id_data.create_test_entity(booker_api)
 
     data: Dict[str, Any] = body_id_data.TestDictForRequests().return_dict()
 
@@ -129,8 +127,7 @@ def test_patch_empty_body(booker_api: conftest.ApiClient) -> None:
 
     :param booker_api: фикстура, создающая и возвращающая экземпляр класса ApiClient
     """
-    with allure.step(allure_steps.create_test_entity()):
-        id_to_do_request: str = body_id_data.create_test_entity(booker_api)
+    id_to_do_request: str = body_id_data.create_test_entity(booker_api)
 
     with allure.step("Получаем все данные сущности"):
         data_for_id: Dict[str, Any] = body_id_data.TestDictForRequests().return_dict_other()

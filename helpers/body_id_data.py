@@ -3,6 +3,7 @@
 from typing import Dict, Any
 import json
 import requests
+import allure
 
 
 class TestDictForRequests:
@@ -76,6 +77,7 @@ class TestDictForRequests:
         return self.data
 
 
+@allure.step("Создаем тестовую сущность и получаем ее id")
 def create_test_entity(booker_api) -> str:
     """Создает тестовую сущность и возвращает ее id."""
     data: Dict[str, Any] = TestDictForRequests().return_dict_other()

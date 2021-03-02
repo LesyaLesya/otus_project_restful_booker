@@ -16,8 +16,7 @@ def test_delete_by_id_positive(booker_api: conftest.ApiClient) -> None:
 
     :param booker_api: фикстура, создающая и возвращающая экземпляр класса ApiClient
     """
-    with allure.step(allure_steps.create_test_entity()):
-        id_to_do_request: str = body_id_data.create_test_entity(booker_api)
+    id_to_do_request: str = body_id_data.create_test_entity(booker_api)
 
     with allure.step(allure_steps.send_delete_request(id_to_do_request)):
         response: requests.models.Response = \

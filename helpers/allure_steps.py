@@ -33,11 +33,6 @@ def check_400_status_code() -> str:
     return "Проверяем, что код ответа 400"
 
 
-def create_test_entity() -> str:
-    """Возвращает строку о создании тестовой сущности."""
-    return "Создаем тестовую сущность и получаем ее id"
-
-
 def send_delete_request(param: Union[int, str]) -> str:
     """Возвращает строку об отправке delete запроса к id"""
     return f"Отправляем delete запрос с id {param}"

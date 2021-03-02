@@ -16,8 +16,7 @@ def test_get_by_id_positive(booker_api: conftest.ApiClient) -> None:
 
     :param booker_api: фикстура, создающая и возвращающая экземпляр класса ApiClient
     """
-    with allure.step(allure_steps.create_test_entity()):
-        id_to_do_request: str = body_id_data.create_test_entity(booker_api)
+    id_to_do_request: str = body_id_data.create_test_entity(booker_api)
 
     with allure.step(allure_steps.send_get_request(id_to_do_request)):
         response: requests.models.Response = booker_api.get(path=id_to_do_request)
