@@ -21,8 +21,8 @@ def test_put_all_fields(booker_api: conftest.ApiClient) -> None:
     """
     data: Dict[str, Any] = body_id_data.TestDictForRequests().return_dict()
 
-    with allure.step(allure_steps.get_id()):
-        id_to_do_request: str = body_id_data.get_id_of_entity(booker_api, -1)
+    with allure.step(allure_steps.create_test_entity()):
+        id_to_do_request: str = body_id_data.create_test_entity(booker_api)
 
     with allure.step(allure_steps.send_put_request(data, id_to_do_request)):
         response: requests.models.Response =\
@@ -76,8 +76,8 @@ def test_put_not_all_fields(booker_api: conftest.ApiClient,
     :param booker_api: фикстура, создающая и возвращающая экземпляр класса ApiClient
     :param data: передаваемое тело запроса
     """
-    with allure.step(allure_steps.get_id()):
-        id_to_do_request: str = body_id_data.get_id_of_entity(booker_api, 0)
+    with allure.step(allure_steps.create_test_entity()):
+        id_to_do_request: str = body_id_data.create_test_entity(booker_api)
 
     with allure.step(allure_steps.send_put_request(data, id_to_do_request)):
         response: requests.models.Response =\

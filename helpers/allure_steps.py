@@ -33,14 +33,9 @@ def check_400_status_code() -> str:
     return "Проверяем, что код ответа 400"
 
 
-def get_id() -> str:
-    """Возвращает строку о получении id сущностей."""
-    return "Получаем id определенной сущности из списка"
-
-
-def get_id_with_param(param: int) -> str:
-    """Возвращает строку о получении id сущностей по индексу."""
-    return f"Получаем id определенной сущности из списка по индексу {param}"
+def create_test_entity() -> str:
+    """Возвращает строку о создании тестовой сущности."""
+    return "Создаем тестовую сущность и получаем ее id"
 
 
 def send_delete_request(param: Union[int, str]) -> str:

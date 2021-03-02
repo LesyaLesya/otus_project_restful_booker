@@ -12,9 +12,9 @@ from helpers import body_id_data, allure_steps  # type: ignore
 @allure.feature("PATCH - PartialUpdateBooking")
 @allure.story("Обновление части параметров сущности")
 @pytest.mark.positive
-@pytest.mark.parametrize("param, first, last", [(0, "Peter", "Jackson"), (1, "Emma", "Star")])
+@pytest.mark.parametrize("first, last", [("Peter", "Jackson"), ("Emma", "Star")])
 def test_patch_part_fields(booker_api: conftest.ApiClient,
-                           param: int, first: str, last: str) -> None:
+                           first: str, last: str) -> None:
     """Тестовая функция для проверки вызова patch запроса с передаваемым телом.
     Проверяются позитивные варианты через параметризацию -
     обновление значений "firstname", "lastname".
@@ -23,14 +23,12 @@ def test_patch_part_fields(booker_api: conftest.ApiClient,
     :param booker_api: фикстура, создающая и возвращающая экземпляр класса ApiClient
     :param first: передаваемый в теле запроса firstname
     :param last: передаваемый в теле запроса lastname
-    :param param: передаваемые индексы сущностей для определения их id
     """
-    with allure.step(allure_steps.get_id_with_param(param)):
-        id_to_do_request: str = body_id_data.get_id_of_entity(booker_api, param)
+    with allure.step(allure_steps.create_test_entity()):
+        id_to_do_request: str = body_id_data.create_test_entity(booker_api)
 
-    with allure.step(f"Получаем все данные по id {id_to_do_request}"):
-        get_request: requests.models.Response = booker_api.get(path=id_to_do_request)
-        data_for_id: Dict[str, Any] = get_request.json()
+    with allure.step("Получаем все данные сущности"):
+        data_for_id: Dict[str, Any] = body_id_data.TestDictForRequests().return_dict_other()
 
     data: Dict[str, str] = {"firstname": first, "lastname": last}
 
@@ -78,10 +76,10 @@ def test_patch_all_fields(booker_api: conftest.ApiClient) -> None:
 
     :param booker_api: фикстура, создающая и возвращающая экземпляр класса ApiClient
     """
-    data: Dict[str, Any] = body_id_data.TestDictForRequests().return_dict()
+    with allure.step(allure_steps.create_test_entity()):
+        id_to_do_request: str = body_id_data.create_test_entity(booker_api)
 
-    with allure.step(allure_steps.get_id()):
-        id_to_do_request: str = body_id_data.get_id_of_entity(booker_api, -1)
+    data: Dict[str, Any] = body_id_data.TestDictForRequests().return_dict()
 
     with allure.step(allure_steps.send_patch_request(data, id_to_do_request)):
         response: requests.models.Response = \
@@ -124,22 +122,18 @@ def test_patch_all_fields(booker_api: conftest.ApiClient) -> None:
 @allure.feature("PATCH - PartialUpdateBooking")
 @allure.story("Обновление сущности передачей пустого тела")
 @pytest.mark.positive
-@pytest.mark.parametrize("param", [-1, 1])
-def test_patch_empty_body(booker_api: conftest.ApiClient,
-                          param: int) -> None:
+def test_patch_empty_body(booker_api: conftest.ApiClient) -> None:
     """Тестовая функция для проверки вызова patch запроса с передаваемым телом.
     Проверяется передача пустого тела.
     Обращение напрямую к определенному id в урле.
 
     :param booker_api: фикстура, создающая и возвращающая экземпляр класса ApiClient
-    :param param: передаваемые индексы сущностей для определения их id
     """
-    with allure.step(allure_steps.get_id_with_param(param)):
-        id_to_do_request: str = body_id_data.get_id_of_entity(booker_api, param)
+    with allure.step(allure_steps.create_test_entity()):
+        id_to_do_request: str = body_id_data.create_test_entity(booker_api)
 
-    with allure.step(f"Получаем все данные по id {id_to_do_request}"):
-        get_request: requests.models.Response = booker_api.get(path=id_to_do_request)
-        data_for_id: Dict[str, Any] = get_request.json()
+    with allure.step("Получаем все данные сущности"):
+        data_for_id: Dict[str, Any] = body_id_data.TestDictForRequests().return_dict_other()
 
     with allure.step(f"Отправляем patch запрос с пустым телом и id {id_to_do_request}"):
         response: requests.models.Response = booker_api.patch(path=id_to_do_request, data={})

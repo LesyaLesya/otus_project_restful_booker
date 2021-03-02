@@ -10,17 +10,14 @@ from helpers import body_id_data, allure_steps  # type: ignore
 @allure.feature("GET - GetBooking")
 @allure.story("Получение существующей сущности по id")
 @pytest.mark.positive
-@pytest.mark.parametrize("param", [1, 2, 3])
-def test_get_by_id_positive(booker_api: conftest.ApiClient,
-                            param: int) -> None:
+def test_get_by_id_positive(booker_api: conftest.ApiClient) -> None:
     """Тестовая функция для проверки вызова get запроса.
     Проверяются позитивные варианты для id через параметризацию.
 
     :param booker_api: фикстура, создающая и возвращающая экземпляр класса ApiClient
-    :param param: передаваемые индексы сущностей для определения их id
     """
-    with allure.step(allure_steps.get_id_with_param(param)):
-        id_to_do_request: str = body_id_data.get_id_of_entity(booker_api, param)
+    with allure.step(allure_steps.create_test_entity()):
+        id_to_do_request: str = body_id_data.create_test_entity(booker_api)
 
     with allure.step(allure_steps.send_get_request(id_to_do_request)):
         response: requests.models.Response = booker_api.get(path=id_to_do_request)

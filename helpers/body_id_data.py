@@ -1,6 +1,7 @@
 """Модуль с вспомогательными функциями для id и тела запросов."""
 
 from typing import Dict, Any
+import json
 import requests
 
 
@@ -60,9 +61,24 @@ class TestDictForRequests:
         """Возвращает словарь без параметризации значений ключей."""
         return self.data
 
+    def return_dict_other(self) -> Dict[str, Any]:
+        """Возвращает словарь без параметризации значений ключей."""
+        self.data: Dict[str, Any] = {
+            "firstname": "Anna",
+            "lastname": "Chapman",
+            "totalprice": 100,
+            "depositpaid": False,
+            "bookingdates": {
+                "checkin": "2014-03-01",
+                "checkout": "2015-04-01"
+            },
+            "additionalneeds": "no"}
+        return self.data
 
-def get_id_of_entity(booker_api, idx: int) -> str:
-    """Возвращает id сущности по переданному в параметрах индексу."""
-    get_all_ids: requests.models.Response = booker_api.get()
-    id_to_do_request: str = get_all_ids.json()[idx]['bookingid']
+
+def create_test_entity(booker_api) -> str:
+    """Создает тестовую сущность и возвращает ее id."""
+    data: Dict[str, Any] = TestDictForRequests().return_dict_other()
+    ent: requests.models.Response = booker_api.post(data=json.dumps(data))
+    id_to_do_request: str = ent.json()['bookingid']
     return id_to_do_request
