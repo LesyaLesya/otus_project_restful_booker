@@ -30,7 +30,7 @@ def test_get_all_bookings(booker_api: conftest.ApiClient) -> None:
 @allure.feature("GET - GetBookingIds")
 @allure.story("Получение списка сущностей по существующему 'firstname'")
 @pytest.mark.positive
-@pytest.mark.parametrize("param", ["Sam", "Susan"])
+@pytest.mark.parametrize("param", ["Peter", "Susan"])
 def test_get_by_firstname_positive(booker_api: conftest.ApiClient,
                                    param: str) -> None:
     """Тестовая функция для проверки вызова get запроса с передаваемым в урле параметром.
@@ -131,7 +131,7 @@ def test_get_by_lastname_negative(booker_api: conftest.ApiClient,
 @allure.feature("GET - GetBookingIds")
 @allure.story("Получение списка сущностей по существующим 'firstname' и 'lastname'")
 @pytest.mark.positive
-@pytest.mark.parametrize("first, last", [("Sam", "Jackson"), ("Susan", "Brown")])
+@pytest.mark.parametrize("first, last", [("Peter", "Brown"), ("Susan", "Brown")])
 def test_get_by_fullname_positive(booker_api: conftest.ApiClient,
                                   first: str, last: str) -> None:
     """Тестовая функция для проверки вызова get запроса с передаваемым в урле 2 параметрами.

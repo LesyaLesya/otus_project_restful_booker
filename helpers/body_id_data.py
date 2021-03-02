@@ -4,124 +4,61 @@ from typing import Dict, Any
 import requests
 
 
-def return_dict_with_firstname(param: Any) -> Dict[str, Any]:
-    """Возвращает словарь с параметризованным значением для ключа firstname."""
-    data: Dict[str, Any] = {
-        "firstname": param,
-        "lastname": "Brown",
-        "totalprice": 1,
-        "depositpaid": True,
-        "bookingdates": {
-            "checkin": "2018-01-01",
-            "checkout": "2019-01-01"
-        },
-        "additionalneeds": "Breakfast"}
-    return data
+class TestDictForRequests:
+    """Класс с методами, возвращающими словари с параметризованными значениями полей"""
+    def __init__(self) -> None:
+        """Конструктор класса. При инициализации создается словарь, у которого
+        меняются значения полей в методах класса
+        """
+        self.data: Dict[str, Any] = {
+            "firstname": "Susan",
+            "lastname": "Brown",
+            "totalprice": 1,
+            "depositpaid": True,
+            "bookingdates": {
+                "checkin": "2018-01-01",
+                "checkout": "2019-01-01"
+            },
+            "additionalneeds": "Breakfast"}
 
+    def return_dict_with_firstname(self, param: Any) -> Dict[str, Any]:
+        """Возвращает словарь с параметризованным значением для ключа firstname."""
+        self.data["firstname"] = param
+        return self.data
 
-def return_dict_with_lastname(param: Any) -> Dict[str, Any]:
-    """Возвращает словарь с параметризованным значением для ключа lastname."""
-    data: Dict[str, Any] = {
-        "firstname": "Sam",
-        "lastname": param,
-        "totalprice": 111,
-        "depositpaid": False,
-        "bookingdates": {
-            "checkin": "2000-03-11",
-            "checkout": "2019-02-02"
-        },
-        "additionalneeds": "Breakfast"}
-    return data
+    def return_dict_with_lastname(self, param: Any) -> Dict[str, Any]:
+        """Возвращает словарь с параметризованным значением для ключа lastname."""
+        self.data["lastname"] = param
+        return self.data
 
+    def return_dict_with_totalprice(self, param: Any) -> Dict[str, Any]:
+        """Возвращает словарь с параметризованным значением для ключа totalprice."""
+        self.data["totalprice"] = param
+        return self.data
 
-def return_dict_with_totalprice(param: Any) -> Dict[str, Any]:
-    """Возвращает словарь с параметризованным значением для ключа totalprice."""
-    data: Dict[str, Any] = {
-        "firstname": "Sam",
-        "lastname": "Jackson",
-        "totalprice": param,
-        "depositpaid": True,
-        "bookingdates": {
-            "checkin": "2015-12-30",
-            "checkout": "2015-12-31"
-        },
-        "additionalneeds": "Breakfast"}
-    return data
+    def return_dict_with_depositpaid(self, param: Any) -> Dict[str, Any]:
+        """Возвращает словарь с параметризованным значением для ключа depositpaid."""
+        self.data["depositpaid"] = param
+        return self.data
 
+    def return_dict_with_chekin(self, param: Any) -> Dict[str, Any]:
+        """Возвращает словарь с параметризованным значением для ключа checkin."""
+        self.data["bookingdates"]["checkin"] = param
+        return self.data
 
-def return_dict_with_depositpaid(param: Any) -> Dict[str, Any]:
-    """Возвращает словарь с параметризованным значением для ключа depositpaid."""
-    data: Dict[str, Any] = {
-        "firstname": "Sam",
-        "lastname": "Jackson",
-        "totalprice": 4000,
-        "depositpaid": param,
-        "bookingdates": {
-            "checkin": "2011-01-01",
-            "checkout": "2012-01-01"
-        },
-        "additionalneeds": "Breakfast"}
-    return data
+    def return_dict_with_chekout(self, param: Any) -> Dict[str, Any]:
+        """Возвращает словарь с параметризованным значением для ключа checkout."""
+        self.data["bookingdates"]["checkout"] = param
+        return self.data
 
+    def return_dict_with_addneeds(self, param: Any) -> Dict[str, Any]:
+        """Возвращает словарь с параметризованным значением для ключа additionalneeds."""
+        self.data["additionalneeds"] = param
+        return self.data
 
-def return_dict_with_chekin(param: Any) -> Dict[str, Any]:
-    """Возвращает словарь с параметризованным значением для ключа checkin."""
-    data: Dict[str, Any] = {
-        "firstname": "Sam",
-        "lastname": "Jackson",
-        "totalprice": 5,
-        "depositpaid": False,
-        "bookingdates": {
-            "checkin": param,
-            "checkout": "2019-01-01"
-        },
-        "additionalneeds": "Breakfast"}
-    return data
-
-
-def return_dict_with_chekout(param: Any) -> Dict[str, Any]:
-    """Возвращает словарь с параметризованным значением для ключа checkout."""
-    data: Dict[str, Any] = {
-        "firstname": "Sam",
-        "lastname": "Jackson",
-        "totalprice": 123,
-        "depositpaid": True,
-        "bookingdates": {
-            "checkin": "2019-01-01",
-            "checkout": param
-        },
-        "additionalneeds": "Breakfast"}
-    return data
-
-
-def return_dict_with_addneeds(param: Any) -> Dict[str, Any]:
-    """Возвращает словарь с параметризованным значением для ключа additionalneeds."""
-    data: Dict[str, Any] = {
-        "firstname": "Sam",
-        "lastname": "Jackson",
-        "totalprice": 123,
-        "depositpaid": False,
-        "bookingdates": {
-            "checkin": "2018-01-01",
-            "checkout": "2019-01-01"
-        },
-        "additionalneeds": param}
-    return data
-
-
-def return_dict() -> Dict[str, Any]:
-    """Возвращает словарь без параметризации значений ключей."""
-    data: Dict[str, Any] = {
-        "firstname": "Leena",
-        "lastname": "White",
-        "totalprice": 1000,
-        "depositpaid": False,
-        "bookingdates": {
-            "checkin": "2021-01-01",
-            "checkout": "2023-12-01"
-        },
-        "additionalneeds": "Nothing"}
-    return data
+    def return_dict(self) -> Dict[str, Any]:
+        """Возвращает словарь без параметризации значений ключей."""
+        return self.data
 
 
 def get_id_of_entity(booker_api, idx: int) -> str:

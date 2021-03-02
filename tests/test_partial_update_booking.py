@@ -78,7 +78,7 @@ def test_patch_all_fields(booker_api: conftest.ApiClient) -> None:
 
     :param booker_api: фикстура, создающая и возвращающая экземпляр класса ApiClient
     """
-    data: Dict[str, Any] = body_id_data.return_dict()
+    data: Dict[str, Any] = body_id_data.TestDictForRequests().return_dict()
 
     with allure.step(allure_steps.get_id()):
         id_to_do_request: str = body_id_data.get_id_of_entity(booker_api, -1)
@@ -187,7 +187,7 @@ def test_patch_invalid_id(booker_api: conftest.ApiClient,
     :param booker_api: фикстура, создающая и возвращающая экземпляр класса ApiClient
     :param param: передеваемый в урле id
     """
-    data: Dict[str, Any] = body_id_data.return_dict()
+    data: Dict[str, Any] = body_id_data.TestDictForRequests().return_dict()
 
     with allure.step(f"Отправляем patch запрос с id {param}"):
         response: requests.models.Response =\

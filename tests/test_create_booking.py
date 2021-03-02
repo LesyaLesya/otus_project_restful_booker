@@ -12,7 +12,7 @@ from helpers import allure_steps, body_id_data  # type: ignore
 @allure.feature("POST - CreateBooking")
 @allure.story("Создание сущности - позитивная проверка 'firstname'")
 @pytest.mark.positive
-@pytest.mark.parametrize("param", ["Susan", "Maria-Elena", "Имя Имя", ""])
+@pytest.mark.parametrize("param", ["Peter", "Maria-Elena", "Имя Имя", ""])
 def test_post_firstname_positive(booker_api: conftest.ApiClient,
                                  param: str) -> None:
     """Тестовая функция для проверки вызова post запроса.
@@ -22,7 +22,7 @@ def test_post_firstname_positive(booker_api: conftest.ApiClient,
     :param param: передаваемые в теле запроса варианты для "firstname"
     """
 
-    data: Dict[str, Any] = body_id_data.return_dict_with_firstname(param)
+    data: Dict[str, Any] = body_id_data.TestDictForRequests().return_dict_with_firstname(param)
 
     with allure.step(f"Отправляем post запрос с firstname - '{param}'"):
         response: requests.models.Response = booker_api.post(data=json.dumps(data))
@@ -48,7 +48,7 @@ def test_post_firstname_negative(booker_api: conftest.ApiClient,
     :param booker_api: фикстура, создающая и возвращающая экземпляр класса ApiClient
     :param param: передаваемые в теле запроса варианты для "firstname"
     """
-    data: Dict[str, Any] = body_id_data.return_dict_with_firstname(param)
+    data: Dict[str, Any] = body_id_data.TestDictForRequests().return_dict_with_firstname(param)
 
     with allure.step(f"Отправляем post запрос с firstname - '{param}'"):
         response: requests.models.Response = booker_api.post(data=json.dumps(data))
@@ -60,7 +60,7 @@ def test_post_firstname_negative(booker_api: conftest.ApiClient,
 @allure.feature("POST - CreateBooking")
 @allure.story("Создание сущности - проверка 'lastname'")
 @pytest.mark.positive
-@pytest.mark.parametrize("param", ["Иванов", "Brown", "W", "Last-name", ""])
+@pytest.mark.parametrize("param", ["Иванов", "Black", "W", "Last-name", ""])
 def test_post_lastname(booker_api: conftest.ApiClient,
                        param: str) -> None:
     """Тестовая функция для проверки вызова post запроса.
@@ -69,7 +69,7 @@ def test_post_lastname(booker_api: conftest.ApiClient,
     :param booker_api: фикстура, создающая и возвращающая экземпляр класса ApiClient
     :param param: передаваемые в теле запроса варианты для "lastname"
     """
-    data: Dict[str, Any] = body_id_data.return_dict_with_lastname(param)
+    data: Dict[str, Any] = body_id_data.TestDictForRequests().return_dict_with_lastname(param)
 
     with allure.step(f"Отправляем post запрос с lastname - '{param}'"):
         response: requests.models.Response = booker_api.post(data=json.dumps(data))
@@ -94,7 +94,7 @@ def test_post_totalprice(booker_api: conftest.ApiClient,
     :param booker_api: фикстура, создающая и возвращающая экземпляр класса ApiClient
     :param param: передаваемые в теле запроса варианты для "totalprice"
     """
-    data: Dict[str, Any] = body_id_data.return_dict_with_totalprice(param)
+    data: Dict[str, Any] = body_id_data.TestDictForRequests().return_dict_with_totalprice(param)
 
     with allure.step(f"Отправляем post запрос с totalprice - '{param}'"):
         response: requests.models.Response = booker_api.post(data=json.dumps(data))
@@ -119,7 +119,7 @@ def test_post_depositpaid(booker_api: conftest.ApiClient,
     :param booker_api: фикстура, создающая и возвращающая экземпляр класса ApiClient
     :param param: передаваемые в теле запроса варианты для "depositpaid"
     """
-    data: Dict[str, Any] = body_id_data.return_dict_with_depositpaid(param)
+    data: Dict[str, Any] = body_id_data.TestDictForRequests().return_dict_with_depositpaid(param)
 
     with allure.step(f"Отправляем post запрос с depositpaid - '{param}'"):
         response: requests.models.Response = booker_api.post(data=json.dumps(data))
@@ -144,7 +144,7 @@ def test_post_checkin_positive(booker_api: conftest.ApiClient,
     :param booker_api: фикстура, создающая и возвращающая экземпляр класса ApiClient
     :param param: передаваемые в теле запроса варианты для "checkin"
     """
-    data: Dict[str, Any] = body_id_data.return_dict_with_chekin(param)
+    data: Dict[str, Any] = body_id_data.TestDictForRequests().return_dict_with_chekin(param)
 
     with allure.step(f"Отправляем post запрос с checkin - '{param}'"):
         response: requests.models.Response = booker_api.post(data=json.dumps(data))
@@ -170,7 +170,7 @@ def test_post_checkin_negative(booker_api: conftest.ApiClient,
     :param booker_api: фикстура, создающая и возвращающая экземпляр класса ApiClient
     :param param: передаваемые в теле запроса варианты для "checkin"
     """
-    data: Dict[str, Any] = body_id_data.return_dict_with_chekin(param)
+    data: Dict[str, Any] = body_id_data.TestDictForRequests().return_dict_with_chekin(param)
 
     with allure.step(f"Отправляем post запрос с checkin - '{param}'"):
         response: requests.models.Response = booker_api.post(data=json.dumps(data))
@@ -194,7 +194,7 @@ def test_post_checkout(booker_api: conftest.ApiClient,
     :param booker_api: фикстура, создающая и возвращающая экземпляр класса ApiClient
     :param param: передаваемые в теле запроса варианты для "checkout"
     """
-    data: Dict[str, Any] = body_id_data.return_dict_with_chekout(param)
+    data: Dict[str, Any] = body_id_data.TestDictForRequests().return_dict_with_chekout(param)
 
     with allure.step(f"Отправляем post запрос с checkout - '{param}'"):
         response: requests.models.Response = booker_api.post(data=json.dumps(data))
@@ -219,7 +219,7 @@ def test_post_additionalneeds(booker_api: conftest.ApiClient,
     :param booker_api: фикстура, создающая и возвращающая экземпляр класса ApiClient
     :param param: передаваемые в теле запроса варианты для "additionalneeds"
     """
-    data: Dict[str, Any] = body_id_data.return_dict_with_addneeds(param)
+    data: Dict[str, Any] = body_id_data.TestDictForRequests().return_dict_with_addneeds(param)
 
     with allure.step(f"Отправляем post запрос с additionalneeds - '{param}'"):
         response: requests.models.Response = booker_api.post(data=json.dumps(data))
