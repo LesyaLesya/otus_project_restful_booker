@@ -5,7 +5,6 @@ from typing import Any, Dict
 import pytest
 import requests
 import allure  # type: ignore
-from helpers import body_id_data
 
 
 def pytest_addoption(parser) -> None:
