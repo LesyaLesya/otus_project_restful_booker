@@ -27,6 +27,8 @@ def test_get_by_id_positive(booker_api: conftest.ApiClient) -> None:
     with allure.step(f"Проверяем длину тела ответа сущности с id {id_to_do_request}"):
         assert len(response.json()) != 0, "Такой сущности не существует"
 
+    body_id_data.delete_test_entity(booker_api, id_to_do_request)
+
 
 @allure.feature("GET - GetBooking")
 @allure.story("Получение несуществующей сущности по id")

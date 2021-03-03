@@ -34,6 +34,8 @@ def test_post_firstname_positive(booker_api: conftest.ApiClient,
         assert response.json()["booking"]["firstname"] == param, \
             f"Имя -  '{response.json()['booking']['firstname']}'"
 
+    body_id_data.delete_test_entity(booker_api, response.json()['bookingid'])
+
 
 @allure.feature("POST - CreateBooking")
 @allure.story("Создание сущности - негативная проверка 'firstname'")
@@ -81,6 +83,8 @@ def test_post_lastname(booker_api: conftest.ApiClient,
         assert response.json()["booking"]["lastname"] == param, \
             f"Фамилия - '{response.json()['booking']['lastname']}'"
 
+    body_id_data.delete_test_entity(booker_api, response.json()['bookingid'])
+
 
 @allure.feature("POST - CreateBooking")
 @allure.story("Создание сущности - проверка 'totalprice'")
@@ -105,6 +109,8 @@ def test_post_totalprice(booker_api: conftest.ApiClient,
     with allure.step(allure_steps.check_totalprice(param)):
         assert response.json()["booking"]["totalprice"] == param, \
             f"Общая сумма - '{response.json()['booking']['totalprice']}'"
+
+    body_id_data.delete_test_entity(booker_api, response.json()['bookingid'])
 
 
 @allure.feature("POST - CreateBooking")
@@ -131,6 +137,8 @@ def test_post_depositpaid(booker_api: conftest.ApiClient,
         assert response.json()["booking"]["depositpaid"] == param, \
             f"Статус внесения депозита - '{response.json()['booking']['depositpaid']}'"
 
+    body_id_data.delete_test_entity(booker_api, response.json()['bookingid'])
+
 
 @allure.feature("POST - CreateBooking")
 @allure.story("Создание сущности - позитивная проверка 'checkin'")
@@ -155,6 +163,8 @@ def test_post_checkin_positive(booker_api: conftest.ApiClient,
     with allure.step(allure_steps.check_checkin(param)):
         assert response.json()["booking"]["bookingdates"]["checkin"] == param, \
             f"Дата заезда - '{response.json()['booking']['bookingdates']['checkin']}'"
+
+    body_id_data.delete_test_entity(booker_api, response.json()['bookingid'])
 
 
 @allure.feature("POST - CreateBooking")
@@ -206,6 +216,8 @@ def test_post_checkout(booker_api: conftest.ApiClient,
         assert response.json()["booking"]["bookingdates"]["checkout"] == param, \
             f"Дата выезда - '{response.json()['booking']['bookingdates']['checkout']}'"
 
+    body_id_data.delete_test_entity(booker_api, response.json()['bookingid'])
+
 
 @allure.feature("POST - CreateBooking")
 @allure.story("Создание сущности - проверка 'additionalneeds'")
@@ -230,6 +242,8 @@ def test_post_additionalneeds(booker_api: conftest.ApiClient,
     with allure.step(allure_steps.check_addneeds(param)):
         assert response.json()["booking"]["additionalneeds"] == param, \
             f"Дополнительные пожелания - '{response.json()['booking']['additionalneeds']}'"
+
+    body_id_data.delete_test_entity(booker_api, response.json()['bookingid'])
 
 
 @allure.feature("POST - CreateBooking")

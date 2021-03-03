@@ -5,7 +5,7 @@ import pytest
 import requests
 import allure  # type: ignore
 import conftest
-from helpers import allure_steps  # type: ignore
+from helpers import allure_steps, body_id_data  # type: ignore
 
 
 @allure.feature("GET - GetBookingIds")
@@ -30,7 +30,7 @@ def test_get_all_bookings(booker_api: conftest.ApiClient) -> None:
 @allure.feature("GET - GetBookingIds")
 @allure.story("Получение списка сущностей по существующему 'firstname'")
 @pytest.mark.positive
-@pytest.mark.parametrize("param", ["Peter", "Susan"])
+@pytest.mark.parametrize("param", ["Anna", "Susan"])
 def test_get_by_firstname_positive(booker_api: conftest.ApiClient,
                                    param: str) -> None:
     """Тестовая функция для проверки вызова get запроса с передаваемым в урле параметром.
@@ -40,6 +40,7 @@ def test_get_by_firstname_positive(booker_api: conftest.ApiClient,
     :param booker_api: фикстура, создающая и возвращающая экземпляр класса ApiClient
     :param param: передаваемый в урле параметр firstname
     """
+    id_to_do_request = body_id_data.create_test_entity(booker_api)
     payload: Dict[str, str] = {"firstname": param}
 
     with allure.step(allure_steps.send_get_request_with_param(payload)):
@@ -50,6 +51,8 @@ def test_get_by_firstname_positive(booker_api: conftest.ApiClient,
 
     with allure.step(f"Проверяем, что у '{param}' есть бронь"):
         assert len(response.json()) != 0, f"У '{param}' нет брони"
+
+    body_id_data.delete_test_entity(booker_api, id_to_do_request)
 
 
 @allure.feature("GET - GetBookingIds")
@@ -81,7 +84,7 @@ def test_get_by_firstname_negative(booker_api: conftest.ApiClient,
 @allure.feature("GET - GetBookingIds")
 @allure.story("Получение списка сущностей по существующему 'lastname'")
 @pytest.mark.positive
-@pytest.mark.parametrize("param", ["Иванов", "Brown"])
+@pytest.mark.parametrize("param", ["Chapman", "Brown"])
 def test_get_by_lastname_positive(booker_api: conftest.ApiClient,
                                   param: str) -> None:
     """Тестовая функция для проверки вызова get запроса с передаваемым в урле параметром.
@@ -91,6 +94,7 @@ def test_get_by_lastname_positive(booker_api: conftest.ApiClient,
     :param booker_api: фикстура, создающая и возвращающая экземпляр класса ApiClient
     :param param: передаваемый в урле параметр lastname
     """
+    id_to_do_request = body_id_data.create_test_entity(booker_api)
     payload: Dict[str, str] = {"lastname": param}
 
     with allure.step(allure_steps.send_get_request_with_param(payload)):
@@ -101,6 +105,8 @@ def test_get_by_lastname_positive(booker_api: conftest.ApiClient,
 
     with allure.step(f"Проверяем, что у '{param}' есть бронь"):
         assert len(response.json()) != 0, f"У '{param}' нет брони"
+
+    body_id_data.delete_test_entity(booker_api, id_to_do_request)
 
 
 @allure.feature("GET - GetBookingIds")
@@ -131,7 +137,7 @@ def test_get_by_lastname_negative(booker_api: conftest.ApiClient,
 @allure.feature("GET - GetBookingIds")
 @allure.story("Получение списка сущностей по существующим 'firstname' и 'lastname'")
 @pytest.mark.positive
-@pytest.mark.parametrize("first, last", [("Peter", "Brown"), ("Susan", "Brown")])
+@pytest.mark.parametrize("first, last", [("Anna", "Chapman"), ("Susan", "Brown")])
 def test_get_by_fullname_positive(booker_api: conftest.ApiClient,
                                   first: str, last: str) -> None:
     """Тестовая функция для проверки вызова get запроса с передаваемым в урле 2 параметрами.
@@ -142,6 +148,7 @@ def test_get_by_fullname_positive(booker_api: conftest.ApiClient,
     :param first: передаваемый в урле параметр firstname
     :param last: передаваемый в урле параметр lastname
     """
+    id_to_do_request = body_id_data.create_test_entity(booker_api)
     payload: Dict[str, str] = {"firstname": first, "lastname": last}
 
     with allure.step(allure_steps.send_get_request_with_param(payload)):
@@ -152,6 +159,8 @@ def test_get_by_fullname_positive(booker_api: conftest.ApiClient,
 
     with allure.step(f"Проверяем, что у '{first} {last}' есть бронь"):
         assert len(response.json()) != 0, f"У '{first} {last}' нет брони"
+
+    body_id_data.delete_test_entity(booker_api, id_to_do_request)
 
 
 @allure.feature("GET - GetBookingIds")

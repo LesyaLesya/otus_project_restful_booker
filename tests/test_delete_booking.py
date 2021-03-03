@@ -25,6 +25,8 @@ def test_delete_by_id_positive(booker_api: conftest.ApiClient) -> None:
     with allure.step(allure_steps.check_201_status_code()):
         assert response.status_code == 201, f"Код ответа - {response.status_code}"
 
+    body_id_data.delete_test_entity(booker_api, id_to_do_request)
+
 
 @allure.feature("DELETE - DeleteBooking")
 @allure.story("Удаление несуществующей сущности по id")

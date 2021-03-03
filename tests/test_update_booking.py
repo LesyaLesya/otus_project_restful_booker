@@ -61,6 +61,8 @@ def test_put_all_fields(booker_api: conftest.ApiClient) -> None:
                data['additionalneeds'], \
                f"Депозит - '{response.json()['additionalneeds']}'"
 
+    body_id_data.delete_test_entity(booker_api, id_to_do_request)
+
 
 @allure.feature("PUT - UpdateBooking")
 @allure.story("Обновление части параметров сущности")

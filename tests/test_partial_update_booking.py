@@ -64,6 +64,8 @@ def test_patch_part_fields(booker_api: conftest.ApiClient,
             data_for_id["bookingdates"]["checkout"], \
             f"Дата выезда - '{response.json()['bookingdates']['checkout']}'"
 
+    body_id_data.delete_test_entity(booker_api, id_to_do_request)
+
 
 @allure.feature("PATCH - PartialUpdateBooking")
 @allure.story("Обновление всех параметров сущности")
@@ -116,6 +118,8 @@ def test_patch_all_fields(booker_api: conftest.ApiClient) -> None:
         assert response.json()["additionalneeds"] == data['additionalneeds'], \
                f"Пожелания - '{response.json()['additionalneeds']}'"
 
+    body_id_data.delete_test_entity(booker_api, id_to_do_request)
+
 
 @allure.feature("PATCH - PartialUpdateBooking")
 @allure.story("Обновление сущности передачей пустого тела")
@@ -163,6 +167,8 @@ def test_patch_empty_body(booker_api: conftest.ApiClient) -> None:
         assert response.json()["bookingdates"]["checkout"] == \
             data_for_id["bookingdates"]["checkout"], \
             f"Дата выезда - '{response.json()['bookingdates']['checkout']}'"
+
+    body_id_data.delete_test_entity(booker_api, id_to_do_request)
 
 
 @allure.feature("PATCH - PartialUpdateBooking")

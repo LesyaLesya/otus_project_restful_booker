@@ -84,3 +84,9 @@ def create_test_entity(booker_api) -> str:
     ent: requests.models.Response = booker_api.post(data=json.dumps(data))
     id_to_do_request: str = ent.json()['bookingid']
     return id_to_do_request
+
+
+@allure.step("Удаляем тестовую сущность")
+def delete_test_entity(booker_api, param: str) -> str:
+    """Удаляет тестовую сущность."""
+    return booker_api.delete(path=param)
