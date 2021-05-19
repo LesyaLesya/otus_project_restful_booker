@@ -98,7 +98,7 @@ class ApiClient:
         url: str = f"{self.host}/booking/{path}"
         headers: Dict[str, str] = {"Content-Type": "application/json",
                                    "Accept": "application/json",
-                                   "Cookie": f"token={self.__token}"}
+                                   "Cookie": f"token={self.__get_token()}"}
         return self.session.patch(url=url, headers=headers, data=data)
 
     @allure.step("Выполнение put запроса")
@@ -114,7 +114,7 @@ class ApiClient:
         url: str = f"{self.host}/booking/{path}"
         headers: Dict[str, str] = {"Content-Type": "application/json",
                                    "Accept": "application/json",
-                                   "Cookie": f"token={self.__token}"}
+                                   "Cookie": f"token={self.__get_token()}"}
         return self.session.put(url=url, headers=headers, data=data)
 
     @allure.step("Выполнение delete запроса")
@@ -127,7 +127,7 @@ class ApiClient:
 
         url: str = f"{self.host}/booking/{path}"
         headers: Dict[str, str] = {"Content-Type": "application/json",
-                                   "Cookie": f"token={self.__token}"}
+                                   "Cookie": f"token={self.__get_token()}"}
         return self.session.delete(url=url, headers=headers)
 
 
