@@ -113,6 +113,7 @@ pytest -n 2 (-m positive|negative) tests/ --login=admin --passw=password123
   + PASSW - значение по-умолчанию password123
   + NODES - значение по-умолчанию 1
   + MARKER с вариантами на выбор all_tests, positive, negative
+  + DOCKER_PATH - путь до исполняемого файла Docker на машине
   
 - Выбрать Pipeline script from SCM
 
