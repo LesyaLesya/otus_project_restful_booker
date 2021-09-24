@@ -1,25 +1,23 @@
 """Модуль с тестами get запросов - GetBooking."""
 
 import pytest
-import requests
-import allure  # type: ignore
-import conftest
-from helpers import body_id_data, allure_steps  # type: ignore
+import allure
+from helpers import body_id_data, allure_steps
 
 
 @allure.feature("GET - GetBooking")
 @allure.story("Получение существующей сущности по id")
 @pytest.mark.positive
-def test_get_by_id_positive(booker_api: conftest.ApiClient) -> None:
+def test_get_by_id_positive(booker_api):
     """Тестовая функция для проверки вызова get запроса.
     Проверяются позитивные варианты для id через параметризацию.
 
     :param booker_api: фикстура, создающая и возвращающая экземпляр класса ApiClient
     """
-    id_to_do_request: str = body_id_data.create_test_entity(booker_api)
+    id_to_do_request = body_id_data.create_test_entity(booker_api)
 
     with allure.step(allure_steps.send_get_request(id_to_do_request)):
-        response: requests.models.Response = booker_api.get(path=id_to_do_request)
+        response = booker_api.get(path=id_to_do_request)
 
     with allure.step(allure_steps.check_200_status_code()):
         assert response.status_code == 200, f"Код ответа - {response.status_code}"
@@ -34,8 +32,7 @@ def test_get_by_id_positive(booker_api: conftest.ApiClient) -> None:
 @allure.story("Получение несуществующей сущности по id")
 @pytest.mark.negative
 @pytest.mark.parametrize("param", ["10000", "hello", "0"])
-def test_get_by_id_negative(booker_api: conftest.ApiClient,
-                            param: str) -> None:
+def test_get_by_id_negative(booker_api, param):
     """Тестовая функция для проверки вызова get запроса.
     Проверяются негативные варианты для id через параметризацию -
     несуществующий id.
@@ -44,7 +41,7 @@ def test_get_by_id_negative(booker_api: conftest.ApiClient,
     :param param: передаваемые в урле id сущностей
     """
     with allure.step(allure_steps.send_get_request(param)):
-        response: requests.models.Response = booker_api.get(path=param)
+        response = booker_api.get(path=param)
 
     with allure.step(allure_steps.check_404_status_code()):
         assert response.status_code == 404, f"Код ответа - {response.status_code}"

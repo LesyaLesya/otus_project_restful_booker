@@ -1,20 +1,16 @@
 """Модуль с тестами patch запросов - PartialUpdateBooking."""
 
-from typing import Dict, Any
 import json
 import pytest
-import requests
-import allure   # type: ignore
-import conftest
-from helpers import body_id_data, allure_steps  # type: ignore
+import allure
+from helpers import body_id_data, allure_steps
 
 
 @allure.feature("PATCH - PartialUpdateBooking")
 @allure.story("Обновление части параметров сущности")
 @pytest.mark.positive
 @pytest.mark.parametrize("first, last", [("Peter", "Jackson"), ("Emma", "Star")])
-def test_patch_part_fields(booker_api: conftest.ApiClient,
-                           first: str, last: str) -> None:
+def test_patch_part_fields(booker_api, first, last):
     """Тестовая функция для проверки вызова patch запроса с передаваемым телом.
     Проверяются позитивные варианты через параметризацию -
     обновление значений "firstname", "lastname".
@@ -24,16 +20,15 @@ def test_patch_part_fields(booker_api: conftest.ApiClient,
     :param first: передаваемый в теле запроса firstname
     :param last: передаваемый в теле запроса lastname
     """
-    id_to_do_request: str = body_id_data.create_test_entity(booker_api)
+    id_to_do_request = body_id_data.create_test_entity(booker_api)
 
     with allure.step("Получаем все данные сущности"):
-        data_for_id: Dict[str, Any] = body_id_data.TestDictForRequests().return_dict_other()
+        data_for_id = body_id_data.TestDictForRequests().return_dict_other()
 
-    data: Dict[str, str] = {"firstname": first, "lastname": last}
+    data = {"firstname": first, "lastname": last}
 
     with allure.step(allure_steps.send_patch_request(data, id_to_do_request)):
-        response: requests.models.Response =\
-            booker_api.patch(path=id_to_do_request, data=json.dumps(data))
+        response = booker_api.patch(path=id_to_do_request, data=json.dumps(data))
 
     with allure.step(allure_steps.check_200_status_code()):
         assert response.status_code == 200, f"Код ответа - {response.status_code}"
@@ -70,20 +65,19 @@ def test_patch_part_fields(booker_api: conftest.ApiClient,
 @allure.feature("PATCH - PartialUpdateBooking")
 @allure.story("Обновление всех параметров сущности")
 @pytest.mark.positive
-def test_patch_all_fields(booker_api: conftest.ApiClient) -> None:
+def test_patch_all_fields(booker_api):
     """Тестовая функция для проверки вызова patch запроса с передаваемым телом.
     Проверяется обновление всех полей сущности.
     Обращение напрямую к определенному id в урле.
 
     :param booker_api: фикстура, создающая и возвращающая экземпляр класса ApiClient
     """
-    id_to_do_request: str = body_id_data.create_test_entity(booker_api)
+    id_to_do_request = body_id_data.create_test_entity(booker_api)
 
-    data: Dict[str, Any] = body_id_data.TestDictForRequests().return_dict()
+    data = body_id_data.TestDictForRequests().return_dict()
 
     with allure.step(allure_steps.send_patch_request(data, id_to_do_request)):
-        response: requests.models.Response = \
-            booker_api.patch(path=id_to_do_request, data=json.dumps(data))
+        response = booker_api.patch(path=id_to_do_request, data=json.dumps(data))
 
     with allure.step(allure_steps.check_200_status_code()):
         assert response.status_code == 200, f"Код ответа - {response.status_code}"
@@ -124,20 +118,20 @@ def test_patch_all_fields(booker_api: conftest.ApiClient) -> None:
 @allure.feature("PATCH - PartialUpdateBooking")
 @allure.story("Обновление сущности передачей пустого тела")
 @pytest.mark.positive
-def test_patch_empty_body(booker_api: conftest.ApiClient) -> None:
+def test_patch_empty_body(booker_api):
     """Тестовая функция для проверки вызова patch запроса с передаваемым телом.
     Проверяется передача пустого тела.
     Обращение напрямую к определенному id в урле.
 
     :param booker_api: фикстура, создающая и возвращающая экземпляр класса ApiClient
     """
-    id_to_do_request: str = body_id_data.create_test_entity(booker_api)
+    id_to_do_request = body_id_data.create_test_entity(booker_api)
 
     with allure.step("Получаем все данные сущности"):
-        data_for_id: Dict[str, Any] = body_id_data.TestDictForRequests().return_dict_other()
+        data_for_id = body_id_data.TestDictForRequests().return_dict_other()
 
     with allure.step(f"Отправляем patch запрос с пустым телом и id {id_to_do_request}"):
-        response: requests.models.Response = booker_api.patch(path=id_to_do_request, data={})
+        response = booker_api.patch(path=id_to_do_request, data={})
 
     with allure.step(allure_steps.check_200_status_code()):
         assert response.status_code == 200, f"Код ответа - {response.status_code}"
@@ -175,8 +169,7 @@ def test_patch_empty_body(booker_api: conftest.ApiClient) -> None:
 @allure.story("Обновление параметров несуществующей сущности")
 @pytest.mark.negative
 @pytest.mark.parametrize("param", ["213123", "tests"])
-def test_patch_invalid_id(booker_api: conftest.ApiClient,
-                          param: str) -> None:
+def test_patch_invalid_id(booker_api, param):
     """Тестовая функция для проверки вызова patch запроса с передаваемым телом.
     Проверяются негативные варианты через параметризацию -
     обращение к несуществующему id в урле.
@@ -184,11 +177,10 @@ def test_patch_invalid_id(booker_api: conftest.ApiClient,
     :param booker_api: фикстура, создающая и возвращающая экземпляр класса ApiClient
     :param param: передеваемый в урле id
     """
-    data: Dict[str, Any] = body_id_data.TestDictForRequests().return_dict()
+    data = body_id_data.TestDictForRequests().return_dict()
 
     with allure.step(f"Отправляем patch запрос с id {param}"):
-        response: requests.models.Response =\
-            booker_api.patch(path=param, data=json.dumps(data))
+        response = booker_api.patch(path=param, data=json.dumps(data))
 
     with allure.step(allure_steps.check_405_status_code()):
         assert response.status_code == 405, f"Код ответа - {response.status_code}"
