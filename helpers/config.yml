@@ -1,0 +1,12 @@
+# Хранилище тестовых данных
+
+schema:
+  https: 'https'
+  http: 'http'
+
+host:
+  default: 'restful-booker.herokuapp.com'
+
+admin:
+  login: 'admin'
+  password: 'password123'

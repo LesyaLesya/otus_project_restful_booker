@@ -1,174 +1,209 @@
 """Модуль с тестами get запросов - GetBookingIds."""
 
-import pytest
 import allure
-from helpers import allure_steps, body_id_data
+import pytest
+
+from helpers.schemas import GET_BOOKING_IDS_SCHEMA
+from helpers.urls_helper import Params, Paths
 
 
-@allure.feature("GET - GetBookingIds")
-@allure.story("Получение списка всех сущностей")
-@pytest.mark.positive
-def test_get_all_bookings(booker_api):
-    """Тестовая функция для проверки вызова get запроса.
-    Проверяется получение всех сущностей.
-    :param booker_api: фикстура, создающая и возвращающая экземпляр класса ApiClient
-    """
-    with allure.step("Отправляем get запрос"):
-        response = booker_api.get()
-
-    with allure.step(allure_steps.check_200_status_code()):
-        assert response.status_code == 200, f"Код ответа - {response.status_code}"
-
-    with allure.step("Проверяем, что в ответе непустой список"):
-        assert len(response.json()) != 0, "Нет ни одной сущности"
+@pytest.fixture
+def fixture_create_delete_booking_data_firstname(create_test_booking, delete_test_booking, get_params):
+    booking = create_test_booking(firstname=get_params)
+    booking_id = booking['bookingid']
+    yield booking_id
+    delete_test_booking(booking_id)
 
 
-@allure.feature("GET - GetBookingIds")
-@allure.story("Получение списка сущностей по существующему 'firstname'")
-@pytest.mark.positive
-@pytest.mark.parametrize("param", ["Anna", "Susan"])
-def test_get_by_firstname_positive(booker_api, param):
-    """Тестовая функция для проверки вызова get запроса с передаваемым в урле параметром.
-    Проверяются позитивные варианты через параметризацию -
-    для передачи параметра firstname в урле.
-    :param booker_api: фикстура, создающая и возвращающая экземпляр класса ApiClient
-    :param param: передаваемый в урле параметр firstname
-    """
-    id_to_do_request = body_id_data.create_test_entity(booker_api)
-    payload = {"firstname": param}
-
-    with allure.step(allure_steps.send_get_request_with_param(payload)):
-        response = booker_api.get(params=payload)
-
-    with allure.step(allure_steps.check_200_status_code()):
-        assert response.status_code == 200, f"Код ответа - {response.status_code}"
-
-    with allure.step(f"Проверяем, что у '{param}' есть бронь"):
-        assert len(response.json()) != 0, f"У '{param}' нет брони"
-
-    body_id_data.delete_test_entity(booker_api, id_to_do_request)
+@pytest.fixture
+def fixture_create_delete_booking_data_lastname(create_test_booking, delete_test_booking, get_params):
+    booking = create_test_booking(lastname=get_params)
+    booking_id = booking['bookingid']
+    yield booking_id
+    delete_test_booking(booking_id)
 
 
-@allure.feature("GET - GetBookingIds")
-@allure.story("Получение списка сущностей по несуществующему 'firstname'")
-@pytest.mark.negative
-@pytest.mark.parametrize("param", ["Тест", "13"])
-def test_get_by_firstname_negative(booker_api, param):
-    """Тестовая функция для проверки вызова get запроса с передаваемым в урле параметром.
-    Проверяются негативные варианты через параметризацию -
-    для передачи параметра firstname в урле -
-    несуществующее имя.
-    :param booker_api: фикстура, создающая и возвращающая экземпляр класса ApiClient
-    :param param: передаваемый в урле параметр firstname
-    """
-    payload = {"firstname": param}
-
-    with allure.step(allure_steps.send_get_request_with_param(payload)):
-        response = booker_api.get(params=payload)
-
-    with allure.step(allure_steps.check_200_status_code()):
-        assert response.status_code == 200, f"Код ответа - {response.status_code}"
-
-    with allure.step(f"Проверяем, что у '{param}' нет брони"):
-        assert len(response.json()) == 0, f"У '{param}' есть бронь"
+@pytest.fixture
+def fixture_create_delete_booking_data_fullname(create_test_booking, delete_test_booking, get_params):
+    booking = create_test_booking(firstname=get_params['first'], lastname=get_params['last'])
+    booking_id = booking['bookingid']
+    yield booking_id
+    delete_test_booking(booking_id)
 
 
-@allure.feature("GET - GetBookingIds")
-@allure.story("Получение списка сущностей по существующему 'lastname'")
-@pytest.mark.positive
-@pytest.mark.parametrize("param", ["Chapman", "Brown"])
-def test_get_by_lastname_positive(booker_api, param):
-    """Тестовая функция для проверки вызова get запроса с передаваемым в урле параметром.
-    Проверяются позитивные варианты через параметризацию -
-    для передачи параметра lastname в урле.
-    :param booker_api: фикстура, создающая и возвращающая экземпляр класса ApiClient
-    :param param: передаваемый в урле параметр lastname
-    """
-    id_to_do_request = body_id_data.create_test_entity(booker_api)
-    payload = {"lastname": param}
+@pytest.mark.get_booking_ids
+@allure.feature('GET - GetBookingIds')
+class TestGetBookingIds:
+    """Тесты метода get /booking."""
 
-    with allure.step(allure_steps.send_get_request_with_param(payload)):
-        response = booker_api.get(params=payload)
+    @allure.title('Получение списка всех броней')
+    def test_get_all_bookings(self, booker_api, validate_json, status_code_msg, response_body_msg):
+        """Тестовая функция для проверки получения всех сущностей.
 
-    with allure.step(allure_steps.check_200_status_code()):
-        assert response.status_code == 200, f"Код ответа - {response.status_code}"
+        :param booker_api: фикстура, создающая и возвращающая экземпляр класса ApiClient
+        :param validate_json: фикстура для валидации JSON схемы
+        :param status_code_msg: фикстура, возвращающая текст проверки кода ответа
+        :param response_body_msg: фикстура, возвращающая текст проверки тела ответа
+        """
+        response = booker_api.get(Paths.BOOKING)
+        booking_data = response.json()
 
-    with allure.step(f"Проверяем, что у '{param}' есть бронь"):
-        assert len(response.json()) != 0, f"У '{param}' нет брони"
+        with allure.step(status_code_msg(200)):
+            assert response.status_code == 200, f'Код ответа - {response.status_code}'
 
-    body_id_data.delete_test_entity(booker_api, id_to_do_request)
+        assert validate_json(booking_data, GET_BOOKING_IDS_SCHEMA)
 
+        with allure.step(response_body_msg(booking_data)):
+            assert len(booking_data) != 0, 'Нет ни одной сущности'
 
-@allure.feature("GET - GetBookingIds")
-@allure.story("Получение списка сущностей по несуществующему 'lastname'")
-@pytest.mark.negative
-@pytest.mark.parametrize("param", ["0", "'$$@*:;"])
-def test_get_by_lastname_negative(booker_api, param):
-    """Тестовая функция для проверки вызова get запроса с передаваемым в урле параметром.
-    Проверяются негативные варианты через параметризацию -
-    для передачи параметра lastname в урле - несуществующая фамилия.
-    :param booker_api: фикстура, создающая и возвращающая экземпляр класса ApiClient
-    :param param: передаваемый в урле параметр lastname
-    """
-    payload = {"lastname": param}
+    @allure.story('Проверка параметра firstname')
+    @allure.title('Валидные значения firstname - {get_params}')
+    @pytest.mark.parametrize('get_params', ['Stacy', 'Olivia'])
+    def test_get_by_valid_firstname(
+            self, booker_api, fixture_create_delete_booking_data_firstname,
+            validate_json, status_code_msg, response_body_msg, get_params):
+        """Тестовая функция для проверки получения брони с валидными значениями параметра firstname.
 
-    with allure.step(allure_steps.send_get_request_with_param(payload)):
-        response = booker_api.get(params=payload)
+        :param booker_api: фикстура, создающая и возвращающая экземпляр класса ApiClient
+        :param fixture_create_delete_booking_data_firstname: фикстура для создания и удаления тестовых данных
+        :param validate_json: фикстура для валидации JSON схемы
+        :param status_code_msg: фикстура, возвращающая текст проверки кода ответа
+        :param response_body_msg: фикстура, возвращающая текст проверки тела ответа
+        """
+        booking_id = fixture_create_delete_booking_data_firstname
 
-    with allure.step(allure_steps.check_200_status_code()):
-        assert response.status_code == 200, f"Код ответа - {response.status_code}"
+        payload = {Params.FIRSTNAME: get_params}
+        response = booker_api.get(path=Paths.BOOKING, params=payload)
+        booking_data = response.json()
 
-    with allure.step(f"Проверяем, что у '{param}' нет брони"):
-        assert len(response.json()) == 0, f"У '{param}' есть бронь"
+        with allure.step(status_code_msg(200)):
+            assert response.status_code == 200, f'Код ответа - {response.status_code}'
 
+        assert validate_json(booking_data, GET_BOOKING_IDS_SCHEMA)
 
-@allure.feature("GET - GetBookingIds")
-@allure.story("Получение списка сущностей по существующим 'firstname' и 'lastname'")
-@pytest.mark.positive
-@pytest.mark.parametrize("first, last", [("Anna", "Chapman")])
-def test_get_by_fullname_positive(booker_api, first, last):
-    """Тестовая функция для проверки вызова get запроса с передаваемым в урле 2 параметрами.
-    Проверяются позитивные варианты через параметризацию -
-    для передачи параметров firstname и lastname в урле.
-    :param booker_api: фикстура, создающая и возвращающая экземпляр класса ApiClient
-    :param first: передаваемый в урле параметр firstname
-    :param last: передаваемый в урле параметр lastname
-    """
-    id_to_do_request = body_id_data.create_test_entity(booker_api)
-    payload = {"firstname": first, "lastname": last}
+        with allure.step(response_body_msg(booking_data)):
+            assert len(booking_data) == 1, f'Количество броней с именем {get_params} - {len(booking_data)}'
+            assert booking_data[0]['bookingid'] == booking_id, f'Тело ответа {booking_data}'
 
-    with allure.step(allure_steps.send_get_request_with_param(payload)):
-        response = booker_api.get(params=payload)
+    @allure.story('Проверка параметра firstname')
+    @allure.title('Несуществующие значения firstname - {value}')
+    @pytest.mark.parametrize('value', ['Тест', '13'])
+    def test_get_by_invalid_firstname(self, booker_api, value, status_code_msg, response_body_msg):
+        """Тестовая функция для проверки получения брони с несуществующими значениями параметра firstname.
 
-    with allure.step(allure_steps.check_200_status_code()):
-        assert response.status_code == 200, f"Код ответа - {response.status_code}"
+        :param booker_api: фикстура, создающая и возвращающая экземпляр класса ApiClient
+        :param value: передаваемый в урле параметр firstname
+        :param status_code_msg: фикстура, возвращающая текст проверки кода ответа
+        :param response_body_msg: фикстура, возвращающая текст проверки тела ответа
+        """
+        payload = {Params.FIRSTNAME: value}
+        response = booker_api.get(path=Paths.BOOKING, params=payload)
+        booking_data = response.json()
 
-    with allure.step(f"Проверяем, что у '{first} {last}' есть бронь"):
-        assert len(response.json()) != 0, f"У '{first} {last}' нет брони"
+        with allure.step(status_code_msg(200)):
+            assert response.status_code == 200, f'Код ответа - {response.status_code}'
 
-    body_id_data.delete_test_entity(booker_api, id_to_do_request)
+        with allure.step(response_body_msg(booking_data)):
+            assert len(booking_data) == 0, f'У {value} есть бронь. Тело ответа {booking_data}'
 
+    @allure.story('Проверка параметра lastname')
+    @allure.title('Существующие значения lastname - {get_params}')
+    @pytest.mark.parametrize('get_params', ['Chapman-Wilson', 'Chacha'])
+    def test_get_by_valid_lastname(
+            self, booker_api, status_code_msg, response_body_msg,
+             validate_json, fixture_create_delete_booking_data_lastname, get_params):
+        """Тестовая функция для проверки получения брони с существующими значениями параметра lastname.
 
-@allure.feature("GET - GetBookingIds")
-@allure.story("Получение списка сущностей по несуществующим 'firstname' и 'lastname'")
-@pytest.mark.negative
-@pytest.mark.parametrize("first, last", [("Eric", "0"), ("Test", "Jones")])
-def test_get_by_fullname_negative(booker_api, first, last):
-    """Тестовая функция для проверки вызова get запроса с передаваемым в урле 2 параметрами.
-    Проверяются негативные варианты через параметризацию -
-    для передачи параметров firstname и lastname в урле -
-    несуществующие сочетания имени и фамилиии.
-    :param booker_api: фикстура, создающая и возвращающая экземпляр класса ApiClient
-    :param first: передаваемый в урле параметр firstname
-    :param last: передаваемый в урле параметр lastname
-    """
-    payload = {"firstname": first, "lastname": last}
+        :param booker_api: фикстура, создающая и возвращающая экземпляр класса ApiClient
+        :param fixture_create_delete_booking_data_lastname: фикстура для создания и удаления тестовых данных
+        :param validate_json: фикстура для валидации JSON схемы
+        :param status_code_msg: фикстура, возвращающая текст проверки кода ответа
+        :param response_body_msg: фикстура, возвращающая текст проверки тела ответа
+        """
+        booking_id = fixture_create_delete_booking_data_lastname
 
-    with allure.step(allure_steps.send_get_request_with_param(payload)):
-        response = booker_api.get(params=payload)
+        payload = {Params.LASTNAME: get_params}
+        response = booker_api.get(path=Paths.BOOKING, params=payload)
+        booking_data = response.json()
 
-    with allure.step(allure_steps.check_200_status_code()):
-        assert response.status_code == 200, f"Код ответа - {response.status_code}"
+        with allure.step(status_code_msg(200)):
+            assert response.status_code == 200, f'Код ответа - {response.status_code}'
 
-    with allure.step(f"Проверяем, что у '{first} {last}' нет брони"):
-        assert len(response.json()) == 0, f"У '{first} {last}' есть бронь"
+        assert validate_json(booking_data, GET_BOOKING_IDS_SCHEMA)
+
+        with allure.step(response_body_msg(booking_data)):
+            assert len(booking_data) == 1, f'Количество броней с фамилией {get_params} - {len(booking_data)}'
+            assert booking_data[0]['bookingid'] == booking_id, f'Тело ответа {booking_data}'
+
+    @allure.story('Проверка параметра lastname')
+    @allure.title('Несуществующие значения lastname - {value}')
+    @pytest.mark.parametrize('value', ['0', '$$@*:;'])
+    def test_get_by_invalid_lastname(self, booker_api, value, status_code_msg, response_body_msg):
+        """Тестовая функция для проверки получения брони с несуществующими значениями параметра lastname.
+
+        :param booker_api: фикстура, создающая и возвращающая экземпляр класса ApiClient
+        :param value: передаваемый в урле параметр lastname
+        :param status_code_msg: фикстура, возвращающая текст проверки кода ответа
+        :param response_body_msg: фикстура, возвращающая текст проверки тела ответа
+        """
+        payload = {Params.LASTNAME: value}
+        response = booker_api.get(path=Paths.BOOKING, params=payload)
+        booking_data = response.json()
+
+        with allure.step(status_code_msg(200)):
+            assert response.status_code == 200, f'Код ответа - {response.status_code}'
+
+        with allure.step(response_body_msg(booking_data)):
+            assert len(booking_data) == 0, f'У {value} есть бронь. Тело ответа {booking_data}'
+
+    @allure.story('Проверка нескольких параметров')
+    @allure.title('Существующие значения firstname и lastname - {get_params}')
+    @pytest.mark.parametrize('get_params', [({'first': 'Stella', 'last': 'White'})])
+    def test_get_by_valid_fullname(
+            self, booker_api, status_code_msg, validate_json, response_body_msg,
+            fixture_create_delete_booking_data_fullname, get_params):
+        """Тестовая функция для проверки получения брони с существующими значениями параметров firstname и lastname.
+
+        :param booker_api: фикстура, создающая и возвращающая экземпляр класса ApiClient
+        :param fixture_create_delete_booking_data_fullname: фикстура для создания и удаления тестовых данных
+        :param validate_json: фикстура для валидации JSON схемы
+        :param status_code_msg: фикстура, возвращающая текст проверки кода ответа
+        :param response_body_msg: фикстура, возвращающая текст проверки тела ответа
+        """
+        booking_id = fixture_create_delete_booking_data_fullname
+
+        payload = {Params.FIRSTNAME: get_params['first'], Params.LASTNAME: get_params['last']}
+        response = booker_api.get(path=Paths.BOOKING, params=payload)
+        booking_data = response.json()
+
+        with allure.step(status_code_msg(200)):
+            assert response.status_code == 200, f'Код ответа - {response.status_code}'
+
+        assert validate_json(booking_data, GET_BOOKING_IDS_SCHEMA)
+
+        with allure.step(response_body_msg(booking_data)):
+            assert len(booking_data) == 1, \
+                f'Количество броней с фамилией {get_params["l"]} и именем {get_params["f"]} - {len(booking_data)}'
+            assert booking_data[0]['bookingid'] == booking_id, f'Тело ответа {booking_data}'
+
+    @allure.story('Проверка нескольких параметров')
+    @allure.title('Несуществующие значения firstname {first} и lastname {last}')
+    @pytest.mark.parametrize('first, last', [('Eric', '0'), ('Test', 'Jones')])
+    def test_get_by_invalid_fullname(self, booker_api, first, last, status_code_msg, response_body_msg):
+        """Тестовая функция для проверки получения брони с несуществующими значениями параметров firstname и lastname.
+
+        :param booker_api: фикстура, создающая и возвращающая экземпляр класса ApiClient
+        :param first: передаваемый в урле параметр firstname
+        :param last: передаваемый в урле параметр lastname
+        :param status_code_msg: фикстура, возвращающая текст проверки кода ответа
+        :param response_body_msg: фикстура, возвращающая текст проверки тела ответа
+        """
+        payload = {Params.FIRSTNAME: first, Params.LASTNAME: last}
+        response = booker_api.get(path=Paths.BOOKING, params=payload)
+        booking_data = response.json()
+
+        with allure.step(status_code_msg(200)):
+            assert response.status_code == 200, f'Код ответа - {response.status_code}'
+
+        with allure.step(response_body_msg(booking_data)):
+            assert len(booking_data) == 0, f'У {first} {last} есть бронь. Тело ответа {booking_data}'

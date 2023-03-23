@@ -1,186 +1,156 @@
 """Модуль с тестами patch запросов - PartialUpdateBooking."""
 
-import json
-import pytest
+
 import allure
-from helpers import body_id_data, allure_steps
+import pytest
+
+from helpers.schemas import GET_BOOKING_SCHEMA
+from helpers.urls_helper import Paths
 
 
-@allure.feature("PATCH - PartialUpdateBooking")
-@allure.story("Обновление части параметров сущности")
-@pytest.mark.positive
-@pytest.mark.parametrize("first, last", [("Peter", "Jackson"), ("Emma", "Star")])
-def test_patch_part_fields(booker_api, first, last):
-    """Тестовая функция для проверки вызова patch запроса с передаваемым телом.
-    Проверяются позитивные варианты через параметризацию -
-    обновление значений "firstname", "lastname".
-    Обращение напрямую к определенному id в урле.
+@pytest.mark.patch_booking
+@allure.feature('PATCH - PartialUpdateBooking')
+class TestPartialUpdateBooking:
+    """Тесты метода patch /booking/id."""
 
-    :param booker_api: фикстура, создающая и возвращающая экземпляр класса ApiClient
-    :param first: передаваемый в теле запроса firstname
-    :param last: передаваемый в теле запроса lastname
-    """
-    id_to_do_request = body_id_data.create_test_entity(booker_api)
+    @allure.story('Обновление части параметров')
+    @allure.title('Валидные значения firstname {first} и lastname {last}')
+    @pytest.mark.parametrize('first, last', [('Peter', 'Jackson'), ('Emma', 'Star')])
+    def test_patch_valid_firstname_lastname(
+            self, booker_api, first, last, fixture_create_delete_booking_data,
+            status_code_msg, response_body_msg, validate_json):
+        """Тестовая функция для проверки обновления брони с валидными значениями firstname, lastname.
 
-    with allure.step("Получаем все данные сущности"):
-        data_for_id = body_id_data.TestDictForRequests().return_dict_other()
+        :param booker_api: фикстура, создающая и возвращающая экземпляр класса ApiClient
+        :param first: передаваемый в теле запроса firstname
+        :param last: передаваемый в теле запроса lastname
+        :param fixture_create_delete_booking_data: фикстура для создания и удаления тестовых данных
+        :param validate_json: фикстура для валидации JSON схемы
+        :param status_code_msg: фикстура, возвращающая текст проверки кода ответа
+        :param response_body_msg: фикстура, возвращающая текст проверки тела ответа
+        """
+        booking_id, booking_data = fixture_create_delete_booking_data
 
-    data = {"firstname": first, "lastname": last}
+        data = {'firstname': first, 'lastname': last}
+        response = booker_api.patch(f'{Paths.BOOKING}{booking_id}', data)
+        booking_data_new = response.json()
 
-    with allure.step(allure_steps.send_patch_request(data, id_to_do_request)):
-        response = booker_api.patch(path=id_to_do_request, data=json.dumps(data))
+        with allure.step(status_code_msg(200)):
+            assert response.status_code == 200, f'Код ответа - {response.status_code}'
 
-    with allure.step(allure_steps.check_200_status_code()):
-        assert response.status_code == 200, f"Код ответа - {response.status_code}"
+        assert validate_json(booking_data, GET_BOOKING_SCHEMA)
 
-    with allure.step(allure_steps.check_firstname(first)):
-        assert response.json()["firstname"] == first, \
-            f"Имя - '{response.json()['firstname']}'"
+        with allure.step(response_body_msg(booking_data_new)):
+            assert booking_data_new['firstname'] == first, f'Имя - {booking_data_new["firstname"]}'
+            assert booking_data_new['lastname'] == last, f'Фамилия - {booking_data_new["lastname"]}'
+            assert booking_data_new['totalprice'] == booking_data['totalprice'], \
+                f'Итоговая цена - {booking_data_new["totalprice"]}'
+            assert booking_data_new['depositpaid'] == booking_data['depositpaid'], \
+                f'Депозит - {booking_data_new["depositpaid"]}'
+            assert booking_data_new['bookingdates']['checkin'] == \
+                booking_data['bookingdates']['checkin'], \
+                f'Дата заезда - {booking_data_new["bookingdates"]["checkin"]}'
+            assert booking_data_new['bookingdates']['checkout'] == \
+                booking_data['bookingdates']['checkout'], \
+                f'Дата выезда - {booking_data_new["bookingdates"]["checkout"]}'
+            assert booking_data_new['additionalneeds'] == \
+                   booking_data['additionalneeds'], \
+                   f'additionalneeds - {booking_data_new["additionalneeds"]}'
 
-    with allure.step(allure_steps.check_lastname(last)):
-        assert response.json()["lastname"] == last, \
-            f"Фамилия - '{response.json()['lastname']}'"
+    @allure.story('Обновление всех параметров')
+    @allure.title('Валидные значения у всех полей')
+    def test_patch_valid_all_fields(
+            self, booker_api, fixture_create_delete_booking_data, status_code_msg,
+            response_body_msg, validate_json, generate_body_booking):
+        """Тестовая функция для проверки обновления брони с валидными значениями (все поля).
 
-    with allure.step(allure_steps.check_totalprice(data_for_id['totalprice'])):
-        assert response.json()["totalprice"] == data_for_id["totalprice"], \
-            f"Итоговая цена - '{response.json()['totalprice']}'"
+        :param booker_api: фикстура, создающая и возвращающая экземпляр класса ApiClient
+        :param fixture_create_delete_booking_data: фикстура для создания и удаления тестовых данных
+        :param validate_json: фикстура для валидации JSON схемы
+        :param status_code_msg: фикстура, возвращающая текст проверки кода ответа
+        :param response_body_msg: фикстура, возвращающая текст проверки тела ответа
+        :param generate_body_booking: фикстура, создающая тело для запроса
+        """
+        booking_id, booking_data = fixture_create_delete_booking_data
 
-    with allure.step(allure_steps.check_depositpaid(data_for_id['depositpaid'])):
-        assert response.json()["depositpaid"] == data_for_id["depositpaid"], \
-            f"Депозит - '{response.json()['depositpaid']}'"
+        data = generate_body_booking(
+            'Andrea', 'Jackson', 232, False, '2022-05-01', '2022-06-01', 'Breakfast, Dinner')
+        response = booker_api.patch(f'{Paths.BOOKING}{booking_id}', data)
+        booking_data_new = response.json()
 
-    with allure.step(allure_steps.check_checkin(data_for_id['bookingdates']['checkin'])):
-        assert response.json()["bookingdates"]["checkin"] == \
-            data_for_id["bookingdates"]["checkin"], \
-            f"Дата заезда - '{response.json()['bookingdates']['checkin']}'"
+        with allure.step(status_code_msg(200)):
+            assert response.status_code == 200, f'Код ответа - {response.status_code}'
 
-    with allure.step(allure_steps.check_checkout(data_for_id['bookingdates']['checkout'])):
-        assert response.json()["bookingdates"]["checkout"] == \
-            data_for_id["bookingdates"]["checkout"], \
-            f"Дата выезда - '{response.json()['bookingdates']['checkout']}'"
+        assert validate_json(booking_data, GET_BOOKING_SCHEMA)
 
-    body_id_data.delete_test_entity(booker_api, id_to_do_request)
+        with allure.step(response_body_msg(booking_data_new)):
+            assert booking_data_new['firstname'] == data['firstname'], \
+                f'Имя - {booking_data_new["firstname"]}'
+            assert booking_data_new['lastname'] == data['lastname'], \
+                f'Фамилия - {booking_data_new["lastname"]}'
+            assert booking_data_new['totalprice'] == data['totalprice'], \
+                f'Итоговая цена - {booking_data_new["totalprice"]}'
+            assert booking_data_new['depositpaid'] == data['depositpaid'], \
+                f'Депозит - {booking_data_new["depositpaid"]}'
+            assert booking_data_new['bookingdates']['checkin'] == \
+                   data['bookingdates']['checkin'], \
+                   f'Дата заезда - {booking_data_new["bookingdates"]["checkin"]}'
+            assert booking_data_new['bookingdates']['checkout'] == \
+                   data['bookingdates']['checkout'], \
+                   f'Дата выезда - {booking_data_new["bookingdates"]["checkout"]}'
+            assert booking_data_new['additionalneeds'] == data['additionalneeds'], \
+                   f'Пожелания - {booking_data_new["additionalneeds"]}'
 
+    @allure.title('Пустое тело')
+    def test_patch_empty_body(
+            self, booker_api, fixture_create_delete_booking_data, status_code_msg, validate_json, response_body_msg):
+        """Тестовая функция для проверки обновления брони при передаче пустого тела.
 
-@allure.feature("PATCH - PartialUpdateBooking")
-@allure.story("Обновление всех параметров сущности")
-@pytest.mark.positive
-def test_patch_all_fields(booker_api):
-    """Тестовая функция для проверки вызова patch запроса с передаваемым телом.
-    Проверяется обновление всех полей сущности.
-    Обращение напрямую к определенному id в урле.
+        :param booker_api: фикстура, создающая и возвращающая экземпляр класса ApiClient
+        :param fixture_create_delete_booking_data: фикстура для создания и удаления тестовых данных
+        :param validate_json: фикстура для валидации JSON схемы
+        :param status_code_msg: фикстура, возвращающая текст проверки кода ответа
+        :param response_body_msg: фикстура, возвращающая текст проверки тела ответа
+        """
+        booking_id, booking_data = fixture_create_delete_booking_data
 
-    :param booker_api: фикстура, создающая и возвращающая экземпляр класса ApiClient
-    """
-    id_to_do_request = body_id_data.create_test_entity(booker_api)
+        response = booker_api.patch(f'{Paths.BOOKING}{booking_id}', {})
+        booking_data_new = response.json()
 
-    data = body_id_data.TestDictForRequests().return_dict()
+        with allure.step(status_code_msg(200)):
+            assert response.status_code == 200, f'Код ответа - {response.status_code}'
 
-    with allure.step(allure_steps.send_patch_request(data, id_to_do_request)):
-        response = booker_api.patch(path=id_to_do_request, data=json.dumps(data))
+        assert validate_json(booking_data, GET_BOOKING_SCHEMA)
 
-    with allure.step(allure_steps.check_200_status_code()):
-        assert response.status_code == 200, f"Код ответа - {response.status_code}"
+        with allure.step(response_body_msg(booking_data_new)):
+            assert booking_data_new['firstname'] == booking_data['firstname'], \
+                f'Имя - {booking_data_new["firstname"]}'
+            assert booking_data_new['lastname'] == booking_data['lastname'], \
+                f'Фамилия - {booking_data_new["lastname"]}'
+            assert booking_data_new['totalprice'] == booking_data['totalprice'], \
+                f'Итоговая цена - {booking_data_new["totalprice"]}'
+            assert booking_data_new['depositpaid'] == booking_data['depositpaid'], \
+                f'Депозит - {booking_data_new["depositpaid"]}'
+            assert booking_data_new['bookingdates']['checkin'] == \
+                   booking_data['bookingdates']['checkin'], \
+                f'Дата заезда - {booking_data_new["bookingdates"]["checkin"]}'
+            assert booking_data_new['bookingdates']['checkout'] == \
+                   booking_data['bookingdates']['checkout'], \
+                f'Дата выезда - {booking_data_new["bookingdates"]["checkout"]}'
+            assert booking_data_new['additionalneeds'] == booking_data['additionalneeds'], \
+                f'Пожелания - {booking_data_new["additionalneeds"]}'
 
-    with allure.step(allure_steps.check_firstname(data['firstname'])):
-        assert response.json()["firstname"] == data['firstname'], \
-            f"Имя - '{response.json()['firstname']}'"
+    @allure.title('Обновление брони по невалидному id {value}')
+    @pytest.mark.parametrize('value', ['213123', 'tests'])
+    def test_patch_invalid_id(self, booker_api, value, generate_body_booking, status_code_msg):
+        """Тестовая функция для проверки обновления брони по невалидному id.
 
-    with allure.step(allure_steps.check_lastname(data['lastname'])):
-        assert response.json()["lastname"] == data['lastname'], \
-            f"Фамилия - '{response.json()['lastname']}'"
-
-    with allure.step(allure_steps.check_totalprice(data['totalprice'])):
-        assert response.json()["totalprice"] == data['totalprice'], \
-            f"Итоговая цена - '{response.json()['totalprice']}'"
-
-    with allure.step(allure_steps.check_depositpaid(data['depositpaid'])):
-        assert response.json()["depositpaid"] == data['depositpaid'], \
-            f"Депозит - '{response.json()['depositpaid']}'"
-
-    with allure.step(allure_steps.check_checkin(data['bookingdates']['checkin'])):
-        assert response.json()["bookingdates"]["checkin"] == \
-               data['bookingdates']['checkin'], \
-               f"Дата заезда - '{response.json()['bookingdates']['checkin']}'"
-
-    with allure.step(allure_steps.check_checkout(data['bookingdates']['checkout'])):
-        assert response.json()["bookingdates"]["checkout"] == \
-               data['bookingdates']['checkout'], \
-               f"Дата выезда - '{response.json()['bookingdates']['checkout']}'"
-
-    with allure.step(allure_steps.check_addneeds(data['additionalneeds'])):
-        assert response.json()["additionalneeds"] == data['additionalneeds'], \
-               f"Пожелания - '{response.json()['additionalneeds']}'"
-
-    body_id_data.delete_test_entity(booker_api, id_to_do_request)
-
-
-@allure.feature("PATCH - PartialUpdateBooking")
-@allure.story("Обновление сущности передачей пустого тела")
-@pytest.mark.positive
-def test_patch_empty_body(booker_api):
-    """Тестовая функция для проверки вызова patch запроса с передаваемым телом.
-    Проверяется передача пустого тела.
-    Обращение напрямую к определенному id в урле.
-
-    :param booker_api: фикстура, создающая и возвращающая экземпляр класса ApiClient
-    """
-    id_to_do_request = body_id_data.create_test_entity(booker_api)
-
-    with allure.step("Получаем все данные сущности"):
-        data_for_id = body_id_data.TestDictForRequests().return_dict_other()
-
-    with allure.step(f"Отправляем patch запрос с пустым телом и id {id_to_do_request}"):
-        response = booker_api.patch(path=id_to_do_request, data={})
-
-    with allure.step(allure_steps.check_200_status_code()):
-        assert response.status_code == 200, f"Код ответа - {response.status_code}"
-
-    with allure.step(allure_steps.check_firstname(data_for_id['firstname'])):
-        assert response.json()["firstname"] == data_for_id["firstname"], \
-            f"Имя - '{response.json()['firstname']}'"
-
-    with allure.step(allure_steps.check_lastname(data_for_id['lastname'])):
-        assert response.json()["lastname"] == data_for_id["lastname"], \
-            f"Фамилия - '{response.json()['lastname']}'"
-
-    with allure.step(allure_steps.check_totalprice(data_for_id['totalprice'])):
-        assert response.json()["totalprice"] == data_for_id["totalprice"], \
-            f"Итоговая цена - '{response.json()['totalprice']}'"
-
-    with allure.step(allure_steps.check_depositpaid(data_for_id['depositpaid'])):
-        assert response.json()["depositpaid"] == data_for_id["depositpaid"], \
-            f"Депозит - '{response.json()['depositpaid']}'"
-
-    with allure.step(allure_steps.check_checkin(data_for_id['bookingdates']['checkin'])):
-        assert response.json()["bookingdates"]["checkin"] == \
-            data_for_id["bookingdates"]["checkin"], \
-            f"Дата заезда - '{response.json()['bookingdates']['checkin']}'"
-
-    with allure.step(allure_steps.check_checkout(data_for_id['bookingdates']['checkout'])):
-        assert response.json()["bookingdates"]["checkout"] == \
-            data_for_id["bookingdates"]["checkout"], \
-            f"Дата выезда - '{response.json()['bookingdates']['checkout']}'"
-
-    body_id_data.delete_test_entity(booker_api, id_to_do_request)
-
-
-@allure.feature("PATCH - PartialUpdateBooking")
-@allure.story("Обновление параметров несуществующей сущности")
-@pytest.mark.negative
-@pytest.mark.parametrize("param", ["213123", "tests"])
-def test_patch_invalid_id(booker_api, param):
-    """Тестовая функция для проверки вызова patch запроса с передаваемым телом.
-    Проверяются негативные варианты через параметризацию -
-    обращение к несуществующему id в урле.
-
-    :param booker_api: фикстура, создающая и возвращающая экземпляр класса ApiClient
-    :param param: передеваемый в урле id
-    """
-    data = body_id_data.TestDictForRequests().return_dict()
-
-    with allure.step(f"Отправляем patch запрос с id {param}"):
-        response = booker_api.patch(path=param, data=json.dumps(data))
-
-    with allure.step(allure_steps.check_405_status_code()):
-        assert response.status_code == 405, f"Код ответа - {response.status_code}"
+        :param booker_api: фикстура, создающая и возвращающая экземпляр класса ApiClient
+        :param value: передеваемый в урле id
+        :param status_code_msg: фикстура, возвращающая текст проверки кода ответа
+        :param generate_body_booking: фикстура, создающая тело для запроса
+        """
+        data = generate_body_booking()
+        response = booker_api.patch(f'{Paths.BOOKING}{value}', data)
+        with allure.step(status_code_msg(405)):
+            assert response.status_code == 405, f'Код ответа - {response.status_code}'

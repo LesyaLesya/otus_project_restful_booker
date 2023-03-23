@@ -9,3 +9,4 @@ allure-report/
 __pycache__/
 .DS_Store
 allure-results
+log_tests.txt
