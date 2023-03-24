@@ -27,6 +27,7 @@ class ApiClient:
         self.headers = headers
         self.session = requests.Session()
         self.logger = logging.getLogger('requests')
+        self.__token = self.__get_token()
 
     def _get_url(self, path):
         return f'{self.schema}://{self.host}/{path}'
@@ -94,8 +95,7 @@ class ApiClient:
         :param data_xml: тело запроса в формате xml
         :param headers_new: кастомные заголовки
         """
-        token = self.__get_token()
-        headers = headers_new or self.headers(method='patch', token=token)
+        headers = headers_new or self.headers(method='patch', token=self.__token)
         data = data_xml or json.dumps(data_json)
         url = self._get_url(path)
         with allure.step(f'Выполнить запрос PATCH {url}, headers={headers}, data={data}'):
@@ -120,8 +120,7 @@ class ApiClient:
         :param data_xml: тело запроса в формате xml
         :param headers_new: кастомные заголовки
         """
-        token = self.__get_token()
-        headers = headers_new or self.headers(method='patch', token=token)
+        headers = headers_new or self.headers(method='patch', token=self.__token)
         data = data_xml or json.dumps(data_json)
         url = self._get_url(path)
         with allure.step(f'Выполнить запрос PUT {url}, headers={headers}, data={data}'):
@@ -144,8 +143,7 @@ class ApiClient:
         :param path: адрес хоста
         :param headers_new: кастомные заголовки
         """
-        token = self.__get_token()
-        headers = headers_new or self.headers(method='delete', token=token)
+        headers = headers_new or self.headers(method='delete', token=self.__token)
         url = self._get_url(path)
         with allure.step(f'Выполнить запрос DELETE {url}, headers={headers}'):
             res = self.session.delete(url=url, headers=headers)
