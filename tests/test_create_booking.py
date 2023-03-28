@@ -96,9 +96,7 @@ def fixture_post_booking_firstname_xml(
         booker_api, generate_body_booking_xml, delete_test_booking, get_params,
         parsing_xml_response, get_text_of_element_xml_tree):
     data = generate_body_booking_xml(firstname=get_params)
-    response = booker_api.post(
-        Paths.BOOKING, headers_new={'Content-Type': 'text/xml', 'Accept': 'application/xml'},
-        data_xml=data)
+    response = booker_api.post(Paths.BOOKING, data_xml=data)
     booking_data = response.text
     tree = parsing_xml_response(booking_data)
     booking_id = get_text_of_element_xml_tree(tree, 'bookingid')

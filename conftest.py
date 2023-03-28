@@ -1,6 +1,7 @@
 """Модуль с фикстурами."""
 
 import allure
+import base64
 import jsonschema
 import logging
 import lxml
@@ -81,14 +82,37 @@ def get_admin_password(cfg):
 
 
 @pytest.fixture(scope='session')
-def headers():
+def encode_login_pass(get_admin_login, get_admin_password):
+    """Кодирование логина и пароля в base64."""
+    login = get_admin_login
+    passw = get_admin_password
+    for_token = f'{login}:{passw}'
+    sample_string_bytes = for_token.encode('ascii')
+    base64_bytes = base64.b64encode(sample_string_bytes)
+    base64_string = base64_bytes.decode('ascii')
+    return base64_string
+
+
+@pytest.fixture(scope='session')
+def headers(encode_login_pass):
     """Генерация заголовков запроса"""
-    def _headers(method='get', token=None):
-        headers = {'Accept': 'application/json'}
-        if method == 'post':
-            headers.update({'Content-Type': 'application/json'})
-        if method == 'put' or method == 'patch' or method == 'delete':
-            headers.update({'Content-Type': 'application/json', 'Cookie': f'token={token}'})
+    def _headers(method='get', token=None, xml=False):
+        headers = {}
+        if method == 'get' and xml is False:
+            headers = {'Accept': 'application/json'}
+        if method == 'get' and xml is True:
+            headers = {'Accept': 'application/xml'}
+        if method == 'post' and xml is False:
+            headers = {'Accept': 'application/json', 'Content-Type': 'application/json'}
+        if method == 'post' and xml is True:
+            headers = {'Accept': 'application/xml', 'Content-Type': 'text/xml'}
+        if (method == 'put' or method == 'patch' or method == 'delete') and xml is False:
+            headers = {'Accept': 'application/json', 'Content-Type': 'application/json', 'Cookie': f'token={token}'}
+        if (method == 'put' or method == 'patch' or method == 'delete') and xml is True:
+            headers = {'Accept': 'application/xml', 'Content-Type': 'text/xml',
+                       'Authorization': f'Basic {encode_login_pass}'}
+        if method == 'delete':
+            headers = {'Cookie': f'token={token}'}
         return headers
     return _headers
 
@@ -152,9 +176,26 @@ def create_test_booking(booker_api, generate_body_booking, logger_test):
 
 
 @pytest.fixture
+def create_test_booking_xml(booker_api, generate_body_booking_xml, logger_test, parsing_xml_response):
+    """Фикстура, создающая тестовую сущность и возвращающая ее тело (в xml)."""
+    @allure.step(
+        'Создать тестовое бронирование: firstname={firstname}, lastname={lastname}, totalprice={totalprice}, '
+        'depositpaid={depositpaid}, checkin={checkin}, checkout={checkout}, additionalneeds={additionalneeds}')
+    def _create_test_booking_xml(firstname='Susan', lastname='Brown', totalprice=1, depositpaid=True,
+                                 checkin='2018-01-01', checkout='2019-01-01', additionalneeds='Breakfast'):
+        data = generate_body_booking_xml(
+            firstname, lastname, totalprice, depositpaid, checkin, checkout, additionalneeds)
+        logger_test.info(f'Создать тестовую бронь: data {data}.')
+        test_booking = booker_api.post(Paths.BOOKING, data_xml=data)
+        booking_data = test_booking.text
+        tree = parsing_xml_response(booking_data)
+        return tree
+    return _create_test_booking_xml
+
+
+@pytest.fixture
 def delete_test_booking(booker_api, logger_test):
     """Фикстура, удаляющая тестовую сущность.
-
     :param booker_api: id брони для удаления
     """
     @allure.step('Удалить бронь с id {booking_id}')
@@ -246,3 +287,13 @@ def validate_xml(logger_test):
         except lxml.etree.XMLSchemaParseError:
             return False
     return _validate
+
+
+@pytest.fixture
+def fixture_create_delete_booking_data_xml(
+        create_test_booking_xml, delete_test_booking, get_text_of_element_xml_tree):
+    """Фикстура создания дефолтной тестовой брони в xml и ее удаления."""
+    booking = create_test_booking_xml()
+    booking_id = get_text_of_element_xml_tree(booking, 'bookingid')
+    yield booking_id, booking
+    delete_test_booking(booking_id)

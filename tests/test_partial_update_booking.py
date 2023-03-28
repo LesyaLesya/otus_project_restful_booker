@@ -4,7 +4,7 @@
 import allure
 import pytest
 
-from helpers.schemas import GET_BOOKING_SCHEMA
+from helpers.schemas import GET_BOOKING_SCHEMA, GET_BOOKING_SCHEMA_XSD
 from helpers.urls_helper import Paths
 
 
@@ -154,3 +154,59 @@ class TestPartialUpdateBooking:
         response = booker_api.patch(f'{Paths.BOOKING}{value}', data)
         with allure.step(status_code_msg(405)):
             assert response.status_code == 405, f'Код ответа - {response.status_code}'
+
+    @allure.story('Обновление части параметров')
+    @allure.title('Валидные значения firstname {first} и lastname {last} - запрос в xml')
+    @pytest.mark.parametrize('first, last', [('Peter', 'Jackson'), ('Emma', 'Star')])
+    def test_patch_valid_firstname_lastname_xml(
+            self, booker_api, first, last, fixture_create_delete_booking_data,
+            status_code_msg, response_body_msg, validate_xml, fixture_create_delete_booking_data_xml, generate_body_booking_xml,
+            parsing_xml_response, get_text_of_element_xml_tree):
+        """Тестовая функция для проверки обновления брони с валидными значениями firstname, lastname - запрос в xml.
+
+        :param booker_api: фикстура, создающая и возвращающая экземпляр класса ApiClient
+        :param first: передаваемый в теле запроса firstname
+        :param last: передаваемый в теле запроса lastname
+        :param fixture_create_delete_booking_data: фикстура для создания и удаления тестовых данных
+        :param validate_xml: фикстура валидации xml схемы
+        :param status_code_msg: фикстура, возвращающая текст проверки кода ответа
+        :param response_body_msg: фикстура, возвращающая текст проверки тела ответа
+        :param fixture_create_delete_booking_data_xml: фикстура создания дефолтной тестовой брони в xml и ее удаления.
+        :param generate_body_booking_xml: фикстура генерации тела для запроса в xml
+        :param parsing_xml_response: фикстура парсинга XML из строки
+        :param get_text_of_element_xml_tree: фикстура получения текста элемента XML дерева
+        """
+        booking_id, booking_data = fixture_create_delete_booking_data_xml
+        totalprice_old = get_text_of_element_xml_tree(booking_data, 'booking/totalprice')
+        depositpaid_old = get_text_of_element_xml_tree(booking_data, 'booking/depositpaid')
+        checkin_old = get_text_of_element_xml_tree(booking_data, 'booking/bookingdates/checkin')
+        checkout_old = get_text_of_element_xml_tree(booking_data, 'booking/bookingdates/checkout')
+        additionalneeds_old = get_text_of_element_xml_tree(booking_data, 'booking/additionalneeds')
+
+        data = generate_body_booking_xml(first, last)
+        response = booker_api.patch(f'{Paths.BOOKING}{booking_id}', data_xml=data)
+        booking_data_new = response.text
+
+        with allure.step(status_code_msg(200)):
+            assert response.status_code == 200, f'Код ответа - {response.status_code}'
+
+        assert validate_xml(booking_data_new, GET_BOOKING_SCHEMA_XSD)
+
+        with allure.step(response_body_msg(booking_data_new)):
+            tree = parsing_xml_response(booking_data_new)
+            firstname_new = get_text_of_element_xml_tree(tree, 'firstname')
+            lastname_new = get_text_of_element_xml_tree(tree, 'lastname')
+            totalprice_new = get_text_of_element_xml_tree(tree, 'totalprice')
+            depositpaid_new = get_text_of_element_xml_tree(tree, 'depositpaid')
+            checkin_new = get_text_of_element_xml_tree(tree, 'bookingdates/checkin')
+            checkout_new = get_text_of_element_xml_tree(tree, 'bookingdates/checkout')
+            additionalneeds_new = get_text_of_element_xml_tree(tree, 'additionalneeds')
+
+            assert firstname_new == first, f'Имя - {firstname_new}'
+            assert lastname_new == last, f'Фамилия - {lastname_new}'
+            assert totalprice_new == totalprice_old, f'Итоговая цена - {totalprice_new}'
+            assert depositpaid_new == depositpaid_old, f'Депозит - {depositpaid_new}'
+            assert checkin_new == checkin_old, f'Дата заезда - {checkin_new}'
+            assert checkout_new == checkout_old, f'Дата выезда - {checkout_new}'
+            assert additionalneeds_new == additionalneeds_old, \
+                f'additionalneeds - {additionalneeds_new}'

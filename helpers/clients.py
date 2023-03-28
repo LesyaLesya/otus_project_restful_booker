@@ -41,14 +41,21 @@ class ApiClient:
         self.logger.info(f'Получить токен {self.__token}')
         return self.__token
 
-    def get(self, path='', params=None, headers_new=None):
+    def get(self, path='', params=None, headers_new=None, in_xml=False):
         """Возвращает вызов get запроса к API.
 
         :param path: путь
         :param params: гет параметры
         :param headers_new: кастомные заголовки
+        :param in_xml: генерировать ли заголовки для формата xml
         """
-        headers = headers_new or self.headers()
+        if headers_new:
+            headers = headers_new
+        else:
+            if in_xml:
+                headers = self.headers(xml=True)
+            else:
+                headers = self.headers()
         url = self._get_url(path)
         with allure.step(f'Выполнить запрос GET {url}, headers={headers}, params={params}'):
             res = self.session.get(url=url, params=params, headers=headers)
@@ -70,7 +77,13 @@ class ApiClient:
         :param data_xml: тело запроса в формате xml
         :param headers_new: кастомные заголовки
         """
-        headers = headers_new or self.headers(method='post')
+        if headers_new:
+            headers = headers_new
+        else:
+            if data_xml:
+                headers = self.headers(method='post', xml=True)
+            else:
+                headers = self.headers(method='post')
         data = data_xml or json.dumps(data_json)
         url = self._get_url(path)
         with allure.step(f'Выполнить запрос POST {url}, headers={headers}, data={data}'):
@@ -95,7 +108,14 @@ class ApiClient:
         :param data_xml: тело запроса в формате xml
         :param headers_new: кастомные заголовки
         """
-        headers = headers_new or self.headers(method='patch', token=self.__token)
+        if headers_new:
+            headers = headers_new
+        else:
+            if data_xml:
+                headers = self.headers(method='patch', xml=True)
+            else:
+                headers = self.headers(method='patch', token=self.__token)
+
         data = data_xml or json.dumps(data_json)
         url = self._get_url(path)
         with allure.step(f'Выполнить запрос PATCH {url}, headers={headers}, data={data}'):
@@ -120,7 +140,13 @@ class ApiClient:
         :param data_xml: тело запроса в формате xml
         :param headers_new: кастомные заголовки
         """
-        headers = headers_new or self.headers(method='patch', token=self.__token)
+        if headers_new:
+            headers = headers_new
+        else:
+            if data_xml:
+                headers = self.headers(method='put', xml=True)
+            else:
+                headers = self.headers(method='put', token=self.__token)
         data = data_xml or json.dumps(data_json)
         url = self._get_url(path)
         with allure.step(f'Выполнить запрос PUT {url}, headers={headers}, data={data}'):
