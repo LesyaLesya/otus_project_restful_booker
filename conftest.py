@@ -8,6 +8,7 @@ import lxml
 import pytest
 import yaml
 from io import StringIO
+from dataclasses import asdict
 from dicttoxml import dicttoxml
 from jsonschema import validate
 from lxml import etree
@@ -15,6 +16,7 @@ from lxml.etree import fromstring
 
 
 from helpers.clients import ApiClient
+from helpers.data import BookingData, BookingDates
 from helpers.urls_helper import Paths
 
 
@@ -33,7 +35,7 @@ def log_test_description(request, logger_test):
 
 @pytest.fixture(scope='module', autouse=True)
 def log_module_description(request, logger_test):
-    logger_test.info(f'_____Start testing module {request.node.name}')
+    logger_test.info(f'_____START testing module {request.node.name}')
     yield
     logger_test.info(f'_____STOP testing module {request.node.name}')
 
@@ -125,16 +127,8 @@ def generate_body_booking():
             firstname='Susan', lastname='Brown', totalprice=1, depositpaid=True,
             checkin='2018-01-01', checkout='2019-01-01', additionalneeds='Breakfast',
             del_key=False, key_to_del=None):
-        data = {
-                'firstname': firstname,
-                'lastname': lastname,
-                'totalprice': totalprice,
-                'depositpaid': depositpaid,
-                'bookingdates': {
-                    'checkin': checkin,
-                    'checkout': checkout
-                },
-                'additionalneeds': additionalneeds}
+        data = asdict(BookingData(
+            firstname, lastname, totalprice, depositpaid, BookingDates(checkin, checkout), additionalneeds))
         if del_key:
             for i in key_to_del:
                 data.pop(i)
@@ -186,7 +180,7 @@ def create_test_booking_xml(booker_api, generate_body_booking_xml, logger_test, 
         data = generate_body_booking_xml(
             firstname, lastname, totalprice, depositpaid, checkin, checkout, additionalneeds)
         logger_test.info(f'Создать тестовую бронь: data {data}.')
-        test_booking = booker_api.post(Paths.BOOKING, data_xml=data)
+        test_booking = booker_api.post(Paths.BOOKING, data, in_xml=True)
         booking_data = test_booking.text
         tree = parsing_xml_response(booking_data)
         return tree

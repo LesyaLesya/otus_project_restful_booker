@@ -184,7 +184,7 @@ class TestPartialUpdateBooking:
         additionalneeds_old = get_text_of_element_xml_tree(booking_data, 'booking/additionalneeds')
 
         data = generate_body_booking_xml(first, last)
-        response = booker_api.patch(f'{Paths.BOOKING}{booking_id}', data_xml=data)
+        response = booker_api.patch(f'{Paths.BOOKING}{booking_id}', data, in_xml=True)
         booking_data_new = response.text
 
         with allure.step(status_code_msg(200)):
@@ -210,3 +210,36 @@ class TestPartialUpdateBooking:
             assert checkout_new == checkout_old, f'Дата выезда - {checkout_new}'
             assert additionalneeds_new == additionalneeds_old, \
                 f'additionalneeds - {additionalneeds_new}'
+
+    @allure.story('Проверка заголовков')
+    @allure.title('Без токена')
+    def test_patch_without_token(
+            self, booker_api, fixture_create_delete_booking_data, status_code_msg,
+            response_body_msg, generate_body_booking):
+        """Тестовая функция для проверки обновления брони без токена.
+
+        :param booker_api: фикстура, создающая и возвращающая экземпляр класса ApiClient
+        :param fixture_create_delete_booking_data: фикстура для создания и удаления тестовых данных
+        :param status_code_msg: фикстура, возвращающая текст проверки кода ответа
+        :param response_body_msg: фикстура, возвращающая текст проверки тела ответа
+        :param generate_body_booking: фикстура, создающая тело для запроса
+        """
+        booking_id, booking_data = fixture_create_delete_booking_data
+        data = generate_body_booking()
+        response = booker_api.patch(
+            f'{Paths.BOOKING}{booking_id}', data,
+            headers_new={'Accept': 'application/json', 'Content-Type': 'application/json'})
+        booking_data_new = response.text
+
+        with allure.step(status_code_msg(403)):
+            assert response.status_code == 403, f'Код ответа - {response.status_code}'
+
+        with allure.step(response_body_msg(booking_data_new)):
+            assert booking_data_new == 'Forbidden', f'Тело ответа без токена - {booking_data_new}'
+
+        response_get = booker_api.get(f'{Paths.BOOKING}{booking_id}')
+        response_after_patch = response_get.json()
+
+        with allure.step(response_body_msg(response_after_patch)):
+            assert response_after_patch == booking_data, \
+                f'Тело до изменения {booking_data}, тело после изменения {response_after_patch}'

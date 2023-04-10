@@ -96,7 +96,7 @@ def fixture_post_booking_firstname_xml(
         booker_api, generate_body_booking_xml, delete_test_booking, get_params,
         parsing_xml_response, get_text_of_element_xml_tree):
     data = generate_body_booking_xml(firstname=get_params)
-    response = booker_api.post(Paths.BOOKING, data_xml=data)
+    response = booker_api.post(Paths.BOOKING, data, in_xml=True)
     booking_data = response.text
     tree = parsing_xml_response(booking_data)
     booking_id = get_text_of_element_xml_tree(tree, 'bookingid')
@@ -434,3 +434,25 @@ class TestCreateBooking:
                 assert firstname is None, f'Имя - {firstname}'
             else:
                 assert firstname == get_params, f'Имя - {firstname}'
+
+    @allure.story('Проверка заголовков')
+    @allure.title('Content-type: text/plain')
+    def test_post_with_content_type_text_plain(
+            self, booker_api, status_code_msg, response_body_msg, generate_body_booking):
+        """Тестовая функция для проверки создания бронирования с валидным именем.
+
+        :param booker_api: фикстура, создающая и возвращающая экземпляр класса ApiClient
+        :param status_code_msg: фикстура, возвращающая текст проверки кода ответа
+        :param response_body_msg: фикстура, возвращающая текст проверки тела ответа
+        :param generate_body_booking: фикстура, создающая тело для запроса
+        """
+        data = generate_body_booking()
+        response = booker_api.post(Paths.BOOKING, data, headers_new={'Content-type': 'text/plain'})
+        booking_data = response.text
+
+        with allure.step(status_code_msg(500)):
+            assert response.status_code == 500, f'Код ответа - {response.status_code}'
+
+        with allure.step(response_body_msg(booking_data)):
+            assert booking_data == 'Internal Server Error', \
+                f'Тело ответа, если Content-type: text/plain  - {booking_data}'

@@ -69,22 +69,24 @@ class ApiClient:
                 self.logger.info(f'Тело ответа: {res.content}')
             return res
 
-    def post(self, path='', data_json=None, headers_new=None, data_xml=None):
+    def post(self, path='', data=None, headers_new=None, in_xml=False):
         """Возвращает вызов post запроса к API.
 
         :param path: путь
-        :param data_json: тело запроса в формате json
-        :param data_xml: тело запроса в формате xml
+        :param data: тело запроса
         :param headers_new: кастомные заголовки
         """
         if headers_new:
             headers = headers_new
         else:
-            if data_xml:
+            if in_xml:
                 headers = self.headers(method='post', xml=True)
             else:
                 headers = self.headers(method='post')
-        data = data_xml or json.dumps(data_json)
+        if in_xml:
+            data = data
+        else:
+            data = json.dumps(data)
         url = self._get_url(path)
         with allure.step(f'Выполнить запрос POST {url}, headers={headers}, data={data}'):
             res = self.session.post(url=url, headers=headers, data=data)
@@ -99,24 +101,26 @@ class ApiClient:
                 self.logger.info(f'Тело ответа: {res.content}')
             return res
 
-    def patch(self, path='', data_json=None, headers_new=None, data_xml=None):
+    def patch(self, path='', data=None, headers_new=None, in_xml=False):
         """Возвращает вызов patch запроса к API.
         Требует передачу в заголовке Cookie auth token.
 
         :param path: путь
-        :param data_json: тело запроса в формате json
-        :param data_xml: тело запроса в формате xml
+        :param data: тело запроса
         :param headers_new: кастомные заголовки
         """
         if headers_new:
             headers = headers_new
         else:
-            if data_xml:
+            if in_xml:
                 headers = self.headers(method='patch', xml=True)
             else:
                 headers = self.headers(method='patch', token=self.__token)
 
-        data = data_xml or json.dumps(data_json)
+        if in_xml:
+            data = data
+        else:
+            data = json.dumps(data)
         url = self._get_url(path)
         with allure.step(f'Выполнить запрос PATCH {url}, headers={headers}, data={data}'):
             res = self.session.patch(url=url, headers=headers, data=data)
@@ -131,23 +135,25 @@ class ApiClient:
                 self.logger.info(f'Тело ответа: {res.content}')
             return res
 
-    def put(self, path='', data_json=None, headers_new=None, data_xml=None):
+    def put(self, path='', data=None, headers_new=None, in_xml=False):
         """Возвращает вызов put запроса к API.
         Требует передачу в заголовке Cookie auth token.
 
         :param path: путь
-        :param data_json: тело запроса в формате json
-        :param data_xml: тело запроса в формате xml
+        :param data: тело запроса
         :param headers_new: кастомные заголовки
         """
         if headers_new:
             headers = headers_new
         else:
-            if data_xml:
+            if in_xml:
                 headers = self.headers(method='put', xml=True)
             else:
                 headers = self.headers(method='put', token=self.__token)
-        data = data_xml or json.dumps(data_json)
+        if in_xml:
+            data = data
+        else:
+            data = json.dumps(data)
         url = self._get_url(path)
         with allure.step(f'Выполнить запрос PUT {url}, headers={headers}, data={data}'):
             res = self.session.put(url=url, headers=headers, data=data)
