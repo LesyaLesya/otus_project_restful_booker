@@ -70,7 +70,7 @@ class TestGetBooking:
             assert response_body == 'Not Found', f'Текст ответа - {response_body}'
 
     @allure.title('Получение существующей брони по id - проверка получения ответа в xml')
-    def test_get_by_exist_id_check_xml(
+    def test_get_by_exist_id_in_xml(
             self, booker_api, fixture_create_delete_booking_data, validate_xml,
             status_code_msg, response_body_msg, parsing_xml_response, get_text_of_element_xml_tree):
         """Тестовая функция для проверки получения бронирования по существующему id в xml.
@@ -110,3 +110,28 @@ class TestGetBooking:
             assert checkin == booking_test_data['bookingdates']['checkin'], f'checkin - {checkin}'
             assert checkout == booking_test_data['bookingdates']['checkout'], f'checkout - {checkout}'
             assert additionalneeds == booking_test_data['additionalneeds'], f'additionalneeds - {additionalneeds}'
+
+    @pytest.mark.parametrize('header', ['text/plain', 'text/html', 'application/pdf'])
+    @allure.title('Получение существующей брони с невалидным заголовком')
+    def test_get_by_exist_id_with_invalid_headers(
+            self, booker_api, fixture_create_delete_booking_data, validate_json,
+            status_code_msg, response_body_msg, header):
+        """Тестовая функция для проверки получения бронирования по существующему id.
+
+        :param booker_api: фикстура, создающая и возвращающая экземпляр класса ApiClient
+        :param validate_json: фикстура для валидации JSON схемы
+        :param status_code_msg: фикстура, возвращающая текст проверки кода ответа
+        :param response_body_msg: фикстура, возвращающая текст проверки тела ответа
+        :param fixture_create_delete_booking_data: фикстура для создания и удаления тестовых данных
+        :param header: значение заголовка Accept
+        """
+        booking_id, booking_test_data = fixture_create_delete_booking_data
+        response = booker_api.get(path=f'{Paths.BOOKING}{booking_id}', headers_new={'Accept': header})
+        response_text = response.text
+
+        with allure.step(status_code_msg(418)):
+            assert response.status_code == 418, f'Код ответа - {response.status_code}'
+
+        with allure.step(response_body_msg(response_text)):
+            assert response_text == "I'm a Teapot", \
+                f'Ответ при невалидном заголовке Accept: {header} - {response_text}'

@@ -168,14 +168,20 @@ class ApiClient:
                 self.logger.info(f'Тело ответа: {res.content}')
             return res
 
-    def delete(self, path='', headers_new=None):
+    def delete(self, path='', headers_new=None, auth='cookie'):
         """Возвращает вызов delete запроса к API.
         Требует передачу в заголовке Cookie auth token.
 
         :param path: адрес хоста
         :param headers_new: кастомные заголовки
         """
-        headers = headers_new or self.headers(method='delete', token=self.__token)
+        if headers_new:
+            headers = headers_new
+        else:
+            if auth == 'cookie':
+                headers = self.headers(method='delete', token=self.__token, auth='cookie')
+            else:
+                headers = self.headers(method='delete', auth='basic_auth')
         url = self._get_url(path)
         with allure.step(f'Выполнить запрос DELETE {url}, headers={headers}'):
             res = self.session.delete(url=url, headers=headers)

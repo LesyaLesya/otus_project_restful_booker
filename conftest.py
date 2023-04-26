@@ -98,7 +98,7 @@ def encode_login_pass(get_admin_login, get_admin_password):
 @pytest.fixture(scope='session')
 def headers(encode_login_pass):
     """Генерация заголовков запроса"""
-    def _headers(method='get', token=None, xml=False):
+    def _headers(method='get', token=None, xml=False, auth='cookie'):
         headers = {}
         if method == 'get' and xml is False:
             headers = {'Accept': 'application/json'}
@@ -108,13 +108,15 @@ def headers(encode_login_pass):
             headers = {'Accept': 'application/json', 'Content-Type': 'application/json'}
         if method == 'post' and xml is True:
             headers = {'Accept': 'application/xml', 'Content-Type': 'text/xml'}
-        if (method == 'put' or method == 'patch' or method == 'delete') and xml is False:
+        if (method == 'put' or method == 'patch') and xml is False:
             headers = {'Accept': 'application/json', 'Content-Type': 'application/json', 'Cookie': f'token={token}'}
-        if (method == 'put' or method == 'patch' or method == 'delete') and xml is True:
+        if (method == 'put' or method == 'patch') and xml is True:
             headers = {'Accept': 'application/xml', 'Content-Type': 'text/xml',
                        'Authorization': f'Basic {encode_login_pass}'}
-        if method == 'delete':
-            headers = {'Cookie': f'token={token}'}
+        if method == 'delete' and auth == 'cookie':
+            headers = {'Content-Type': 'application/json', 'Cookie': f'token={token}'}
+        if method == 'delete' and auth == 'basic_auth':
+            headers = {'Content-Type': 'application/json', 'Authorization': f'Basic {encode_login_pass}'}
         return headers
     return _headers
 

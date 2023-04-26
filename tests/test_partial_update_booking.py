@@ -103,7 +103,8 @@ class TestPartialUpdateBooking:
 
     @allure.title('Пустое тело')
     def test_patch_empty_body(
-            self, booker_api, fixture_create_delete_booking_data, status_code_msg, validate_json, response_body_msg):
+            self, booker_api, fixture_create_delete_booking_data,
+            status_code_msg, validate_json, response_body_msg):
         """Тестовая функция для проверки обновления брони при передаче пустого тела.
 
         :param booker_api: фикстура, создающая и возвращающая экземпляр класса ApiClient

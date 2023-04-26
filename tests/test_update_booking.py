@@ -61,7 +61,7 @@ class TestUpdateBooking:
     @allure.title('Валидные значения firstname {first} и lastname {last}')
     @pytest.mark.parametrize('first, last', [('Peter', 'Jackson')])
     def test_put_not_all_fields(
-            self, booker_api, first, last, fixture_create_delete_booking_data, status_code_msg):
+            self, booker_api, first, last, fixture_create_delete_booking_data, status_code_msg, response_body_msg):
         """Тестовая функция для проверки обновления брони с частью параметров.
 
         :param booker_api: фикстура, создающая и возвращающая экземпляр класса ApiClient
@@ -69,6 +69,7 @@ class TestUpdateBooking:
         :param last: передаваемый в теле запроса lastname
         :param fixture_create_delete_booking_data: фикстура для создания и удаления тестовых данных
         :param status_code_msg: фикстура, возвращающая текст проверки кода ответа
+        :param response_body_msg: фикстура, возвращающая текст проверки тела ответа
         """
         booking_id, booking_data = fixture_create_delete_booking_data
 
@@ -78,19 +79,30 @@ class TestUpdateBooking:
         with allure.step(status_code_msg(400)):
             assert response.status_code == 400, f'Код ответа - {response.status_code}'
 
+        get_after_put = booker_api.get(path=f'{Paths.BOOKING}{booking_id}').json()
+        with allure.step(response_body_msg(get_after_put)):
+            assert get_after_put == booking_data, \
+                f'Тело до изменения {booking_data}, тело после изменения {get_after_put}'
+
     @allure.title('Пустое тело')
     def test_put_empty_body(
-            self, booker_api, fixture_create_delete_booking_data, status_code_msg):
+            self, booker_api, fixture_create_delete_booking_data, status_code_msg, response_body_msg):
         """Тестовая функция для проверки обновления брони с пустым телом.
 
         :param booker_api: фикстура, создающая и возвращающая экземпляр класса ApiClient
         :param fixture_create_delete_booking_data: фикстура для создания и удаления тестовых данных
         :param status_code_msg: фикстура, возвращающая текст проверки кода ответа
+        :param response_body_msg: фикстура, возвращающая текст проверки тела ответа
         """
         booking_id, booking_data = fixture_create_delete_booking_data
         response = booker_api.put(f'{Paths.BOOKING}{booking_id}', {})
         with allure.step(status_code_msg(400)):
             assert response.status_code == 400, f'Код ответа - {response.status_code}'
+
+        get_after_put = booker_api.get(path=f'{Paths.BOOKING}{booking_id}').json()
+        with allure.step(response_body_msg(get_after_put)):
+            assert get_after_put == booking_data, \
+                f'Тело до изменения {booking_data}, тело после изменения {get_after_put}'
 
     @allure.title('Обновление брони по невалидному id {value}')
     @pytest.mark.parametrize('value', ['34533424553', '&(*&(*UIU*('])

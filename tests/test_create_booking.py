@@ -439,7 +439,7 @@ class TestCreateBooking:
     @allure.title('Content-type: text/plain')
     def test_post_with_content_type_text_plain(
             self, booker_api, status_code_msg, response_body_msg, generate_body_booking):
-        """Тестовая функция для проверки создания бронирования с валидным именем.
+        """Тестовая функция для проверки создания бронирования с заголовком Content-type: text/plain.
 
         :param booker_api: фикстура, создающая и возвращающая экземпляр класса ApiClient
         :param status_code_msg: фикстура, возвращающая текст проверки кода ответа
