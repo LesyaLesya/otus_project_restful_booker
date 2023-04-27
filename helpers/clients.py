@@ -41,21 +41,15 @@ class ApiClient:
         self.logger.info(f'Получить токен {self.__token}')
         return self.__token
 
-    def get(self, path='', params=None, headers_new=None, in_xml=False):
+    def get(self, path='', params=None, headers_new=None, accept_header='json'):
         """Возвращает вызов get запроса к API.
 
         :param path: путь
         :param params: гет параметры
         :param headers_new: кастомные заголовки
-        :param in_xml: генерировать ли заголовки для формата xml
+        :param accept_header: в каком типе данных получать ответ
         """
-        if headers_new:
-            headers = headers_new
-        else:
-            if in_xml:
-                headers = self.headers(xml=True)
-            else:
-                headers = self.headers()
+        headers = headers_new or self.headers(accept=accept_header)
         url = self._get_url(path)
         with allure.step(f'Выполнить запрос GET {url}, headers={headers}, params={params}'):
             res = self.session.get(url=url, params=params, headers=headers)
@@ -69,24 +63,20 @@ class ApiClient:
                 self.logger.info(f'Тело ответа: {res.content}')
             return res
 
-    def post(self, path='', data=None, headers_new=None, in_xml=False):
+    def post(self, path='', data=None, headers_new=None, cont_type='json', accept_header='json'):
         """Возвращает вызов post запроса к API.
 
         :param path: путь
         :param data: тело запроса
         :param headers_new: кастомные заголовки
+        :param accept_header: в каком типе данных получать ответ
+        :param cont_type: в каком типе данных отправлять запрос
         """
-        if headers_new:
-            headers = headers_new
-        else:
-            if in_xml:
-                headers = self.headers(method='post', xml=True)
-            else:
-                headers = self.headers(method='post')
-        if in_xml:
-            data = data
-        else:
+        headers = headers_new or self.headers(cont_type=cont_type, accept=accept_header)
+        if cont_type == 'json':
             data = json.dumps(data)
+        else:
+            data = data
         url = self._get_url(path)
         with allure.step(f'Выполнить запрос POST {url}, headers={headers}, data={data}'):
             res = self.session.post(url=url, headers=headers, data=data)
@@ -101,26 +91,25 @@ class ApiClient:
                 self.logger.info(f'Тело ответа: {res.content}')
             return res
 
-    def patch(self, path='', data=None, headers_new=None, in_xml=False):
+    def patch(
+            self, path='', data=None, headers_new=None, cont_type='json',
+            accept_header='json', auth_type='cookie'):
         """Возвращает вызов patch запроса к API.
         Требует передачу в заголовке Cookie auth token.
 
         :param path: путь
         :param data: тело запроса
         :param headers_new: кастомные заголовки
+        :param accept_header: в каком типе данных получать ответ
+        :param cont_type: в каком типе данных отправлять запрос
+        :param auth_type: как авторизоваться
         """
-        if headers_new:
-            headers = headers_new
-        else:
-            if in_xml:
-                headers = self.headers(method='patch', xml=True)
-            else:
-                headers = self.headers(method='patch', token=self.__token)
-
-        if in_xml:
-            data = data
-        else:
+        headers = headers_new or self.headers(
+            cont_type=cont_type, accept=accept_header, auth_type=auth_type, token=self.__token)
+        if cont_type == 'json':
             data = json.dumps(data)
+        else:
+            data = data
         url = self._get_url(path)
         with allure.step(f'Выполнить запрос PATCH {url}, headers={headers}, data={data}'):
             res = self.session.patch(url=url, headers=headers, data=data)
@@ -135,25 +124,24 @@ class ApiClient:
                 self.logger.info(f'Тело ответа: {res.content}')
             return res
 
-    def put(self, path='', data=None, headers_new=None, in_xml=False):
+    def put(self, path='', data=None, headers_new=None, cont_type='json',
+            accept_header='json', auth_type='cookie'):
         """Возвращает вызов put запроса к API.
         Требует передачу в заголовке Cookie auth token.
 
         :param path: путь
         :param data: тело запроса
         :param headers_new: кастомные заголовки
+        :param accept_header: в каком типе данных получать ответ
+        :param cont_type: в каком типе данных отправлять запрос
+        :param auth_type: как авторизоваться
         """
-        if headers_new:
-            headers = headers_new
-        else:
-            if in_xml:
-                headers = self.headers(method='put', xml=True)
-            else:
-                headers = self.headers(method='put', token=self.__token)
-        if in_xml:
-            data = data
-        else:
+        headers = headers_new or self.headers(
+            cont_type=cont_type, accept=accept_header, auth_type=auth_type, token=self.__token)
+        if cont_type == 'json':
             data = json.dumps(data)
+        else:
+            data = data
         url = self._get_url(path)
         with allure.step(f'Выполнить запрос PUT {url}, headers={headers}, data={data}'):
             res = self.session.put(url=url, headers=headers, data=data)
@@ -168,20 +156,17 @@ class ApiClient:
                 self.logger.info(f'Тело ответа: {res.content}')
             return res
 
-    def delete(self, path='', headers_new=None, auth='cookie'):
+    def delete(self, path='', headers_new=None, cont_type='json', auth_type='cookie'):
         """Возвращает вызов delete запроса к API.
         Требует передачу в заголовке Cookie auth token.
 
         :param path: адрес хоста
         :param headers_new: кастомные заголовки
+        :param cont_type: в каком типе данных отправлять запрос
+        :param auth_type: как авторизоваться
         """
-        if headers_new:
-            headers = headers_new
-        else:
-            if auth == 'cookie':
-                headers = self.headers(method='delete', token=self.__token, auth='cookie')
-            else:
-                headers = self.headers(method='delete', auth='basic_auth')
+        headers = headers_new or self.headers(
+            cont_type=cont_type, auth_type=auth_type, token=self.__token)
         url = self._get_url(path)
         with allure.step(f'Выполнить запрос DELETE {url}, headers={headers}'):
             res = self.session.delete(url=url, headers=headers)

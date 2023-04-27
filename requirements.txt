@@ -6,3 +6,4 @@ jsonschema==4.2.1
 PyYAML==6.0
 lxml==4.9.2
 dicttoxml== 1.7.16
+multidimensional-urlencode==0.0.4

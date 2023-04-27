@@ -13,6 +13,8 @@ from dicttoxml import dicttoxml
 from jsonschema import validate
 from lxml import etree
 from lxml.etree import fromstring
+from urllib.parse import unquote
+from multidimensional_urlencode import urlencode
 
 
 from helpers.clients import ApiClient
@@ -98,25 +100,22 @@ def encode_login_pass(get_admin_login, get_admin_password):
 @pytest.fixture(scope='session')
 def headers(encode_login_pass):
     """Генерация заголовков запроса"""
-    def _headers(method='get', token=None, xml=False, auth='cookie'):
+    def _headers(cont_type=None, accept=None, auth_type=None, token=None):
         headers = {}
-        if method == 'get' and xml is False:
-            headers = {'Accept': 'application/json'}
-        if method == 'get' and xml is True:
-            headers = {'Accept': 'application/xml'}
-        if method == 'post' and xml is False:
-            headers = {'Accept': 'application/json', 'Content-Type': 'application/json'}
-        if method == 'post' and xml is True:
-            headers = {'Accept': 'application/xml', 'Content-Type': 'text/xml'}
-        if (method == 'put' or method == 'patch') and xml is False:
-            headers = {'Accept': 'application/json', 'Content-Type': 'application/json', 'Cookie': f'token={token}'}
-        if (method == 'put' or method == 'patch') and xml is True:
-            headers = {'Accept': 'application/xml', 'Content-Type': 'text/xml',
-                       'Authorization': f'Basic {encode_login_pass}'}
-        if method == 'delete' and auth == 'cookie':
-            headers = {'Content-Type': 'application/json', 'Cookie': f'token={token}'}
-        if method == 'delete' and auth == 'basic_auth':
-            headers = {'Content-Type': 'application/json', 'Authorization': f'Basic {encode_login_pass}'}
+        if cont_type == 'json':
+            headers['Content-Type'] = 'application/json'
+        if cont_type == 'xml':
+            headers['Content-Type'] = 'text/xml'
+        if cont_type == 'urlencoded':
+            headers['Content-Type'] = 'application/x-www-form-urlencoded'
+        if accept == 'json':
+            headers['Accept'] = 'application/json'
+        if accept == 'xml':
+            headers['Accept'] = 'application/xml'
+        if auth_type == 'cookie':
+            headers['Cookie'] = f'token={token}'
+        if auth_type == 'basic_auth':
+            headers['Authorization'] = f'Basic {encode_login_pass}'
         return headers
     return _headers
 
@@ -140,53 +139,53 @@ def generate_body_booking():
 
 
 @pytest.fixture
-@allure.step('Сгенерировать тело для запроса в xml')
-def generate_body_booking_xml(generate_body_booking):
-    """Фикстура, создающая и возвращающая тело для запроса в xml."""
-    def _generate_body_booking_xml(
-            firstname='Susan', lastname='Brown', totalprice=1, depositpaid=True,
-            checkin='2018-01-01', checkout='2019-01-01', additionalneeds='Breakfast'):
-        d = generate_body_booking(
-            firstname, lastname, totalprice, depositpaid, checkin, checkout, additionalneeds)
+@allure.step('Переконвертировать dict в xml')
+def convert_dict_to_xml():
+    """Фикстура конвертации dict в xml."""
+    def _convert_dict_to_xml(d):
         xml = dicttoxml(d, custom_root='booking', attr_type=False)
         with allure.step(f'Тело запроса - {xml}'):
             return xml
-    return _generate_body_booking_xml
+    return _convert_dict_to_xml
 
 
 @pytest.fixture
-def create_test_booking(booker_api, generate_body_booking, logger_test):
+@allure.step('Переконвертировать dict в urlencoded')
+def convert_dict_to_urlencoded():
+    """Фикстура конвертации dict в urlencoded."""
+    def _convert_dict_to_urlencoded(d):
+        urlencode_d = urlencode(d)
+        body = unquote(urlencode_d)
+        with allure.step(f'Тело запроса - {body}'):
+            return body
+    return _convert_dict_to_urlencoded
+
+
+@pytest.fixture
+def create_test_booking(
+        booker_api, generate_body_booking, convert_dict_to_xml, logger_test, parsing_xml_response):
     """Фикстура, создающая тестовую сущность и возвращающая ее тело."""
     @allure.step(
         'Создать тестовое бронирование: firstname={firstname}, lastname={lastname}, totalprice={totalprice}, '
         'depositpaid={depositpaid}, checkin={checkin}, checkout={checkout}, additionalneeds={additionalneeds}')
     def _create_test_booking(firstname='Susan', lastname='Brown', totalprice=1, depositpaid=True,
-                             checkin='2018-01-01', checkout='2019-01-01', additionalneeds='Breakfast'):
+                             checkin='2018-01-01', checkout='2019-01-01', additionalneeds='Breakfast',
+                             data_type='json'):
         data = generate_body_booking(
             firstname, lastname, totalprice, depositpaid, checkin, checkout, additionalneeds)
-        logger_test.info(f'Создать тестовую бронь: data {data}.')
-        test_booking = booker_api.post(Paths.BOOKING, data)
-        test_booking_data = test_booking.json()
-        return test_booking_data
+        if data_type == 'xml':
+            data_xml = convert_dict_to_xml(data)
+            logger_test.info(f'Создать тестовую бронь: data {data_xml}.')
+            test_booking = booker_api.post(Paths.BOOKING, data, cont_type='xml', accept_header='xml')
+            booking_data = test_booking.text
+            tree = parsing_xml_response(booking_data)
+            return tree
+        else:
+            logger_test.info(f'Создать тестовую бронь: data {data}.')
+            test_booking = booker_api.post(Paths.BOOKING, data)
+            test_booking_data = test_booking.json()
+            return test_booking_data
     return _create_test_booking
-
-
-@pytest.fixture
-def create_test_booking_xml(booker_api, generate_body_booking_xml, logger_test, parsing_xml_response):
-    """Фикстура, создающая тестовую сущность и возвращающая ее тело (в xml)."""
-    @allure.step(
-        'Создать тестовое бронирование: firstname={firstname}, lastname={lastname}, totalprice={totalprice}, '
-        'depositpaid={depositpaid}, checkin={checkin}, checkout={checkout}, additionalneeds={additionalneeds}')
-    def _create_test_booking_xml(firstname='Susan', lastname='Brown', totalprice=1, depositpaid=True,
-                                 checkin='2018-01-01', checkout='2019-01-01', additionalneeds='Breakfast'):
-        data = generate_body_booking_xml(
-            firstname, lastname, totalprice, depositpaid, checkin, checkout, additionalneeds)
-        logger_test.info(f'Создать тестовую бронь: data {data}.')
-        test_booking = booker_api.post(Paths.BOOKING, data, in_xml=True)
-        booking_data = test_booking.text
-        tree = parsing_xml_response(booking_data)
-        return tree
-    return _create_test_booking_xml
 
 
 @pytest.fixture
@@ -283,13 +282,3 @@ def validate_xml(logger_test):
         except lxml.etree.XMLSchemaParseError:
             return False
     return _validate
-
-
-@pytest.fixture
-def fixture_create_delete_booking_data_xml(
-        create_test_booking_xml, delete_test_booking, get_text_of_element_xml_tree):
-    """Фикстура создания дефолтной тестовой брони в xml и ее удаления."""
-    booking = create_test_booking_xml()
-    booking_id = get_text_of_element_xml_tree(booking, 'bookingid')
-    yield booking_id, booking
-    delete_test_booking(booking_id)

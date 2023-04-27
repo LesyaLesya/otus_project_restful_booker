@@ -85,7 +85,7 @@ class TestGetBooking:
         """
         booking_id, booking_test_data = fixture_create_delete_booking_data
         response = booker_api.get(
-            path=f'{Paths.BOOKING}{booking_id}', in_xml=True)
+            path=f'{Paths.BOOKING}{booking_id}', accept_header='xml')
         booking_data = response.text
 
         with allure.step(status_code_msg(200)):

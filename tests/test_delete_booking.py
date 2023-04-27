@@ -39,7 +39,7 @@ class TestDeleteBooking:
         :param status_code_msg: фикстура, возвращающая текст проверки кода ответа
         """
         booking_id = create_test_booking()['bookingid']
-        response = booker_api.delete(path=f'{Paths.BOOKING}{booking_id}', auth='basic_auth')
+        response = booker_api.delete(path=f'{Paths.BOOKING}{booking_id}', auth_type='basic_auth')
 
         with allure.step(status_code_msg(201)):
             assert response.status_code == 201, f'Код ответа - {response.status_code}'
@@ -62,10 +62,10 @@ class TestDeleteBooking:
         with allure.step(status_code_msg(405)):
             assert response.status_code == 405, f'Код ответа - {response.status_code}'
 
-    @allure.title('Удаление существующей брони без токена')
-    def test_delete_without_token(
+    @allure.title('Удаление существующей брони без авторизации')
+    def test_delete_without_auth(
             self, booker_api, fixture_create_delete_booking_data, status_code_msg, response_body_msg):
-        """Тестовая функция для проверки удаления бронирования без токена.
+        """Тестовая функция для проверки удаления бронирования без авторизации.
 
         :param booker_api: фикстура, создающая и возвращающая экземпляр класса ApiClient
         :param fixture_create_delete_booking_data: фикстура для создания и удаления тестовых данных
@@ -81,7 +81,7 @@ class TestDeleteBooking:
             assert response.status_code == 403, f'Код ответа - {response.status_code}'
 
         with allure.step(response_body_msg(response_text)):
-            assert response_text == 'Forbidden', f'Тело ответа без токена - {response_text}'
+            assert response_text == 'Forbidden', f'Тело ответа без авторизации - {response_text}'
 
         get_after_delete = booker_api.get(path=f'{Paths.BOOKING}{booking_id}')
         get_after_delete_body = get_after_delete.json()
@@ -89,4 +89,4 @@ class TestDeleteBooking:
             assert get_after_delete.status_code == 200, f'Код ответа - {get_after_delete.status_code}'
         with allure.step(response_body_msg(get_after_delete_body)):
             assert get_after_delete_body == booking_test_data, \
-                f'Бронь после попытки удаления без токена {get_after_delete_body}'
+                f'Бронь после попытки удаления без авторизации {get_after_delete_body}'
