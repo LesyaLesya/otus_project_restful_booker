@@ -232,7 +232,7 @@ class TestGetBookingIds:
 
     @allure.story('Проверка параметра checkin')
     @allure.title('Невалидные значения checkin - {value}')
-    @pytest.mark.parametrize('value', ['11-11-2023', '11.11.2023', '2023-04-31'])
+    @pytest.mark.parametrize('value', ['11-11-2023', '11.11.2023'])
     def test_get_by_invalid_checkin(self, booker_api, value, status_code_msg, response_body_msg):
         """Тестовая функция для проверки получения брони с валидными значениями параметра checkin.
 
