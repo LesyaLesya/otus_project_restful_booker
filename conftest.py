@@ -104,14 +104,24 @@ def headers(encode_login_pass):
         headers = {}
         if cont_type == 'json':
             headers['Content-Type'] = 'application/json'
-        if cont_type == 'xml':
+        elif cont_type == 'xml':
             headers['Content-Type'] = 'text/xml'
-        if cont_type == 'urlencoded':
+        elif cont_type == 'urlencoded':
             headers['Content-Type'] = 'application/x-www-form-urlencoded'
+        elif cont_type is None:
+            pass
+        else:
+            headers['Content-Type'] = cont_type
+
         if accept == 'json':
             headers['Accept'] = 'application/json'
-        if accept == 'xml':
+        elif accept == 'xml':
             headers['Accept'] = 'application/xml'
+        elif accept is None:
+            pass
+        else:
+            headers['Accept'] = accept
+
         if auth_type == 'cookie':
             headers['Cookie'] = f'token={token}'
         if auth_type == 'basic_auth':

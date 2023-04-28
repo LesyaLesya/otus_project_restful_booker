@@ -6,6 +6,8 @@ class Params:
 
     FIRSTNAME = 'firstname'
     LASTNAME = 'lastname'
+    CHECKIN = 'checkin'
+    CHECKOUT = 'checkout'
 
 
 class Paths:

@@ -437,18 +437,20 @@ class TestCreateBooking:
                 assert firstname == get_params, f'Имя - {firstname}'
 
     @allure.story('Проверка заголовков')
-    @allure.title('Content-type: text/plain')
-    def test_post_with_content_type_text_plain(
-            self, booker_api, status_code_msg, response_body_msg, generate_body_booking):
+    @allure.title('Content-type: {cont_type}')
+    @pytest.mark.parametrize('cont_type', ['text/plain', 'text/html'])
+    def test_post_with_invalid_content_type(
+            self, booker_api, status_code_msg, response_body_msg, generate_body_booking, cont_type):
         """Тестовая функция для проверки создания бронирования с заголовком Content-type: text/plain.
 
         :param booker_api: фикстура, создающая и возвращающая экземпляр класса ApiClient
         :param status_code_msg: фикстура, возвращающая текст проверки кода ответа
         :param response_body_msg: фикстура, возвращающая текст проверки тела ответа
         :param generate_body_booking: фикстура, создающая тело для запроса
+        :param cont_type: значение заголовка Content-type
         """
         data = generate_body_booking()
-        response = booker_api.post(Paths.BOOKING, data, headers_new={'Content-type': 'text/plain'})
+        response = booker_api.post(Paths.BOOKING, data, cont_type=cont_type)
         booking_data = response.text
 
         with allure.step(status_code_msg(500)):
@@ -456,4 +458,28 @@ class TestCreateBooking:
 
         with allure.step(response_body_msg(booking_data)):
             assert booking_data == 'Internal Server Error', \
-                f'Тело ответа, если Content-type: text/plain  - {booking_data}'
+                f'Тело ответа, если Content-type: {cont_type}  - {booking_data}'
+
+    @allure.story('Проверка заголовков')
+    @allure.title('Accept: {accept}')
+    @pytest.mark.parametrize('accept', ['application/javascript', 'text/html'])
+    def test_post_with_invalid_accept(
+            self, booker_api, status_code_msg, response_body_msg, generate_body_booking, accept):
+        """Тестовая функция для проверки создания бронирования с заголовком Content-type: text/plain.
+
+        :param booker_api: фикстура, создающая и возвращающая экземпляр класса ApiClient
+        :param status_code_msg: фикстура, возвращающая текст проверки кода ответа
+        :param response_body_msg: фикстура, возвращающая текст проверки тела ответа
+        :param generate_body_booking: фикстура, создающая тело для запроса
+        :param accept: значение заголовка Accept
+        """
+        data = generate_body_booking()
+        response = booker_api.post(Paths.BOOKING, data, accept_header=accept)
+        booking_data = response.text
+
+        with allure.step(status_code_msg(418)):
+            assert response.status_code == 418, f'Код ответа - {response.status_code}'
+
+        with allure.step(response_body_msg(booking_data)):
+            assert booking_data == "I'm a Teapot", \
+                f'Тело ответа, если Accept: {accept}  - {booking_data}'

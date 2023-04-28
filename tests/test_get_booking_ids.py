@@ -207,3 +207,46 @@ class TestGetBookingIds:
 
         with allure.step(response_body_msg(booking_data)):
             assert len(booking_data) == 0, f'У {first} {last} есть бронь. Тело ответа {booking_data}'
+
+    @allure.story('Проверка параметра checkin')
+    @allure.title('Валидные значения checkin - {value}')
+    @pytest.mark.parametrize('value', ['2023-01-01', '2021-02-01'])
+    def test_get_by_valid_checkin(self, booker_api, value, status_code_msg, response_body_msg):
+        """Тестовая функция для проверки получения брони с валидными значениями параметра checkin.
+
+        :param booker_api: фикстура, создающая и возвращающая экземпляр класса ApiClient
+        :param value: передаваемый в урле параметр checkin
+        :param status_code_msg: фикстура, возвращающая текст проверки кода ответа
+        :param response_body_msg: фикстура, возвращающая текст проверки тела ответа
+        """
+        payload = {Params.CHECKIN: value}
+        response = booker_api.get(path=Paths.BOOKING, params=payload)
+        booking_data = response.json()
+
+        with allure.step(status_code_msg(200)):
+            assert response.status_code == 200, f'Код ответа - {response.status_code}'
+
+        with allure.step(response_body_msg(booking_data)):
+            assert all([booker_api.get(path=f'{Paths.BOOKING}{i["bookingid"]}').json()['bookingdates']['checkin']
+                        >= value for i in booking_data])
+
+    @allure.story('Проверка параметра checkin')
+    @allure.title('Невалидные значения checkin - {value}')
+    @pytest.mark.parametrize('value', ['11-11-2023', '11.11.2023', '2023-04-31'])
+    def test_get_by_invalid_checkin(self, booker_api, value, status_code_msg, response_body_msg):
+        """Тестовая функция для проверки получения брони с валидными значениями параметра checkin.
+
+        :param booker_api: фикстура, создающая и возвращающая экземпляр класса ApiClient
+        :param value: передаваемый в урле параметр checkin
+        :param status_code_msg: фикстура, возвращающая текст проверки кода ответа
+        :param response_body_msg: фикстура, возвращающая текст проверки тела ответа
+        """
+        payload = {Params.CHECKIN: value}
+        response = booker_api.get(path=Paths.BOOKING, params=payload)
+        booking_data = response.json()
+
+        with allure.step(status_code_msg(200)):
+            assert response.status_code == 200, f'Код ответа - {response.status_code}'
+
+        with allure.step(response_body_msg(booking_data)):
+            assert len(booking_data) == 0, f'Количество броней - {len(booking_data)}'
