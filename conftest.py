@@ -22,6 +22,33 @@ from helpers.data import BookingData, BookingDates
 from helpers.urls_helper import Paths
 
 
+def pytest_addoption(parser):
+    parser.addoption('--schema', action='store', default='https', choices=['https', 'http'])
+    parser.addoption('--host', action='store', default='default')
+    parser.addoption('--login', action='store', default='login')
+    parser.addoption('--passw', action='store', default='password')
+
+
+@pytest.fixture(scope='session')
+def parser_schema(request):
+    return request.config.getoption('--schema')
+
+
+@pytest.fixture(scope='session')
+def parser_host(request):
+    return request.config.getoption('--host')
+
+
+@pytest.fixture(scope='session')
+def parser_login(request):
+    return request.config.getoption('--login')
+
+
+@pytest.fixture(scope='session')
+def parser_password(request):
+    return request.config.getoption('--passw')
+
+
 @pytest.fixture(scope='session', autouse=True)
 def logger_test():
     logger = logging.getLogger('testing')
@@ -46,7 +73,7 @@ def log_module_description(request, logger_test):
 def booker_api(get_host, get_schema, get_admin_login, get_admin_password, headers, logger_test):
     """Фикстура, создающая и возвращающая экземпляр класса ApiClient."""
     host = get_host
-    schema = get_schema('https')
+    schema = get_schema
     login = get_admin_login
     passw = get_admin_password
     headers = headers
@@ -64,25 +91,23 @@ def cfg():
 
 
 @pytest.fixture(scope='session')
-def get_host(cfg):
-    return cfg['host']['default']
+def get_host(cfg, parser_host):
+    return cfg['host'][parser_host]
 
 
 @pytest.fixture(scope='session')
-def get_schema(cfg):
-    def _get_schema(sch):
-        return cfg['schema'][sch]
-    return _get_schema
+def get_schema(cfg, parser_schema):
+    return cfg['schema'][parser_schema]
 
 
 @pytest.fixture(scope='session')
-def get_admin_login(cfg):
-    return cfg['admin']['login']
+def get_admin_login(cfg, parser_login):
+    return cfg['admin'][parser_login]
 
 
 @pytest.fixture(scope='session')
-def get_admin_password(cfg):
-    return cfg['admin']['password']
+def get_admin_password(cfg, parser_password):
+    return cfg['admin'][parser_password]
 
 
 @pytest.fixture(scope='session')
@@ -219,17 +244,18 @@ def validate_json(logger_test):
             logger_test.info(f'Валидация схемы для тела {json_data}, схема: {base_schema}')
             validate(instance=json_data, schema=base_schema)
         except jsonschema.exceptions.ValidationError:
-            return False
-        return True
+            assert False
+        assert True
     return _validate
 
 
 @pytest.fixture
-def status_code_msg(logger_test):
-    def _status_code_msg(code):
-        logger_test.info(f'Проверить код ответа - {code}')
-        return f'Проверить, что код ответа {code}'
-    return _status_code_msg
+def check_response_status_code(logger_test):
+    """Фикстура проверки кода ответа."""
+    @allure.step('Проверить, что код ответа {code}')
+    def _check_response_status_code(response, code):
+        assert response.status_code == code, f'Код ответа {response.status_code}, ОР {code}'
+    return _check_response_status_code
 
 
 @pytest.fixture
@@ -288,7 +314,17 @@ def validate_xml(logger_test):
             xmlschema_parse = etree.XMLSchema(xmlschema)
 
             data_parse = etree.parse(StringIO(data))
-            return xmlschema_parse.validate(data_parse)
+            assert xmlschema_parse.validate(data_parse)
         except lxml.etree.XMLSchemaParseError:
-            return False
+            assert False
     return _validate
+
+
+@pytest.fixture
+def check_response_time(logger_test):
+    """Фикстура проверки времени ответа."""
+    @allure.step('Проверить, что время ответа меньше {tims_ms}')
+    def _check_response_time(response, tims_ms=400):
+        actual_time = response.elapsed.total_seconds() * 1000
+        assert actual_time < tims_ms, f'Время ответа {actual_time}, ОР {tims_ms}'
+    return _check_response_time

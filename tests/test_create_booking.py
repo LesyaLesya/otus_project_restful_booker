@@ -114,21 +114,21 @@ class TestCreateBooking:
     @allure.title('Валидные значения firstname - {get_params}')
     @pytest.mark.parametrize('get_params', ['Peter', 'Maria-Elena', 'Имя Имя', ''])
     def test_post_valid_firstname(
-            self, fixture_post_booking_firstname, validate_json, status_code_msg,
-            response_body_msg, get_params):
+            self, fixture_post_booking_firstname, validate_json, check_response_status_code,
+            response_body_msg, get_params, check_response_time):
         """Тестовая функция для проверки создания бронирования с валидным именем.
 
         :param fixture_post_booking_firstname: фикстура создания и удаления тестовых данных и отправки запроса
         :param validate_json: фикстура для валидации JSON схемы
-        :param status_code_msg: фикстура, возвращающая текст проверки кода ответа
+        :param check_response_status_code: фикстура, проверки кода ответа
         :param response_body_msg: фикстура, возвращающая текст проверки тела ответа
+        :param check_response_time: фикстура проверки времени ответа
         """
         response, booking_data, booking_id = fixture_post_booking_firstname
 
-        with allure.step(status_code_msg(200)):
-            assert response.status_code == 200, f'Код ответа - {response.status_code}'
-
-        assert validate_json(booking_data, CREATE_BOOKING_SCHEMA)
+        check_response_status_code(response, 200)
+        check_response_time(response)
+        validate_json(booking_data, CREATE_BOOKING_SCHEMA)
 
         with allure.step(response_body_msg(booking_data)):
             assert booking_data['booking']['firstname'] == get_params, \
@@ -138,41 +138,46 @@ class TestCreateBooking:
     @allure.title('Невалидные значения firstname - {value}')
     @pytest.mark.parametrize('value', [123, True, None])
     def test_post_invalid_firstname(
-            self, booker_api, value, generate_body_booking, status_code_msg, response_body_msg):
+            self, booker_api, value, generate_body_booking, check_response_status_code,
+            response_body_msg, check_response_time):
         """Тестовая функция для проверки создания бронирования с невалидным именем.
 
         :param booker_api: фикстура, создающая и возвращающая экземпляр класса ApiClient
         :param value: передаваемые в теле запроса варианты для "firstname"
         :param generate_body_booking: фикстура, создающая тело для запроса
-        :param status_code_msg: фикстура, возвращающая текст проверки кода ответа
+        :param check_response_status_code: фикстура, проверки кода ответа
         :param response_body_msg: фикстура, возвращающая текст проверки тела ответа
+        :param check_response_time: фикстура проверки времени ответа
         """
         data = generate_body_booking(firstname=value)
         response = booker_api.post(Paths.BOOKING, data)
         response_body = response.text
 
-        with allure.step(status_code_msg(500)):
-            assert response.status_code == 500, f'Код ответа - {response.status_code}'
+        check_response_status_code(response, 500)
+        check_response_time(response)
 
         with allure.step(response_body_msg(response_body)):
             assert response_body == 'Internal Server Error', f'Тело ответа  - {response_body}'
 
     @allure.story('Проверка firstname')
     @allure.title('Не передавать в теле firstname')
-    def test_post_without_firstname(self, booker_api, generate_body_booking, status_code_msg, response_body_msg):
+    def test_post_without_firstname(
+            self, booker_api, generate_body_booking, check_response_status_code,
+            response_body_msg, check_response_time):
         """Тестовая функция для проверки создания бронирования без имени.
 
         :param booker_api: фикстура, создающая и возвращающая экземпляр класса ApiClient
         :param generate_body_booking: фикстура, создающая тело для запроса
-        :param status_code_msg: фикстура, возвращающая текст проверки кода ответа
+        :param check_response_status_code: фикстура, проверки кода ответа
         :param response_body_msg: фикстура, возвращающая текст проверки тела ответа
+        :param check_response_time: фикстура проверки времени ответа
         """
         data = generate_body_booking(del_key=True, key_to_del=['firstname'])
         response = booker_api.post(Paths.BOOKING, data)
         response_body = response.text
 
-        with allure.step(status_code_msg(500)):
-            assert response.status_code == 500, f'Код ответа - {response.status_code}'
+        check_response_status_code(response, 500)
+        check_response_time(response)
 
         with allure.step(response_body_msg(response_body)):
             assert response_body == 'Internal Server Error', f'Тело ответа  - {response_body}'
@@ -181,20 +186,21 @@ class TestCreateBooking:
     @allure.title('Валидные значения lastname - {get_params}')
     @pytest.mark.parametrize('get_params', ['Иванов', 'Black', 'W', 'Last-name', ''])
     def test_post_valid_lastname(
-            self, validate_json, status_code_msg, response_body_msg, fixture_post_booking_lastname, get_params):
+            self, validate_json, check_response_status_code, response_body_msg,
+            fixture_post_booking_lastname, get_params, check_response_time):
         """Тестовая функция для проверки создания бронирования с валидной фамилией.
 
         :param fixture_post_booking_lastname: фикстура создания и удаления тестовых данных и отправки запроса
         :param validate_json: фикстура для валидации JSON схемы
-        :param status_code_msg: фикстура, возвращающая текст проверки кода ответа
+        :param check_response_status_code: фикстура, проверки кода ответа
         :param response_body_msg: фикстура, возвращающая текст проверки тела ответа
+        :param check_response_time: фикстура проверки времени ответа
         """
         response, booking_data, booking_id = fixture_post_booking_lastname
 
-        with allure.step(status_code_msg(200)):
-            assert response.status_code == 200, f'Код ответа - {response.status_code}'
-
-        assert validate_json(booking_data, CREATE_BOOKING_SCHEMA)
+        check_response_status_code(response, 200)
+        check_response_time(response)
+        validate_json(booking_data, CREATE_BOOKING_SCHEMA)
 
         with allure.step(response_body_msg(booking_data)):
             assert booking_data['booking']['lastname'] == get_params, \
@@ -203,20 +209,22 @@ class TestCreateBooking:
     @allure.story('Проверка lastname')
     @allure.title('Не передавать в теле lastname')
     def test_post_without_lastname(
-            self, booker_api, generate_body_booking, status_code_msg, response_body_msg):
+            self, booker_api, generate_body_booking, check_response_status_code,
+            response_body_msg, check_response_time):
         """Тестовая функция для проверки создания бронирования без фамилии.
 
         :param booker_api: фикстура, создающая и возвращающая экземпляр класса ApiClient
         :param generate_body_booking: фикстура, создающая тело для запроса
-        :param status_code_msg: фикстура, возвращающая текст проверки кода ответа
+        :param check_response_status_code: фикстура, проверки кода ответа
         :param response_body_msg: фикстура, возвращающая текст проверки тела ответа
+        :param check_response_time: фикстура проверки времени ответа
         """
         data = generate_body_booking(del_key=True, key_to_del=['lastname'])
         response = booker_api.post(Paths.BOOKING, data)
         response_body = response.text
 
-        with allure.step(status_code_msg(500)):
-            assert response.status_code == 500, f'Код ответа - {response.status_code}'
+        check_response_status_code(response, 500)
+        check_response_time(response)
 
         with allure.step(response_body_msg(response_body)):
             assert response_body == 'Internal Server Error', f'Тело ответа  - {response_body}'
@@ -226,20 +234,20 @@ class TestCreateBooking:
     @pytest.mark.parametrize('get_params', [123, 1, 566778])
     def test_post_valid_totalprice(
             self, fixture_post_booking_totalprice,
-            validate_json, status_code_msg, response_body_msg, get_params):
+            validate_json, check_response_status_code, response_body_msg, get_params, check_response_time):
         """Тестовая функция для проверки создания бронирования с валидной ценой.
 
         :param fixture_post_booking_totalprice: фикстура создания и удаления тестовых данных и отправки запроса
         :param validate_json: фикстура для валидации JSON схемы
-        :param status_code_msg: фикстура, возвращающая текст проверки кода ответа
+        :param check_response_status_code: фикстура, проверки кода ответа
         :param response_body_msg: фикстура, возвращающая текст проверки тела ответа
+        :param check_response_time: фикстура проверки времени ответа
         """
         response, booking_data, booking_id = fixture_post_booking_totalprice
 
-        with allure.step(status_code_msg(200)):
-            assert response.status_code == 200, f'Код ответа - {response.status_code}'
-
-        assert validate_json(booking_data, CREATE_BOOKING_SCHEMA)
+        check_response_status_code(response, 200)
+        check_response_time(response)
+        validate_json(booking_data, CREATE_BOOKING_SCHEMA)
 
         with allure.step(response_body_msg(booking_data)):
             assert booking_data['booking']['totalprice'] == get_params, \
@@ -249,21 +257,21 @@ class TestCreateBooking:
     @allure.title('Валидные значения depositpaid - {get_params}')
     @pytest.mark.parametrize('get_params', [True, False])
     def test_post_valid_depositpaid(
-            self, validate_json, status_code_msg, response_body_msg,
-            fixture_post_booking_deposit, get_params):
+            self, validate_json, check_response_status_code, response_body_msg,
+            fixture_post_booking_deposit, get_params, check_response_time):
         """Тестовая функция для проверки создания бронирования с валидным depositpaid.
 
         :param fixture_post_booking_deposit:  фикстура создания и удаления тестовых данных и отправки запроса
         :param validate_json: фикстура для валидации JSON схемы
-        :param status_code_msg: фикстура, возвращающая текст проверки кода ответа
+        :param check_response_status_code: фикстура, проверки кода ответа
         :param response_body_msg: фикстура, возвращающая текст проверки тела ответа
+        :param check_response_time: фикстура проверки времени ответа
         """
         response, booking_data, booking_id = fixture_post_booking_deposit
 
-        with allure.step(status_code_msg(200)):
-            assert response.status_code == 200, f'Код ответа - {response.status_code}'
-
-        assert validate_json(booking_data, CREATE_BOOKING_SCHEMA)
+        check_response_status_code(response, 200)
+        check_response_time(response)
+        validate_json(booking_data, CREATE_BOOKING_SCHEMA)
 
         with allure.step(response_body_msg(booking_data)):
             assert booking_data['booking']['depositpaid'] == get_params, \
@@ -273,21 +281,21 @@ class TestCreateBooking:
     @allure.title('Валидные значения checkin - {get_params}')
     @pytest.mark.parametrize('get_params', ['1900-11-11', '2021-02-11', '2030-06-01'])
     def test_post_valid_checkin(
-            self, validate_json, status_code_msg, response_body_msg,
-            fixture_post_booking_checkin, get_params):
+            self, validate_json, check_response_status_code, response_body_msg,
+            fixture_post_booking_checkin, get_params, check_response_time):
         """Тестовая функция для проверки создания бронирования с валидным checkin.
 
         :param fixture_post_booking_checkin: фикстура создания и удаления тестовых данных и отправки запроса
         :param validate_json: фикстура для валидации JSON схемы
-        :param status_code_msg: фикстура, возвращающая текст проверки кода ответа
+        :param check_response_status_code: фикстура, проверки кода ответа
         :param response_body_msg: фикстура, возвращающая текст проверки тела ответа
+        :param check_response_time: фикстура проверки времени ответа
         """
         response, booking_data, booking_id = fixture_post_booking_checkin
 
-        with allure.step(status_code_msg(200)):
-            assert response.status_code == 200, f'Код ответа - {response.status_code}'
-
-        assert validate_json(booking_data, CREATE_BOOKING_SCHEMA)
+        check_response_status_code(response, 200)
+        check_response_time(response)
+        validate_json(booking_data, CREATE_BOOKING_SCHEMA)
 
         with allure.step(response_body_msg(booking_data)):
             assert booking_data['booking']['bookingdates']['checkin'] == get_params, \
@@ -297,21 +305,21 @@ class TestCreateBooking:
     @allure.title('Невалидные значения checkin - {get_params}')
     @pytest.mark.parametrize('get_params', ['00-00-00', 'tests', ' '])
     def test_post_invalid_checkin(
-            self, validate_json, status_code_msg, response_body_msg,
-            fixture_post_booking_checkin, get_params):
+            self, validate_json, check_response_status_code, response_body_msg,
+            fixture_post_booking_checkin, get_params, check_response_time):
         """Тестовая функция для проверки создания бронирования с невалидным checkin.
 
         :param fixture_post_booking_checkin: фикстура создания и удаления тестовых данных и отправки запроса
         :param validate_json: фикстура для валидации JSON схемы
-        :param status_code_msg: фикстура, возвращающая текст проверки кода ответа
+        :param check_response_status_code: фикстура, проверки кода ответа
         :param response_body_msg: фикстура, возвращающая текст проверки тела ответа
+        :param check_response_time: фикстура проверки времени ответа
         """
         response, booking_data, booking_id = fixture_post_booking_checkin
 
-        with allure.step(status_code_msg(200)):
-            assert response.status_code == 200, f'Код ответа - {response.status_code}'
-
-        assert validate_json(booking_data, CREATE_BOOKING_SCHEMA)
+        check_response_status_code(response, 200)
+        check_response_time(response)
+        validate_json(booking_data, CREATE_BOOKING_SCHEMA)
 
         with allure.step(response_body_msg(booking_data)):
             assert booking_data['booking']['bookingdates']['checkin'] == '0NaN-aN-aN', \
@@ -321,21 +329,21 @@ class TestCreateBooking:
     @allure.title('Валидные значения checkout - {get_params}')
     @pytest.mark.parametrize('get_params', ['1871-01-01', '2021-02-11', '2041-12-31'])
     def test_post_valid_checkout(
-            self, validate_json, status_code_msg, response_body_msg,
-            fixture_post_booking_checkout, get_params):
+            self, validate_json, check_response_status_code, response_body_msg,
+            fixture_post_booking_checkout, get_params, check_response_time):
         """Тестовая функция для проверки создания бронирования с валидным checkout.
 
         :param fixture_post_booking_checkout: фикстура создания и удаления тестовых данных и отправки запроса
         :param validate_json: фикстура для валидации JSON схемы
-        :param status_code_msg: фикстура, возвращающая текст проверки кода ответа
+        :param check_response_status_code: фикстура, проверки кода ответа
         :param response_body_msg: фикстура, возвращающая текст проверки тела ответа
+        :param check_response_time: фикстура проверки времени ответа
         """
         response, booking_data, booking_id = fixture_post_booking_checkout
 
-        with allure.step(status_code_msg(200)):
-            assert response.status_code == 200, f'Код ответа - {response.status_code}'
-
-        assert validate_json(booking_data, CREATE_BOOKING_SCHEMA)
+        check_response_status_code(response, 200)
+        check_response_time(response)
+        validate_json(booking_data, CREATE_BOOKING_SCHEMA)
 
         with allure.step(response_body_msg(booking_data)):
             assert booking_data['booking']['bookingdates']['checkout'] == get_params, \
@@ -345,64 +353,68 @@ class TestCreateBooking:
     @allure.title('Валидные значения additionalneeds - {get_params}')
     @pytest.mark.parametrize('get_params', ['что-то', 'dinner, breakfast', ''])
     def test_post_valid_additionalneeds(
-            self, validate_json, status_code_msg, response_body_msg,
-            fixture_post_booking_additionalneeds, get_params):
+            self, validate_json, check_response_status_code, response_body_msg,
+            fixture_post_booking_additionalneeds, get_params, check_response_time):
         """Тестовая функция для проверки создания бронирования с валидным additionalneeds.
 
         :param fixture_post_booking_additionalneeds: фикстура создания и удаления тестовых данных и отправки запроса
         :param validate_json: фикстура для валидации JSON схемы
-        :param status_code_msg: фикстура, возвращающая текст проверки кода ответа
+        :param check_response_status_code: фикстура, проверки кода ответа
         :param response_body_msg: фикстура, возвращающая текст проверки тела ответа
+        :param check_response_time: фикстура проверки времени ответа
         """
         response, booking_data, booking_id = fixture_post_booking_additionalneeds
 
-        with allure.step(status_code_msg(200)):
-            assert response.status_code == 200, f'Код ответа - {response.status_code}'
-
-        assert validate_json(booking_data, CREATE_BOOKING_SCHEMA)
+        check_response_status_code(response, 200)
+        check_response_time(response)
+        validate_json(booking_data, CREATE_BOOKING_SCHEMA)
 
         with allure.step(response_body_msg(booking_data)):
             assert booking_data['booking']['additionalneeds'] == get_params, \
                 f'Дополнительные пожелания - {booking_data["booking"]["additionalneeds"]}'
 
     @allure.title('Пустое тело запроса')
-    def test_post_empty_body(self, booker_api, status_code_msg, response_body_msg):
+    def test_post_empty_body(
+            self, booker_api, check_response_status_code, response_body_msg, check_response_time):
         """Тестовая функция для проверки создания бронирования с пустым телом.
 
-        :param status_code_msg: фикстура, возвращающая текст проверки кода ответа
+        :param check_response_status_code: фикстура, проверки кода ответа
         :param response_body_msg: фикстура, возвращающая текст проверки тела ответа
+        :param check_response_time: фикстура проверки времени ответа
         """
         response = booker_api.post(Paths.BOOKING, {})
         response_body = response.text
 
-        with allure.step(status_code_msg(500)):
-            assert response.status_code == 500, f'Код ответа - {response.status_code}'
+        check_response_status_code(response, 500)
+        check_response_time(response)
 
         with allure.step(response_body_msg(response_body)):
             assert response_body == 'Internal Server Error', f'Тело ответа  - {response_body}'
 
     @allure.title('Повторное создание бронирования')
     def test_post_repeat_create_booking(
-            self, validate_json, status_code_msg, response_body_msg, fixture_post_booking_repeat):
+            self, validate_json, check_response_status_code,
+            response_body_msg, fixture_post_booking_repeat, check_response_time):
         """Тестовая функция для проверки повторного создания бронирования.
 
         :param fixture_post_booking_repeat: фикстура создания и удаления тестовых данных и отправки запроса
         :param validate_json: фикстура для валидации JSON схемы
-        :param status_code_msg: фикстура, возвращающая текст проверки кода ответа
+        :param check_response_status_code: фикстура, проверки кода ответа
         :param response_body_msg: фикстура, возвращающая текст проверки тела ответа
+        :param check_response_time: фикстура проверки времени ответа
         """
         data, response_first, response_repeat = fixture_post_booking_repeat
         response_body_first = response_first.json()
         response_body_repeat = response_repeat.json()
 
-        with allure.step(status_code_msg(200)):
-            assert response_first.status_code == 200, f'Код ответа - {response_first.status_code}'
+        check_response_status_code(response_first, 200)
+        check_response_status_code(response_repeat, 200)
 
-        with allure.step(status_code_msg(200)):
-            assert response_repeat.status_code == 200, f'Код ответа - {response_repeat.status_code}'
+        check_response_time(response_first)
+        check_response_time(response_repeat)
 
-        assert validate_json(response_body_first, CREATE_BOOKING_SCHEMA)
-        assert validate_json(response_body_repeat, CREATE_BOOKING_SCHEMA)
+        validate_json(response_body_first, CREATE_BOOKING_SCHEMA)
+        validate_json(response_body_repeat, CREATE_BOOKING_SCHEMA)
 
         with allure.step(response_body_msg(response_body_repeat)):
             assert response_body_repeat['booking'] == data, f'Тело ответа  - {response_body_repeat}'
@@ -411,23 +423,23 @@ class TestCreateBooking:
     @allure.title('Валидные значения firstname - запрос в xml')
     @pytest.mark.parametrize('get_params', ['Peter', 'Maria', '', 'имя'])
     def test_post_valid_firstname_xml(
-            self, fixture_post_booking_firstname_xml, status_code_msg, response_body_msg,
-            get_params, validate_xml, get_text_of_element_xml_tree):
+            self, fixture_post_booking_firstname_xml, check_response_status_code, response_body_msg,
+            get_params, validate_xml, get_text_of_element_xml_tree, check_response_time):
         """Тестовая функция для проверки создания бронирования с валидным именем.
 
         :param fixture_post_booking_firstname_xml: фикстура создания и удаления тестовых данных и отправки запроса (xml)
         :param validate_xml: фикстура валидации xml схемы
-        :param status_code_msg: фикстура, возвращающая текст проверки кода ответа
+        :param check_response_status_code: фикстура, проверки кода ответа
         :param response_body_msg: фикстура, возвращающая текст проверки тела ответа
         :param get_text_of_element_xml_tree: фикстура получения текста элемента XML дерева
+        :param check_response_time: фикстура проверки времени ответа
         """
 
         response, booking_data, booking_id, tree = fixture_post_booking_firstname_xml
 
-        with allure.step(status_code_msg(200)):
-            assert response.status_code == 200, f'Код ответа - {response.status_code}'
-
-        assert validate_xml(booking_data, CREATE_BOOKING_SCHEMA_XSD)
+        check_response_status_code(response, 200)
+        check_response_time(response)
+        validate_xml(booking_data, CREATE_BOOKING_SCHEMA_XSD)
 
         with allure.step(response_body_msg(booking_data)):
             firstname = get_text_of_element_xml_tree(tree, 'booking/firstname')
@@ -440,21 +452,23 @@ class TestCreateBooking:
     @allure.title('Content-type: {cont_type}')
     @pytest.mark.parametrize('cont_type', ['text/plain', 'text/html'])
     def test_post_with_invalid_content_type(
-            self, booker_api, status_code_msg, response_body_msg, generate_body_booking, cont_type):
+            self, booker_api, check_response_status_code, response_body_msg,
+            generate_body_booking, cont_type, check_response_time):
         """Тестовая функция для проверки создания бронирования с заголовком Content-type: text/plain.
 
         :param booker_api: фикстура, создающая и возвращающая экземпляр класса ApiClient
-        :param status_code_msg: фикстура, возвращающая текст проверки кода ответа
+        :param check_response_status_code: фикстура, проверки кода ответа
         :param response_body_msg: фикстура, возвращающая текст проверки тела ответа
         :param generate_body_booking: фикстура, создающая тело для запроса
         :param cont_type: значение заголовка Content-type
+        :param check_response_time: фикстура проверки времени ответа
         """
         data = generate_body_booking()
         response = booker_api.post(Paths.BOOKING, data, cont_type=cont_type)
         booking_data = response.text
 
-        with allure.step(status_code_msg(500)):
-            assert response.status_code == 500, f'Код ответа - {response.status_code}'
+        check_response_status_code(response, 500)
+        check_response_time(response)
 
         with allure.step(response_body_msg(booking_data)):
             assert booking_data == 'Internal Server Error', \
@@ -464,21 +478,23 @@ class TestCreateBooking:
     @allure.title('Accept: {accept}')
     @pytest.mark.parametrize('accept', ['application/javascript', 'text/html'])
     def test_post_with_invalid_accept(
-            self, booker_api, status_code_msg, response_body_msg, generate_body_booking, accept):
+            self, booker_api, check_response_status_code, response_body_msg,
+            generate_body_booking, accept, check_response_time):
         """Тестовая функция для проверки создания бронирования с заголовком Content-type: text/plain.
 
         :param booker_api: фикстура, создающая и возвращающая экземпляр класса ApiClient
-        :param status_code_msg: фикстура, возвращающая текст проверки кода ответа
+        :param check_response_status_code: фикстура, проверки кода ответа
         :param response_body_msg: фикстура, возвращающая текст проверки тела ответа
         :param generate_body_booking: фикстура, создающая тело для запроса
         :param accept: значение заголовка Accept
+        :param check_response_time: фикстура проверки времени ответа
         """
         data = generate_body_booking()
         response = booker_api.post(Paths.BOOKING, data, accept_header=accept)
         booking_data = response.text
 
-        with allure.step(status_code_msg(418)):
-            assert response.status_code == 418, f'Код ответа - {response.status_code}'
+        check_response_status_code(response, 418)
+        check_response_time(response)
 
         with allure.step(response_body_msg(booking_data)):
             assert booking_data == "I'm a Teapot", \

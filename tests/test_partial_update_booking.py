@@ -18,7 +18,7 @@ class TestPartialUpdateBooking:
     @pytest.mark.parametrize('first, last', [('Peter', 'Jackson'), ('Emma', 'Star')])
     def test_patch_valid_firstname_lastname(
             self, booker_api, first, last, fixture_create_delete_booking_data,
-            status_code_msg, response_body_msg, validate_json):
+            check_response_status_code, response_body_msg, validate_json, check_response_time):
         """Тестовая функция для проверки обновления брони с валидными значениями firstname, lastname.
 
         :param booker_api: фикстура, создающая и возвращающая экземпляр класса ApiClient
@@ -26,8 +26,9 @@ class TestPartialUpdateBooking:
         :param last: передаваемый в теле запроса lastname
         :param fixture_create_delete_booking_data: фикстура для создания и удаления тестовых данных
         :param validate_json: фикстура для валидации JSON схемы
-        :param status_code_msg: фикстура, возвращающая текст проверки кода ответа
+        :param check_response_status_code: фикстура, проверки кода ответа
         :param response_body_msg: фикстура, возвращающая текст проверки тела ответа
+        :param check_response_time: фикстура проверки времени ответа
         """
         booking_id, booking_data = fixture_create_delete_booking_data
 
@@ -35,10 +36,9 @@ class TestPartialUpdateBooking:
         response = booker_api.patch(f'{Paths.BOOKING}{booking_id}', data)
         booking_data_new = response.json()
 
-        with allure.step(status_code_msg(200)):
-            assert response.status_code == 200, f'Код ответа - {response.status_code}'
-
-        assert validate_json(booking_data, GET_BOOKING_SCHEMA)
+        check_response_status_code(response, 200)
+        check_response_time(response)
+        validate_json(booking_data, GET_BOOKING_SCHEMA)
 
         with allure.step(response_body_msg(booking_data_new)):
             assert booking_data_new['firstname'] == first, f'Имя - {booking_data_new["firstname"]}'
@@ -60,16 +60,17 @@ class TestPartialUpdateBooking:
     @allure.story('Обновление всех параметров')
     @allure.title('Валидные значения у всех полей')
     def test_patch_valid_all_fields(
-            self, booker_api, fixture_create_delete_booking_data, status_code_msg,
-            response_body_msg, validate_json, generate_body_booking):
+            self, booker_api, fixture_create_delete_booking_data, check_response_status_code,
+            response_body_msg, validate_json, generate_body_booking, check_response_time):
         """Тестовая функция для проверки обновления брони с валидными значениями (все поля).
 
         :param booker_api: фикстура, создающая и возвращающая экземпляр класса ApiClient
         :param fixture_create_delete_booking_data: фикстура для создания и удаления тестовых данных
         :param validate_json: фикстура для валидации JSON схемы
-        :param status_code_msg: фикстура, возвращающая текст проверки кода ответа
+        :param check_response_status_code: фикстура, проверки кода ответа
         :param response_body_msg: фикстура, возвращающая текст проверки тела ответа
         :param generate_body_booking: фикстура, создающая тело для запроса
+        :param check_response_time: фикстура проверки времени ответа
         """
         booking_id, booking_data = fixture_create_delete_booking_data
 
@@ -78,10 +79,9 @@ class TestPartialUpdateBooking:
         response = booker_api.patch(f'{Paths.BOOKING}{booking_id}', data)
         booking_data_new = response.json()
 
-        with allure.step(status_code_msg(200)):
-            assert response.status_code == 200, f'Код ответа - {response.status_code}'
-
-        assert validate_json(booking_data, GET_BOOKING_SCHEMA)
+        check_response_status_code(response, 200)
+        check_response_time(response)
+        validate_json(booking_data, GET_BOOKING_SCHEMA)
 
         with allure.step(response_body_msg(booking_data_new)):
             assert booking_data_new['firstname'] == data['firstname'], \
@@ -104,24 +104,24 @@ class TestPartialUpdateBooking:
     @allure.title('Пустое тело')
     def test_patch_empty_body(
             self, booker_api, fixture_create_delete_booking_data,
-            status_code_msg, validate_json, response_body_msg):
+            check_response_status_code, validate_json, response_body_msg, check_response_time):
         """Тестовая функция для проверки обновления брони при передаче пустого тела.
 
         :param booker_api: фикстура, создающая и возвращающая экземпляр класса ApiClient
         :param fixture_create_delete_booking_data: фикстура для создания и удаления тестовых данных
         :param validate_json: фикстура для валидации JSON схемы
-        :param status_code_msg: фикстура, возвращающая текст проверки кода ответа
+        :param check_response_status_code: фикстура, проверки кода ответа
         :param response_body_msg: фикстура, возвращающая текст проверки тела ответа
+        :param check_response_time: фикстура проверки времени ответа
         """
         booking_id, booking_data = fixture_create_delete_booking_data
 
         response = booker_api.patch(f'{Paths.BOOKING}{booking_id}', {})
         booking_data_new = response.json()
 
-        with allure.step(status_code_msg(200)):
-            assert response.status_code == 200, f'Код ответа - {response.status_code}'
-
-        assert validate_json(booking_data, GET_BOOKING_SCHEMA)
+        check_response_status_code(response, 200)
+        check_response_time(response)
+        validate_json(booking_data, GET_BOOKING_SCHEMA)
 
         with allure.step(response_body_msg(booking_data_new)):
             assert booking_data_new['firstname'] == booking_data['firstname'], \
@@ -143,26 +143,28 @@ class TestPartialUpdateBooking:
 
     @allure.title('Обновление брони по невалидному id {value}')
     @pytest.mark.parametrize('value', ['213123', 'tests'])
-    def test_patch_invalid_id(self, booker_api, value, generate_body_booking, status_code_msg):
+    def test_patch_invalid_id(
+            self, booker_api, value, generate_body_booking, check_response_status_code, check_response_time):
         """Тестовая функция для проверки обновления брони по невалидному id.
 
         :param booker_api: фикстура, создающая и возвращающая экземпляр класса ApiClient
         :param value: передеваемый в урле id
-        :param status_code_msg: фикстура, возвращающая текст проверки кода ответа
+        :param check_response_status_code: фикстура, проверки кода ответа
         :param generate_body_booking: фикстура, создающая тело для запроса
+        :param check_response_time: фикстура проверки времени ответа
         """
         data = generate_body_booking()
         response = booker_api.patch(f'{Paths.BOOKING}{value}', data)
-        with allure.step(status_code_msg(405)):
-            assert response.status_code == 405, f'Код ответа - {response.status_code}'
+        check_response_status_code(response, 405)
+        check_response_time(response)
 
     @allure.story('Обновление части параметров')
     @allure.title('Валидные значения firstname {first} и lastname {last} - запрос в xml')
     @pytest.mark.parametrize('first, last', [('Peter', 'Jackson'), ('Emma', 'Star')])
     def test_patch_valid_firstname_lastname_xml(
             self, booker_api, first, last, fixture_create_delete_booking_data,
-            status_code_msg, response_body_msg, validate_xml, generate_body_booking, convert_dict_to_xml,
-            parsing_xml_response, get_text_of_element_xml_tree):
+            check_response_status_code, response_body_msg, validate_xml, generate_body_booking, convert_dict_to_xml,
+            parsing_xml_response, get_text_of_element_xml_tree, check_response_time):
         """Тестовая функция для проверки обновления брони с валидными значениями firstname, lastname - запрос в xml.
 
         :param booker_api: фикстура, создающая и возвращающая экземпляр класса ApiClient
@@ -170,12 +172,13 @@ class TestPartialUpdateBooking:
         :param last: передаваемый в теле запроса lastname
         :param fixture_create_delete_booking_data: фикстура для создания и удаления тестовых данных
         :param validate_xml: фикстура валидации xml схемы
-        :param status_code_msg: фикстура, возвращающая текст проверки кода ответа
+        :param check_response_status_code: фикстура, проверки кода ответа
         :param response_body_msg: фикстура, возвращающая текст проверки тела ответа
         :param generate_body_booking: фикстура генерации тела для запроса
         :param parsing_xml_response: фикстура парсинга XML из строки
         :param get_text_of_element_xml_tree: фикстура получения текста элемента XML дерева
         :param convert_dict_to_xml: фикстура конвертации dict в xml
+        :param check_response_time: фикстура проверки времени ответа
         """
         booking_id, booking_data = fixture_create_delete_booking_data
 
@@ -187,10 +190,9 @@ class TestPartialUpdateBooking:
             accept_header='xml', auth_type='basic_auth')
         booking_data_new = response.text
 
-        with allure.step(status_code_msg(200)):
-            assert response.status_code == 200, f'Код ответа - {response.status_code}'
-
-        assert validate_xml(booking_data_new, GET_BOOKING_SCHEMA_XSD)
+        check_response_status_code(response, 200)
+        check_response_time(response)
+        validate_xml(booking_data_new, GET_BOOKING_SCHEMA_XSD)
 
         with allure.step(response_body_msg(booking_data_new)):
             tree = parsing_xml_response(booking_data_new)
@@ -214,15 +216,16 @@ class TestPartialUpdateBooking:
     @allure.story('Проверка заголовков')
     @allure.title('Без токена')
     def test_patch_without_token(
-            self, booker_api, fixture_create_delete_booking_data, status_code_msg,
-            response_body_msg, generate_body_booking):
+            self, booker_api, fixture_create_delete_booking_data, check_response_status_code,
+            response_body_msg, generate_body_booking, check_response_time):
         """Тестовая функция для проверки обновления брони без токена.
 
         :param booker_api: фикстура, создающая и возвращающая экземпляр класса ApiClient
         :param fixture_create_delete_booking_data: фикстура для создания и удаления тестовых данных
-        :param status_code_msg: фикстура, возвращающая текст проверки кода ответа
+        :param check_response_status_code: фикстура, проверки кода ответа
         :param response_body_msg: фикстура, возвращающая текст проверки тела ответа
         :param generate_body_booking: фикстура, создающая тело для запроса
+        :param check_response_time: фикстура проверки времени ответа
         """
         booking_id, booking_data = fixture_create_delete_booking_data
         data = generate_body_booking()
@@ -231,8 +234,8 @@ class TestPartialUpdateBooking:
             headers_new={'Accept': 'application/json', 'Content-Type': 'application/json'})
         booking_data_new = response.text
 
-        with allure.step(status_code_msg(403)):
-            assert response.status_code == 403, f'Код ответа - {response.status_code}'
+        check_response_status_code(response, 403)
+        check_response_time(response)
 
         with allure.step(response_body_msg(booking_data_new)):
             assert booking_data_new == 'Forbidden', f'Тело ответа без токена - {booking_data_new}'

@@ -16,23 +16,23 @@ class TestGetBooking:
     @allure.title('Получение существующей брони по id')
     def test_get_by_exist_id(
             self, booker_api, fixture_create_delete_booking_data, validate_json,
-            status_code_msg, response_body_msg):
+            check_response_status_code, response_body_msg, check_response_time):
         """Тестовая функция для проверки получения бронирования по существующему id.
 
         :param booker_api: фикстура, создающая и возвращающая экземпляр класса ApiClient
         :param validate_json: фикстура для валидации JSON схемы
-        :param status_code_msg: фикстура, возвращающая текст проверки кода ответа
+        :param check_response_status_code: фикстура, проверки кода ответа
         :param response_body_msg: фикстура, возвращающая текст проверки тела ответа
         :param fixture_create_delete_booking_data: фикстура для создания и удаления тестовых данных
+        :param check_response_time: фикстура проверки времени ответа
         """
         booking_id, booking_test_data = fixture_create_delete_booking_data
         response = booker_api.get(path=f'{Paths.BOOKING}{booking_id}')
         booking_data = response.json()
 
-        with allure.step(status_code_msg(200)):
-            assert response.status_code == 200, f'Код ответа - {response.status_code}'
-
-        assert validate_json(booking_data, GET_BOOKING_SCHEMA)
+        check_response_status_code(response, 200)
+        check_response_time(response)
+        validate_json(booking_data, GET_BOOKING_SCHEMA)
 
         with allure.step(response_body_msg(booking_data)):
             assert booking_data['firstname'] == booking_test_data['firstname'], \
@@ -52,19 +52,21 @@ class TestGetBooking:
 
     @allure.title('Получение брони по невалидному id - {value}')
     @pytest.mark.parametrize('value', ['10000000', 'hello', '0'])
-    def test_get_by_invalid_id(self, booker_api, value, status_code_msg, response_body_msg):
+    def test_get_by_invalid_id(
+            self, booker_api, value, check_response_status_code, response_body_msg, check_response_time):
         """Тестовая функция для проверки получения бронирования по невалидному id.
 
         :param booker_api: фикстура, создающая и возвращающая экземпляр класса ApiClient
         :param value: передаваемые в урле id сущностей
-        :param status_code_msg: фикстура, возвращающая текст проверки кода ответа
+        :param check_response_status_code: фикстура, проверки кода ответа
         :param response_body_msg: фикстура, возвращающая текст проверки тела ответа
+        :param check_response_time: фикстура проверки времени ответа
         """
         response = booker_api.get(path=f'{Paths.BOOKING}{value}')
         response_body = response.text
 
-        with allure.step(status_code_msg(404)):
-            assert response.status_code == 404, f'Код ответа - {response.status_code}'
+        check_response_status_code(response, 404)
+        check_response_time(response, 300)
 
         with allure.step(response_body_msg(response_body)):
             assert response_body == 'Not Found', f'Текст ответа - {response_body}'
@@ -72,26 +74,27 @@ class TestGetBooking:
     @allure.title('Получение существующей брони по id - проверка получения ответа в xml')
     def test_get_by_exist_id_in_xml(
             self, booker_api, fixture_create_delete_booking_data, validate_xml,
-            status_code_msg, response_body_msg, parsing_xml_response, get_text_of_element_xml_tree):
+            check_response_status_code, response_body_msg, parsing_xml_response,
+            get_text_of_element_xml_tree, check_response_time):
         """Тестовая функция для проверки получения бронирования по существующему id в xml.
 
         :param booker_api: фикстура, создающая и возвращающая экземпляр класса ApiClient
-        :param status_code_msg: фикстура, возвращающая текст проверки кода ответа
+        :param check_response_status_code: фикстура, проверки кода ответа
         :param response_body_msg: фикстура, возвращающая текст проверки тела ответа
         :param fixture_create_delete_booking_data: фикстура для создания и удаления тестовых данных
         :param parsing_xml_response: фикстура парсинга XML из строки
         :param get_text_of_element_xml_tree: фикстура получения текста элемента XML дерева
         :param validate_xml: фикстура валидации xml схемы
+        :param check_response_time: фикстура проверки времени ответа
         """
         booking_id, booking_test_data = fixture_create_delete_booking_data
         response = booker_api.get(
             path=f'{Paths.BOOKING}{booking_id}', accept_header='xml')
         booking_data = response.text
 
-        with allure.step(status_code_msg(200)):
-            assert response.status_code == 200, f'Код ответа - {response.status_code}'
-
-        assert validate_xml(booking_data, GET_BOOKING_SCHEMA_XSD)
+        check_response_status_code(response, 200)
+        check_response_time(response)
+        validate_xml(booking_data, GET_BOOKING_SCHEMA_XSD)
 
         with allure.step(response_body_msg(booking_data)):
             tree = parsing_xml_response(booking_data)
@@ -115,22 +118,23 @@ class TestGetBooking:
     @allure.title('Получение существующей брони с невалидным заголовком')
     def test_get_by_exist_id_with_invalid_headers(
             self, booker_api, fixture_create_delete_booking_data, validate_json,
-            status_code_msg, response_body_msg, header):
+            check_response_status_code, response_body_msg, header, check_response_time):
         """Тестовая функция для проверки получения бронирования по существующему id.
 
         :param booker_api: фикстура, создающая и возвращающая экземпляр класса ApiClient
         :param validate_json: фикстура для валидации JSON схемы
-        :param status_code_msg: фикстура, возвращающая текст проверки кода ответа
+        :param check_response_status_code: фикстура, проверки кода ответа
         :param response_body_msg: фикстура, возвращающая текст проверки тела ответа
         :param fixture_create_delete_booking_data: фикстура для создания и удаления тестовых данных
         :param header: значение заголовка Accept
+        :param check_response_time: фикстура проверки времени ответа
         """
         booking_id, booking_test_data = fixture_create_delete_booking_data
         response = booker_api.get(path=f'{Paths.BOOKING}{booking_id}', headers_new={'Accept': header})
         response_text = response.text
 
-        with allure.step(status_code_msg(418)):
-            assert response.status_code == 418, f'Код ответа - {response.status_code}'
+        check_response_status_code(response, 418)
+        check_response_time(response)
 
         with allure.step(response_body_msg(response_text)):
             assert response_text == "I'm a Teapot", \
