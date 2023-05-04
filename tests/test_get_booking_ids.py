@@ -59,7 +59,7 @@ class TestGetBookingIds:
 
     @allure.story('Проверка параметра firstname')
     @allure.title('Валидные значения firstname - {get_params}')
-    @pytest.mark.parametrize('get_params', ['Stacy', 'Olivia'])
+    @pytest.mark.parametrize('get_params', ['Angela', 'Olivia'])
     def test_get_by_valid_firstname(
             self, booker_api, fixture_create_delete_booking_data_firstname,
             validate_json, check_response_status_code, response_body_msg, get_params,

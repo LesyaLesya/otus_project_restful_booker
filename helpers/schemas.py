@@ -7,7 +7,9 @@ GET_BOOKING_SCHEMA = {
     'properties': {
         'firstname': {'type': 'string'},
         'lastname': {'type': 'string'},
-        'totalprice': {'type': 'integer'},
+        'totalprice': {'anyOf': [
+            {'type': 'integer'},
+            {'type': 'null'}]},
         'depositpaid': {'type': 'boolean'},
         'bookingdates': {
             'type': 'object',
@@ -16,8 +18,7 @@ GET_BOOKING_SCHEMA = {
                 'checkout': {'type': 'string'}},
             'required': ['checkin', 'checkout']},
         'additionalneeds': {'type': 'string'}},
-    'required': ['firstname', 'lastname', 'totalprice', 'depositpaid',
-                         'bookingdates', 'additionalneeds']}
+    'required': ['firstname', 'lastname', 'totalprice', 'depositpaid', 'bookingdates']}
 
 GET_BOOKING_SCHEMA_XSD = """<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema">
   <xs:element name="booking">

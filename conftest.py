@@ -6,6 +6,7 @@ import jsonschema
 import logging
 import lxml
 import pytest
+import urllib
 import yaml
 from io import StringIO
 from dataclasses import asdict
@@ -162,10 +163,10 @@ def generate_body_booking():
     def _generate_body_booking(
             firstname='Susan', lastname='Brown', totalprice=1, depositpaid=True,
             checkin='2018-01-01', checkout='2019-01-01', additionalneeds='Breakfast',
-            del_key=False, key_to_del=None):
+            key_to_del=None):
         data = asdict(BookingData(
             firstname, lastname, totalprice, depositpaid, BookingDates(checkin, checkout), additionalneeds))
-        if del_key:
+        if key_to_del:
             for i in key_to_del:
                 data.pop(i)
         with allure.step(f'Тело запроса - {data}'):
@@ -189,6 +190,9 @@ def convert_dict_to_xml():
 def convert_dict_to_urlencoded():
     """Фикстура конвертации dict в urlencoded."""
     def _convert_dict_to_urlencoded(d):
+        for k, j in d.items():
+            if isinstance(j, str):
+                d[k] = urllib.parse.quote(j.encode('utf-8'))
         urlencode_d = urlencode(d)
         body = unquote(urlencode_d)
         with allure.step(f'Тело запроса - {body}'):
@@ -323,8 +327,8 @@ def validate_xml(logger_test):
 @pytest.fixture
 def check_response_time(logger_test):
     """Фикстура проверки времени ответа."""
-    @allure.step('Проверить, что время ответа меньше {tims_ms}')
+    @allure.step('Проверить, что время ответа меньше {tims_ms} ms')
     def _check_response_time(response, tims_ms=400):
         actual_time = response.elapsed.total_seconds() * 1000
-        assert actual_time < tims_ms, f'Время ответа {actual_time}, ОР {tims_ms}'
+        assert actual_time < tims_ms, f'Время ответа {actual_time}, ОР {tims_ms} ms'
     return _check_response_time
