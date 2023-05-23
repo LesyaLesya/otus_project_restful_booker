@@ -4,20 +4,16 @@ import allure
 import base64
 import jsonschema
 import logging
-import lxml
 import pytest
-import urllib
 import yaml
 from io import StringIO
 from dataclasses import asdict
-from dicttoxml import dicttoxml
 from jsonschema import validate
 from lxml import etree
-from lxml.etree import fromstring
-from urllib.parse import unquote
-from multidimensional_urlencode import urlencode
 
 
+from helpers.base_functions import (
+    convert_dict_to_urlencoded, convert_dict_to_xml, get_xml_response_data)
 from helpers.clients import ApiClient
 from helpers.data import BookingData, BookingDates
 from helpers.urls_helper import Paths
@@ -163,53 +159,31 @@ def generate_body_booking():
     def _generate_body_booking(
             firstname='Susan', lastname='Brown', totalprice=1, depositpaid=True,
             checkin='2018-01-01', checkout='2019-01-01', additionalneeds='Breakfast',
-            key_to_del=None):
+            key_to_del=None, convert=None):
         data = asdict(BookingData(
             firstname, lastname, totalprice, depositpaid, BookingDates(checkin, checkout), additionalneeds))
         if key_to_del:
             for i in key_to_del:
                 data.pop(i)
+        if convert == 'xml':
+            return convert_dict_to_xml(data), data
+        if convert == 'urlencoded':
+            return convert_dict_to_urlencoded(data), data
         with allure.step(f'Тело запроса - {data}'):
             return data
     return _generate_body_booking
 
 
 @pytest.fixture
-@allure.step('Переконвертировать dict в xml')
-def convert_dict_to_xml():
-    """Фикстура конвертации dict в xml."""
-    def _convert_dict_to_xml(d):
-        xml = dicttoxml(d, custom_root='booking', attr_type=False)
-        with allure.step(f'Тело запроса - {xml}'):
-            return xml
-    return _convert_dict_to_xml
-
-
-@pytest.fixture
-@allure.step('Переконвертировать dict в urlencoded')
-def convert_dict_to_urlencoded():
-    """Фикстура конвертации dict в urlencoded."""
-    def _convert_dict_to_urlencoded(d):
-        for k, j in d.items():
-            if isinstance(j, str):
-                d[k] = urllib.parse.quote(j.encode('utf-8'))
-        urlencode_d = urlencode(d)
-        body = unquote(urlencode_d)
-        with allure.step(f'Тело запроса - {body}'):
-            return body
-    return _convert_dict_to_urlencoded
-
-
-@pytest.fixture
 def create_test_booking(
-        booker_api, generate_body_booking, convert_dict_to_xml, logger_test, parsing_xml_response):
+        booker_api, generate_body_booking, logger_test):
     """Фикстура, создающая тестовую сущность и возвращающая ее тело."""
     @allure.step(
         'Создать тестовое бронирование: firstname={firstname}, lastname={lastname}, totalprice={totalprice}, '
         'depositpaid={depositpaid}, checkin={checkin}, checkout={checkout}, additionalneeds={additionalneeds}')
     def _create_test_booking(firstname='Susan', lastname='Brown', totalprice=1, depositpaid=True,
                              checkin='2018-01-01', checkout='2019-01-01', additionalneeds='Breakfast',
-                             data_type='json'):
+                             data_type='json', *args):
         data = generate_body_booking(
             firstname, lastname, totalprice, depositpaid, checkin, checkout, additionalneeds)
         if data_type == 'xml':
@@ -217,8 +191,8 @@ def create_test_booking(
             logger_test.info(f'Создать тестовую бронь: data {data_xml}.')
             test_booking = booker_api.post(Paths.BOOKING, data, cont_type='xml', accept_header='xml')
             booking_data = test_booking.text
-            tree = parsing_xml_response(booking_data)
-            return tree
+            elements = get_xml_response_data(booking_data, args)
+            return elements
         else:
             logger_test.info(f'Создать тестовую бронь: data {data}.')
             test_booking = booker_api.post(Paths.BOOKING, data)
@@ -240,6 +214,21 @@ def delete_test_booking(booker_api, logger_test):
 
 
 @pytest.fixture
+def get_params(request):
+    return request.param
+
+
+@pytest.fixture
+def fixture_create_delete_booking_data(create_test_booking, delete_test_booking):
+    """Фикстура создания дефолтной тестовой брони и ее удаления."""
+    booking = create_test_booking()
+    booking_id = booking['bookingid']
+    booking_data = booking['booking']
+    yield booking_id, booking_data
+    delete_test_booking(booking_id)
+
+
+@pytest.fixture
 def validate_json(logger_test):
     """Фикстура валидации json схемы."""
     @allure.step('Провалидировать схему для тела ответа {json_data}')
@@ -258,6 +247,7 @@ def check_response_status_code(logger_test):
     """Фикстура проверки кода ответа."""
     @allure.step('Проверить, что код ответа {code}')
     def _check_response_status_code(response, code):
+        logger_test.info(f'Проверка кода ответа {response}, ОР код: {code}')
         assert response.status_code == code, f'Код ответа {response.status_code}, ОР {code}'
     return _check_response_status_code
 
@@ -268,43 +258,6 @@ def response_body_msg(logger_test):
         logger_test.info(f'Проверить тело ответа - {body}')
         return f'Проверить тело ответа - {body}'
     return _response_body_msg
-
-
-@pytest.fixture
-def get_params(request):
-    return request.param
-
-
-@pytest.fixture
-def fixture_create_delete_booking_data(create_test_booking, delete_test_booking):
-    """Фикстура создания дефолтной тестовой брони и ее удаления."""
-    booking = create_test_booking()
-    booking_id = booking['bookingid']
-    booking_data = booking['booking']
-    yield booking_id, booking_data
-    delete_test_booking(booking_id)
-
-
-@pytest.fixture
-def parsing_xml_response():
-    """Фикстура парсинга XML из строки."""
-    def _parsing_xml_response(booking_data):
-        try:
-            tree = fromstring(booking_data)
-        except lxml.etree.XMLSchemaParseError:
-            return False
-        return tree
-    return _parsing_xml_response
-
-
-@pytest.fixture
-def get_text_of_element_xml_tree():
-    """Фикстура получения текста элемента XML дерева."""
-    def _get_text_of_element_xml_tree(parsing_xml_response, path):
-        with allure.step(f'Получить элемент с xpath={path}'):
-            element = parsing_xml_response.xpath(path).pop()
-        return element.text
-    return _get_text_of_element_xml_tree
 
 
 @pytest.fixture
@@ -319,7 +272,7 @@ def validate_xml(logger_test):
 
             data_parse = etree.parse(StringIO(data))
             assert xmlschema_parse.validate(data_parse)
-        except lxml.etree.XMLSchemaParseError:
+        except etree.XMLSchemaParseError:
             assert False
     return _validate
 
@@ -330,5 +283,6 @@ def check_response_time(logger_test):
     @allure.step('Проверить, что время ответа меньше {tims_ms} ms')
     def _check_response_time(response, tims_ms=400):
         actual_time = response.elapsed.total_seconds() * 1000
+        logger_test.info(f'Проверить время ответа - {actual_time}')
         assert actual_time < tims_ms, f'Время ответа {actual_time}, ОР {tims_ms} ms'
     return _check_response_time

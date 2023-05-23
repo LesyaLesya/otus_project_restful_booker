@@ -3,6 +3,7 @@
 import allure
 import pytest
 
+from helpers.base_functions import get_xml_response_data
 from helpers.schemas import CREATE_BOOKING_SCHEMA, CREATE_BOOKING_SCHEMA_XSD
 from helpers.urls_helper import Paths
 
@@ -111,24 +112,20 @@ def fixture_post_booking_repeat(booker_api, generate_body_booking, delete_test_b
 
 @pytest.fixture
 def fixture_post_booking_firstname_xml(
-        booker_api, generate_body_booking, delete_test_booking, get_params,
-        parsing_xml_response, get_text_of_element_xml_tree, convert_dict_to_xml):
-    data = generate_body_booking(firstname=get_params)
-    data_xml = convert_dict_to_xml(data)
+        booker_api, generate_body_booking, delete_test_booking, get_params):
+    data_xml, data = generate_body_booking(firstname=get_params, convert='xml')
     response = booker_api.post(Paths.BOOKING, data_xml, cont_type='xml', accept_header='xml')
     booking_data = response.text
-    tree = parsing_xml_response(booking_data)
-    booking_id = get_text_of_element_xml_tree(tree, 'bookingid')
-    yield response, booking_data, booking_id, tree
+    booking_id, firstname = get_xml_response_data(booking_data, 'bookingid', 'booking/firstname')
+    yield response, booking_data, booking_id, firstname
     delete_test_booking(booking_id)
 
 
 @pytest.fixture
 def fixture_post_booking_firstname_urlencoded(
-        booker_api, generate_body_booking, delete_test_booking, get_params, convert_dict_to_urlencoded):
-    data = generate_body_booking(firstname=get_params)
-    urlencoded_data = convert_dict_to_urlencoded(data)
-    response = booker_api.post(Paths.BOOKING, urlencoded_data, cont_type='urlencoded')
+        booker_api, generate_body_booking, delete_test_booking, get_params):
+    data_urlencoded, data = generate_body_booking(firstname=get_params, convert='urlencoded')
+    response = booker_api.post(Paths.BOOKING, data_urlencoded, cont_type='urlencoded')
     booking_data = response.json()
     booking_id = booking_data['bookingid']
     yield response, booking_data, booking_id
@@ -589,25 +586,23 @@ class TestCreateBookingXML:
     @pytest.mark.parametrize('get_params', ['Peter', 'Maria', '', 'имя'])
     def test_post_valid_firstname_xml(
             self, fixture_post_booking_firstname_xml, check_response_status_code, response_body_msg,
-            get_params, validate_xml, get_text_of_element_xml_tree, check_response_time):
+            get_params, validate_xml, check_response_time):
         """Тестовая функция для проверки создания бронирования с валидным именем.
 
         :param fixture_post_booking_firstname_xml: фикстура создания и удаления тестовых данных и отправки запроса (xml)
         :param validate_xml: фикстура валидации xml схемы
         :param check_response_status_code: фикстура, проверки кода ответа
         :param response_body_msg: фикстура, возвращающая текст проверки тела ответа
-        :param get_text_of_element_xml_tree: фикстура получения текста элемента XML дерева
         :param check_response_time: фикстура проверки времени ответа
         """
 
-        response, booking_data, booking_id, tree = fixture_post_booking_firstname_xml
+        response, booking_data, booking_id, firstname = fixture_post_booking_firstname_xml
 
         check_response_status_code(response, 200)
         check_response_time(response)
         validate_xml(booking_data, CREATE_BOOKING_SCHEMA_XSD)
 
         with allure.step(response_body_msg(booking_data)):
-            firstname = get_text_of_element_xml_tree(tree, 'booking/firstname')
             if get_params == '':
                 assert firstname is None, f'Имя - {firstname}'
             else:
@@ -617,7 +612,7 @@ class TestCreateBookingXML:
     @allure.title('Не передавать в теле firstname')
     def test_post_without_firstname_xml(
             self, booker_api, generate_body_booking, check_response_status_code,
-            response_body_msg, check_response_time, convert_dict_to_xml):
+            response_body_msg, check_response_time):
         """Тестовая функция для проверки создания бронирования без имени.
 
         :param booker_api: фикстура, создающая и возвращающая экземпляр класса ApiClient
@@ -626,8 +621,7 @@ class TestCreateBookingXML:
         :param response_body_msg: фикстура, возвращающая текст проверки тела ответа
         :param check_response_time: фикстура проверки времени ответа
         """
-        data = generate_body_booking(key_to_del=['firstname'])
-        data_xml = convert_dict_to_xml(data)
+        data_xml, data = generate_body_booking(key_to_del=['firstname'], convert='xml')
         response = booker_api.post(Paths.BOOKING, data_xml, cont_type='xml', accept_header='xml')
         response_body = response.text
 
@@ -671,7 +665,7 @@ class TestCreateBookingUrlencoded:
     @allure.title('Не передавать в теле firstname')
     def test_post_without_firstname_urlencoded(
             self, booker_api, generate_body_booking, check_response_status_code,
-            response_body_msg, check_response_time, convert_dict_to_urlencoded):
+            response_body_msg, check_response_time):
         """Тестовая функция для проверки создания бронирования без имени.
 
         :param booker_api: фикстура, создающая и возвращающая экземпляр класса ApiClient
@@ -679,10 +673,8 @@ class TestCreateBookingUrlencoded:
         :param check_response_status_code: фикстура, проверки кода ответа
         :param response_body_msg: фикстура, возвращающая текст проверки тела ответа
         :param check_response_time: фикстура проверки времени ответа
-        :param convert_dict_to_urlencoded:  фикстура конвертации dict в urlencoded
         """
-        data = generate_body_booking(key_to_del=['firstname'])
-        data_urlencoded = convert_dict_to_urlencoded(data)
+        data_urlencoded, data = generate_body_booking(key_to_del=['firstname'], convert='urlencoded')
         response = booker_api.post(Paths.BOOKING, data_urlencoded, cont_type='urlencoded')
         response_body = response.text
 

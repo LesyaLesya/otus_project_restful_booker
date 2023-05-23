@@ -4,6 +4,7 @@
 import allure
 import pytest
 
+from helpers.base_functions import get_xml_response_data
 from helpers.schemas import GET_BOOKING_SCHEMA, GET_BOOKING_SCHEMA_XSD
 from helpers.urls_helper import Paths
 
@@ -163,8 +164,8 @@ class TestPartialUpdateBooking:
     @pytest.mark.parametrize('first, last', [('Peter', 'Jackson'), ('Emma', 'Star')])
     def test_patch_valid_firstname_lastname_xml(
             self, booker_api, first, last, fixture_create_delete_booking_data,
-            check_response_status_code, response_body_msg, validate_xml, generate_body_booking, convert_dict_to_xml,
-            parsing_xml_response, get_text_of_element_xml_tree, check_response_time):
+            check_response_status_code, response_body_msg, validate_xml, generate_body_booking,
+            check_response_time):
         """Тестовая функция для проверки обновления брони с валидными значениями firstname, lastname - запрос в xml.
 
         :param booker_api: фикстура, создающая и возвращающая экземпляр класса ApiClient
@@ -175,15 +176,11 @@ class TestPartialUpdateBooking:
         :param check_response_status_code: фикстура, проверки кода ответа
         :param response_body_msg: фикстура, возвращающая текст проверки тела ответа
         :param generate_body_booking: фикстура генерации тела для запроса
-        :param parsing_xml_response: фикстура парсинга XML из строки
-        :param get_text_of_element_xml_tree: фикстура получения текста элемента XML дерева
-        :param convert_dict_to_xml: фикстура конвертации dict в xml
         :param check_response_time: фикстура проверки времени ответа
         """
         booking_id, booking_data = fixture_create_delete_booking_data
 
-        data = generate_body_booking(first, last)
-        data_xml = convert_dict_to_xml(data)
+        data_xml, data = generate_body_booking(first, last, convert='xml')
 
         response = booker_api.patch(
             f'{Paths.BOOKING}{booking_id}', data_xml, cont_type='xml',
@@ -195,14 +192,10 @@ class TestPartialUpdateBooking:
         validate_xml(booking_data_new, GET_BOOKING_SCHEMA_XSD)
 
         with allure.step(response_body_msg(booking_data_new)):
-            tree = parsing_xml_response(booking_data_new)
-            firstname_new = get_text_of_element_xml_tree(tree, 'firstname')
-            lastname_new = get_text_of_element_xml_tree(tree, 'lastname')
-            totalprice_new = get_text_of_element_xml_tree(tree, 'totalprice')
-            depositpaid_new = get_text_of_element_xml_tree(tree, 'depositpaid')
-            checkin_new = get_text_of_element_xml_tree(tree, 'bookingdates/checkin')
-            checkout_new = get_text_of_element_xml_tree(tree, 'bookingdates/checkout')
-            additionalneeds_new = get_text_of_element_xml_tree(tree, 'additionalneeds')
+            firstname_new, lastname_new, totalprice_new, depositpaid_new, checkin_new, \
+            checkout_new, additionalneeds_new = get_xml_response_data(
+                booking_data_new, 'firstname', 'lastname', 'totalprice', 'depositpaid',
+                'bookingdates/checkin', 'bookingdates/checkout', 'additionalneeds')
 
             assert firstname_new == first, f'Имя - {firstname_new}'
             assert lastname_new == last, f'Фамилия - {lastname_new}'

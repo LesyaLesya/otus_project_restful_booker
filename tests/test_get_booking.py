@@ -4,6 +4,7 @@
 import allure
 import pytest
 
+from helpers.base_functions import get_xml_response_data
 from helpers.schemas import GET_BOOKING_SCHEMA, GET_BOOKING_SCHEMA_XSD
 from helpers.urls_helper import Paths
 
@@ -74,16 +75,13 @@ class TestGetBooking:
     @allure.title('Получение существующей брони по id - проверка получения ответа в xml')
     def test_get_by_exist_id_in_xml(
             self, booker_api, fixture_create_delete_booking_data, validate_xml,
-            check_response_status_code, response_body_msg, parsing_xml_response,
-            get_text_of_element_xml_tree, check_response_time):
+            check_response_status_code, response_body_msg, check_response_time):
         """Тестовая функция для проверки получения бронирования по существующему id в xml.
 
         :param booker_api: фикстура, создающая и возвращающая экземпляр класса ApiClient
         :param check_response_status_code: фикстура, проверки кода ответа
         :param response_body_msg: фикстура, возвращающая текст проверки тела ответа
         :param fixture_create_delete_booking_data: фикстура для создания и удаления тестовых данных
-        :param parsing_xml_response: фикстура парсинга XML из строки
-        :param get_text_of_element_xml_tree: фикстура получения текста элемента XML дерева
         :param validate_xml: фикстура валидации xml схемы
         :param check_response_time: фикстура проверки времени ответа
         """
@@ -97,19 +95,15 @@ class TestGetBooking:
         validate_xml(booking_data, GET_BOOKING_SCHEMA_XSD)
 
         with allure.step(response_body_msg(booking_data)):
-            tree = parsing_xml_response(booking_data)
-            firstname = get_text_of_element_xml_tree(tree, 'firstname')
-            lastname = get_text_of_element_xml_tree(tree, 'lastname')
-            totalprice = int(get_text_of_element_xml_tree(tree, 'totalprice'))
-            depositpaid = bool(get_text_of_element_xml_tree(tree, 'depositpaid'))
-            checkin = get_text_of_element_xml_tree(tree, 'bookingdates/checkin')
-            checkout = get_text_of_element_xml_tree(tree, 'bookingdates/checkout')
-            additionalneeds = get_text_of_element_xml_tree(tree, 'additionalneeds')
+            firstname, lastname, totalprice, depositpaid, checkin, checkout, additionalneeds = \
+                get_xml_response_data(
+                    booking_data, 'firstname', 'lastname', 'totalprice', 'depositpaid',
+                    'bookingdates/checkin', 'bookingdates/checkout', 'additionalneeds')
 
             assert firstname == booking_test_data['firstname'], f'firstname - {firstname}'
             assert lastname == booking_test_data['lastname'], f'lastname - {lastname}'
-            assert totalprice == booking_test_data['totalprice'], f'totalprice - {totalprice}'
-            assert depositpaid == booking_test_data['depositpaid'], f'depositpaid - {depositpaid}'
+            assert totalprice == str(booking_test_data['totalprice']), f'totalprice - {totalprice}'
+            assert depositpaid == str(booking_test_data['depositpaid']).lower(), f'depositpaid - {depositpaid}'
             assert checkin == booking_test_data['bookingdates']['checkin'], f'checkin - {checkin}'
             assert checkout == booking_test_data['bookingdates']['checkout'], f'checkout - {checkout}'
             assert additionalneeds == booking_test_data['additionalneeds'], f'additionalneeds - {additionalneeds}'

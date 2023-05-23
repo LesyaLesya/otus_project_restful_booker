@@ -4,6 +4,7 @@
 import allure
 import pytest
 
+from helpers.base_functions import get_xml_response_data
 from helpers.schemas import GET_BOOKING_SCHEMA, GET_BOOKING_SCHEMA_XSD
 from helpers.urls_helper import Paths
 
@@ -132,7 +133,7 @@ class TestUpdateBooking:
     def test_put_valid_all_fields_urlencoded_accept_json(
             self, booker_api, fixture_create_delete_booking_data, validate_json,
             check_response_status_code, response_body_msg, generate_body_booking,
-            convert_dict_to_urlencoded, check_response_time):
+            check_response_time):
         """Тестовая функция для проверки обновления брони с валидными значениями (все поля) в формате urlencoded,
         получение данных в json.
 
@@ -142,16 +143,14 @@ class TestUpdateBooking:
         :param check_response_status_code: фикстура, проверки кода ответа
         :param response_body_msg: фикстура, возвращающая текст проверки тела ответа
         :param generate_body_booking: фикстура, создающая тело для запроса в urlencoded
-        :param convert_dict_to_urlencoded: фикстура конвертации dict в urlencoded
         :param check_response_time: фикстура проверки времени ответа
         """
         booking_id, booking_data = fixture_create_delete_booking_data
 
-        data = generate_body_booking(
-            'Alexia', 'Jackson', 1200, True, '2023-05-01', '2023-05-12', '')
-        urlencoded_data = convert_dict_to_urlencoded(data)
+        data_urlencoded, data = generate_body_booking(
+            'Alexia', 'Jackson', 1200, True, '2023-05-01', '2023-05-12', '', convert='urlencoded')
         response = booker_api.put(
-            f'{Paths.BOOKING}{booking_id}', urlencoded_data, cont_type='urlencoded', auth_type='basic_auth')
+            f'{Paths.BOOKING}{booking_id}', data_urlencoded, cont_type='urlencoded', auth_type='basic_auth')
         booking_data_new = response.json()
 
         check_response_status_code(response, 200)
@@ -181,7 +180,6 @@ class TestUpdateBooking:
     def test_put_valid_all_fields_urlencoded_accept_xml(
             self, booker_api, fixture_create_delete_booking_data, validate_xml,
             check_response_status_code, response_body_msg, generate_body_booking,
-            convert_dict_to_urlencoded, parsing_xml_response, get_text_of_element_xml_tree,
             check_response_time):
         """Тестовая функция для проверки обновления брони с валидными значениями (все поля) в формате urlencoded,
         получение данных в json.
@@ -192,18 +190,14 @@ class TestUpdateBooking:
         :param check_response_status_code: фикстура, проверки кода ответа
         :param response_body_msg: фикстура, возвращающая текст проверки тела ответа
         :param generate_body_booking: фикстура, создающая тело для запроса в urlencoded
-        :param convert_dict_to_urlencoded: фикстура конвертации dict в urlencoded
-        :param parsing_xml_response: фикстура парсинга XML из строки
-        :param get_text_of_element_xml_tree: фикстура получения текста элемента XML дерева
         :param check_response_time: фикстура проверки времени ответа
         """
         booking_id, booking_data = fixture_create_delete_booking_data
 
-        data = generate_body_booking(
-            'Test', 'Test123', 1, True, '2024-05-01', '2024-05-12', 'Something')
-        urlencoded_data = convert_dict_to_urlencoded(data)
+        data_xml, data = generate_body_booking(
+            'Test', 'Test123', 1, True, '2024-05-01', '2024-05-12', 'Something', convert='urlencoded')
         response = booker_api.put(
-            f'{Paths.BOOKING}{booking_id}', urlencoded_data,
+            f'{Paths.BOOKING}{booking_id}', data_xml,
             cont_type='urlencoded', accept_header='xml', auth_type='basic_auth')
         booking_data_new = response.text
 
@@ -212,14 +206,10 @@ class TestUpdateBooking:
         validate_xml(booking_data_new, GET_BOOKING_SCHEMA_XSD)
 
         with allure.step(response_body_msg(booking_data_new)):
-            tree = parsing_xml_response(booking_data_new)
-            firstname_new = get_text_of_element_xml_tree(tree, 'firstname')
-            lastname_new = get_text_of_element_xml_tree(tree, 'lastname')
-            totalprice_new = get_text_of_element_xml_tree(tree, 'totalprice')
-            depositpaid_new = get_text_of_element_xml_tree(tree, 'depositpaid')
-            checkin_new = get_text_of_element_xml_tree(tree, 'bookingdates/checkin')
-            checkout_new = get_text_of_element_xml_tree(tree, 'bookingdates/checkout')
-            additionalneeds_new = get_text_of_element_xml_tree(tree, 'additionalneeds')
+            firstname_new, lastname_new, totalprice_new, depositpaid_new, checkin_new, \
+            checkout_new, additionalneeds_new = get_xml_response_data(
+                    booking_data_new, 'firstname', 'lastname', 'totalprice', 'depositpaid',
+                    'bookingdates/checkin', 'bookingdates/checkout', 'additionalneeds')
 
             assert firstname_new == data['firstname'], f'Имя - {firstname_new}'
             assert lastname_new == data['lastname'], f'Фамилия - {lastname_new}'

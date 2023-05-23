@@ -59,7 +59,7 @@ class TestGetBookingIds:
 
     @allure.story('Проверка параметра firstname')
     @allure.title('Валидные значения firstname - {get_params}')
-    @pytest.mark.parametrize('get_params', ['Angela', 'Olivia'])
+    @pytest.mark.parametrize('get_params', ['Sometest1', 'Olivia12'])
     def test_get_by_valid_firstname(
             self, booker_api, fixture_create_delete_booking_data_firstname,
             validate_json, check_response_status_code, response_body_msg, get_params,
@@ -112,7 +112,7 @@ class TestGetBookingIds:
 
     @allure.story('Проверка параметра lastname')
     @allure.title('Существующие значения lastname - {get_params}')
-    @pytest.mark.parametrize('get_params', ['Chapman-Wilson', 'Chacha'])
+    @pytest.mark.parametrize('get_params', ['SomeTest_2', 'Lalala'])
     def test_get_by_valid_lastname(
             self, booker_api, check_response_status_code, response_body_msg,
             validate_json, fixture_create_delete_booking_data_lastname, get_params,
@@ -165,7 +165,7 @@ class TestGetBookingIds:
 
     @allure.story('Проверка нескольких параметров')
     @allure.title('Существующие значения firstname и lastname - {get_params}')
-    @pytest.mark.parametrize('get_params', [({'first': 'Stella', 'last': 'White'})])
+    @pytest.mark.parametrize('get_params', [({'first': 'test2', 'last': 'tester12'})])
     def test_get_by_valid_fullname(
             self, booker_api, check_response_status_code, validate_json, response_body_msg,
             fixture_create_delete_booking_data_fullname, get_params, check_response_time):
@@ -219,7 +219,7 @@ class TestGetBookingIds:
 
     @allure.story('Проверка параметра checkin')
     @allure.title('Валидные значения checkin - {value}')
-    @pytest.mark.parametrize('value', ['2022-01-01', '2021-02-01'])
+    @pytest.mark.parametrize('value', ['2022-11-15', '2021-02-01'])
     def test_get_by_valid_checkin(
             self, booker_api, value, check_response_status_code, response_body_msg, check_response_time):
         """Тестовая функция для проверки получения брони с валидными значениями параметра checkin.
