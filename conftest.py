@@ -25,8 +25,8 @@ load_dotenv()
 def pytest_addoption(parser):
     parser.addoption('--schema', action='store', default='https', choices=['https', 'http'])
     parser.addoption('--host', action='store', default='default')
-    parser.addoption('--login', action='store', default='ADMIN_LOGIN')
-    parser.addoption('--passw', action='store', default='ADMIN_PASSWORD')
+    parser.addoption('--login', action='store', default='login')
+    parser.addoption('--passw', action='store', default='password')
 
 
 @pytest.fixture(scope='session')
@@ -102,12 +102,12 @@ def get_schema(cfg, parser_schema):
 
 @pytest.fixture(scope='session')
 def get_admin_login(cfg, parser_login):
-    return os.environ[parser_login]
+    return cfg['admin'][parser_login]
 
 
 @pytest.fixture(scope='session')
 def get_admin_password(cfg, parser_password):
-    return os.environ[parser_password]
+    return cfg['admin'][parser_password]
 
 
 @pytest.fixture(scope='session')

@@ -6,3 +6,8 @@ schema:
 
 host:
   default: 'restful-booker.herokuapp.com'
+
+
+admin:
+  login: 'admin'
+  password: 'password123'
