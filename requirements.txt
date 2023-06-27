@@ -7,3 +7,4 @@ PyYAML==6.0
 lxml==4.9.2
 dicttoxml== 1.7.16
 multidimensional-urlencode==0.0.4
+python-dotenv==0.19.2

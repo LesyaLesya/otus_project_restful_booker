@@ -1,5 +1,6 @@
 """Модуль с фикстурами."""
 
+import os
 import allure
 import base64
 import jsonschema
@@ -10,7 +11,7 @@ from io import StringIO
 from dataclasses import asdict
 from jsonschema import validate
 from lxml import etree
-
+from dotenv import load_dotenv
 
 from helpers.base_functions import (
     convert_dict_to_urlencoded, convert_dict_to_xml, get_xml_response_data)
@@ -18,12 +19,14 @@ from helpers.clients import ApiClient
 from helpers.data import BookingData, BookingDates
 from helpers.urls_helper import Paths
 
+load_dotenv()
+
 
 def pytest_addoption(parser):
     parser.addoption('--schema', action='store', default='https', choices=['https', 'http'])
     parser.addoption('--host', action='store', default='default')
-    parser.addoption('--login', action='store', default='login')
-    parser.addoption('--passw', action='store', default='password')
+    parser.addoption('--login', action='store', default='ADMIN_LOGIN')
+    parser.addoption('--passw', action='store', default='ADMIN_PASSWORD')
 
 
 @pytest.fixture(scope='session')
@@ -82,7 +85,7 @@ def booker_api(get_host, get_schema, get_admin_login, get_admin_password, header
 
 @pytest.fixture(scope='session')
 def cfg():
-    with open('helpers/config.yml', 'r', encoding='utf-8') as file:
+    with open('config.yml', 'r', encoding='utf-8') as file:
         config = yaml.load(file, yaml.SafeLoader)
     return config
 
@@ -99,12 +102,12 @@ def get_schema(cfg, parser_schema):
 
 @pytest.fixture(scope='session')
 def get_admin_login(cfg, parser_login):
-    return cfg['admin'][parser_login]
+    return os.environ[parser_login]
 
 
 @pytest.fixture(scope='session')
 def get_admin_password(cfg, parser_password):
-    return cfg['admin'][parser_password]
+    return os.environ[parser_password]
 
 
 @pytest.fixture(scope='session')
