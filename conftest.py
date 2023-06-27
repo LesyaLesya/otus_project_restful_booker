@@ -1,6 +1,5 @@
 """Модуль с фикстурами."""
 
-import os
 import allure
 import base64
 import jsonschema
@@ -11,15 +10,12 @@ from io import StringIO
 from dataclasses import asdict
 from jsonschema import validate
 from lxml import etree
-from dotenv import load_dotenv
 
 from helpers.base_functions import (
     convert_dict_to_urlencoded, convert_dict_to_xml, get_xml_response_data)
 from helpers.clients import ApiClient
 from helpers.data import BookingData, BookingDates
 from helpers.urls_helper import Paths
-
-load_dotenv()
 
 
 def pytest_addoption(parser):
