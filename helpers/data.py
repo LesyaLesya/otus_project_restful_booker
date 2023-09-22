@@ -1,19 +1,19 @@
-from dataclasses import dataclass, field
+""" Модуль для генерации данных для запросов. """
 
 
-@dataclass
-class BookingDates:
-    checkin: str = None
-    checkout: str = None
+from typing import Any
+from pydantic import BaseModel
 
 
-@dataclass
-class BookingData:
-    """Dataclass booking."""
+class BookingDates(BaseModel):
+    checkin: Any = None
+    checkout: Any = None
 
-    firstname: str = None
-    lastname: str = None
-    totalprice: int = None
-    depositpaid: bool = None
-    bookingdates: BookingDates = field(default_factory=dict)
-    additionalneeds: str = None
+
+class BookingData(BaseModel):
+    firstname: Any = None
+    lastname: Any = None
+    totalprice: Any = None
+    depositpaid: Any = None
+    bookingdates: BookingDates = None
+    additionalneeds: Any = None

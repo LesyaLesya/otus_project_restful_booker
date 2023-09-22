@@ -59,7 +59,7 @@ ____
 В Terminal выполнить команду:
 
 ```
-pytest -n 2 -m marker tests/
+pytest -n 2 -m marker tests/ 
 ```
 где:
 
@@ -67,6 +67,11 @@ pytest -n 2 -m marker tests/
 - -m - маркер, какую группу тестов запускать.
 Варианты: create_booking, delete_booking, get_booking, get_booking_ids, patch_booking, put_booking
 если не добавлять маркер - запускаются все тесты
+Дополнительные параметры (см. config.yml):
+- --schema=http|https - по-умолчанию https
+- --host - по-умолчанию default (restful-booker.herokuapp.com)
+- --login- по-умолчанию login
+- --passw- по-умолчанию password
 
 #### Получить отчет Allure 
 
@@ -81,7 +86,13 @@ pytest -n 2 -m marker tests/
 
 - Запустить Docker
 
-- Запустить тесты и получить отчет командой в Terminal, в качестве параметров указав путь до исполняемого файла allure на вашей машине и маркер (опционально):
+- Запустить тесты и получить отчет командой в Terminal, 
+в качестве параметров указав путь до исполняемого файла allure на вашей машине и маркер (опционально).
+Дополнительные параметры:
+- --schema=http|https - по-умолчанию https
+- --host - по-умолчанию default (restful-booker.herokuapp.com)
+- --login- по-умолчанию login
+- --passw- по-умолчанию password
 
 ```
 ./run_test_in_docker_with_allure.sh  /path/to/allure/bin marker

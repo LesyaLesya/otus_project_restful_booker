@@ -77,7 +77,7 @@ class TestDeleteBooking:
         :param check_response_time: фикстура проверки времени ответа
         :param response_body_msg: фикстура, возвращающая текст проверки тела ответа
         """
-        booking_id, booking_test_data = fixture_create_delete_booking_data
+        booking_id, booking_test_data = fixture_create_delete_booking_data()
         response = booker_api.delete(
             path=f'{Paths.BOOKING}{booking_id}', headers_new={'Content-Type': 'application/json'})
         response_text = response.text

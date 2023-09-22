@@ -4,7 +4,7 @@ import allure
 import pytest
 
 from helpers.base_functions import get_xml_response_data
-from helpers.schemas import CREATE_BOOKING_SCHEMA, CREATE_BOOKING_SCHEMA_XSD
+from helpers.schemas import CreateBookingSchema, XSDSchemas
 from helpers.urls_helper import Paths
 
 
@@ -88,7 +88,7 @@ def fixture_post_booking_additionalneeds(booker_api, generate_body_booking, dele
 
 @pytest.fixture
 def fixture_post_booking_without_additionalneeds(booker_api, generate_body_booking, delete_test_booking):
-    data = generate_body_booking(key_to_del=['additionalneeds'])
+    data = generate_body_booking(additionalneeds=None)
     response = booker_api.post(Paths.BOOKING, data)
     booking_data = response.json()
     booking_id = booking_data['bookingid']
@@ -155,7 +155,7 @@ class TestCreateBookingJSON:
 
         check_response_status_code(response, 200)
         check_response_time(response)
-        validate_json(booking_data, CREATE_BOOKING_SCHEMA)
+        validate_json(booking_data, CreateBookingSchema)
 
         with allure.step(response_body_msg(booking_data)):
             assert booking_data['booking']['firstname'] == get_params, \
@@ -199,7 +199,7 @@ class TestCreateBookingJSON:
         :param response_body_msg: фикстура, возвращающая текст проверки тела ответа
         :param check_response_time: фикстура проверки времени ответа
         """
-        data = generate_body_booking(key_to_del=['firstname'])
+        data = generate_body_booking(firstname=None)
         response = booker_api.post(Paths.BOOKING, data)
         response_body = response.text
 
@@ -227,7 +227,7 @@ class TestCreateBookingJSON:
 
         check_response_status_code(response, 200)
         check_response_time(response)
-        validate_json(booking_data, CREATE_BOOKING_SCHEMA)
+        validate_json(booking_data, CreateBookingSchema)
 
         with allure.step(response_body_msg(booking_data)):
             assert booking_data['booking']['lastname'] == get_params, \
@@ -271,7 +271,7 @@ class TestCreateBookingJSON:
         :param response_body_msg: фикстура, возвращающая текст проверки тела ответа
         :param check_response_time: фикстура проверки времени ответа
         """
-        data = generate_body_booking(key_to_del=['lastname'])
+        data = generate_body_booking(lastname=None)
         response = booker_api.post(Paths.BOOKING, data)
         response_body = response.text
 
@@ -299,7 +299,7 @@ class TestCreateBookingJSON:
 
         check_response_status_code(response, 200)
         check_response_time(response)
-        validate_json(booking_data, CREATE_BOOKING_SCHEMA)
+        validate_json(booking_data, CreateBookingSchema)
 
         with allure.step(response_body_msg(booking_data)):
             assert booking_data['booking']['totalprice'] == int(get_params), \
@@ -320,7 +320,6 @@ class TestCreateBookingJSON:
         :param validate_json: фикстура для валидации JSON схемы
         """
         response, booking_data, booking_id = fixture_post_booking_totalprice
-
         check_response_time(response)
 
         if get_params is None:
@@ -329,7 +328,7 @@ class TestCreateBookingJSON:
                 assert booking_data == 'Internal Server Error', f'Тело ответа  - {booking_data}'
         else:
             check_response_status_code(response, 200)
-            validate_json(booking_data, CREATE_BOOKING_SCHEMA)
+            validate_json(booking_data, CreateBookingSchema)
             with allure.step(response_body_msg(booking_data)):
                 assert booking_data['booking']['totalprice'] is None, \
                     f'Тело ответа  - {booking_data}["booking"]["totalprice"]'
@@ -347,7 +346,7 @@ class TestCreateBookingJSON:
         :param response_body_msg: фикстура, возвращающая текст проверки тела ответа
         :param check_response_time: фикстура проверки времени ответа
         """
-        data = generate_body_booking(key_to_del=['totalprice'])
+        data = generate_body_booking(totalprice=None)
         response = booker_api.post(Paths.BOOKING, data)
         response_body = response.text
 
@@ -375,7 +374,7 @@ class TestCreateBookingJSON:
 
         check_response_status_code(response, 200)
         check_response_time(response)
-        validate_json(booking_data, CREATE_BOOKING_SCHEMA)
+        validate_json(booking_data, CreateBookingSchema)
 
         with allure.step(response_body_msg(booking_data)):
             assert booking_data['booking']['depositpaid'] == get_params, \
@@ -405,7 +404,7 @@ class TestCreateBookingJSON:
                 assert booking_data == 'Internal Server Error', f'Тело ответа  - {booking_data}'
         else:
             check_response_status_code(response, 200)
-            validate_json(booking_data, CREATE_BOOKING_SCHEMA)
+            validate_json(booking_data, CreateBookingSchema)
             with allure.step(response_body_msg(booking_data)):
                 assert booking_data['booking']['depositpaid'] == bool(get_params), \
                     f'Статус внесения депозита - {booking_data["booking"]["depositpaid"]}'
@@ -428,7 +427,7 @@ class TestCreateBookingJSON:
 
         check_response_status_code(response, 200)
         check_response_time(response)
-        validate_json(booking_data, CREATE_BOOKING_SCHEMA)
+        validate_json(booking_data, CreateBookingSchema)
 
         with allure.step(response_body_msg(booking_data)):
             assert booking_data['booking']['bookingdates']['checkin'] == get_params, \
@@ -452,7 +451,7 @@ class TestCreateBookingJSON:
 
         check_response_status_code(response, 200)
         check_response_time(response)
-        validate_json(booking_data, CREATE_BOOKING_SCHEMA)
+        validate_json(booking_data, CreateBookingSchema)
 
         with allure.step(response_body_msg(booking_data)):
             assert booking_data['booking']['bookingdates']['checkin'] == '0NaN-aN-aN', \
@@ -476,7 +475,7 @@ class TestCreateBookingJSON:
 
         check_response_status_code(response, 200)
         check_response_time(response)
-        validate_json(booking_data, CREATE_BOOKING_SCHEMA)
+        validate_json(booking_data, CreateBookingSchema)
 
         with allure.step(response_body_msg(booking_data)):
             assert booking_data['booking']['bookingdates']['checkout'] == get_params, \
@@ -500,7 +499,7 @@ class TestCreateBookingJSON:
 
         check_response_status_code(response, 200)
         check_response_time(response)
-        validate_json(booking_data, CREATE_BOOKING_SCHEMA)
+        validate_json(booking_data, CreateBookingSchema)
 
         with allure.step(response_body_msg(booking_data)):
             assert booking_data['booking']['additionalneeds'] == get_params, \
@@ -523,7 +522,7 @@ class TestCreateBookingJSON:
 
         check_response_status_code(response, 200)
         check_response_time(response)
-        validate_json(booking_data, CREATE_BOOKING_SCHEMA)
+        validate_json(booking_data, CreateBookingSchema)
 
         with allure.step(response_body_msg(booking_data)):
             assert 'additionalneeds' not in booking_data, \
@@ -569,8 +568,8 @@ class TestCreateBookingJSON:
         check_response_time(response_first)
         check_response_time(response_repeat)
 
-        validate_json(response_body_first, CREATE_BOOKING_SCHEMA)
-        validate_json(response_body_repeat, CREATE_BOOKING_SCHEMA)
+        validate_json(response_body_first, CreateBookingSchema)
+        validate_json(response_body_repeat, CreateBookingSchema)
 
         with allure.step(response_body_msg(response_body_repeat)):
             assert response_body_repeat['booking'] == data, f'Тело ответа  - {response_body_repeat}'
@@ -600,7 +599,7 @@ class TestCreateBookingXML:
 
         check_response_status_code(response, 200)
         check_response_time(response)
-        validate_xml(booking_data, CREATE_BOOKING_SCHEMA_XSD)
+        validate_xml(booking_data, XSDSchemas.CREATE_BOOKING_SCHEMA_XSD)
 
         with allure.step(response_body_msg(booking_data)):
             if get_params == '':
@@ -621,7 +620,7 @@ class TestCreateBookingXML:
         :param response_body_msg: фикстура, возвращающая текст проверки тела ответа
         :param check_response_time: фикстура проверки времени ответа
         """
-        data_xml, data = generate_body_booking(key_to_del=['firstname'], convert='xml')
+        data_xml, data = generate_body_booking(firstname=None, convert='xml')
         response = booker_api.post(Paths.BOOKING, data_xml, cont_type='xml', accept_header='xml')
         response_body = response.text
 
@@ -655,7 +654,7 @@ class TestCreateBookingUrlencoded:
 
         check_response_status_code(response, 200)
         check_response_time(response)
-        validate_json(booking_data, CREATE_BOOKING_SCHEMA)
+        validate_json(booking_data, CreateBookingSchema)
 
         with allure.step(response_body_msg(booking_data)):
             assert booking_data['booking']['firstname'] == get_params, \
@@ -674,7 +673,7 @@ class TestCreateBookingUrlencoded:
         :param response_body_msg: фикстура, возвращающая текст проверки тела ответа
         :param check_response_time: фикстура проверки времени ответа
         """
-        data_urlencoded, data = generate_body_booking(key_to_del=['firstname'], convert='urlencoded')
+        data_urlencoded, data = generate_body_booking(firstname=None, convert='urlencoded')
         response = booker_api.post(Paths.BOOKING, data_urlencoded, cont_type='urlencoded')
         response_body = response.text
 

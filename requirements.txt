@@ -3,7 +3,8 @@ requests==2.25.1
 pytest-xdist==2.1.0
 allure-pytest==2.8.33
 jsonschema==4.2.1
-PyYAML==6.0
+PyYAML==6.0.1
 lxml==4.9.2
 dicttoxml== 1.7.16
 multidimensional-urlencode==0.0.4
+pydantic==2.3.0

@@ -1,6 +1,14 @@
 pipeline {
     agent any
 
+    parameters {
+    string(defaultValue: "https", description: "", name: "SCHEMA")
+    string(defaultValue: "default", description: "", name: "HOST")
+    string(defaultValue: "login", description: "", name: "LOGIN")
+    string(defaultValue: "password", description: "", name: "PASSW")
+
+  }
+
     stages {
         stage('DockerBuild') {
             steps {
@@ -14,9 +22,9 @@ pipeline {
                 sh '''
                    if [ "$MARKER" == "all_tests" ]
                    then
-                   ${DOCKER_PATH} run --name my_container tests -n ${NODES}
+                   ${DOCKER_PATH} run --name my_container tests -n ${NODES} --schema ${params.SCHEMA} --host ${params.HOST} --login ${params.LOGIN} --passw ${params.PASSW}
                    else
-                   ${DOCKER_PATH} run --name my_container tests -n ${NODES}  -m ${MARKER}
+                   ${DOCKER_PATH} run --name my_container tests -n ${NODES}  -m ${MARKER} --schema ${params.SCHEMA} --host ${params.HOST} --login ${params.LOGIN} --passw ${params.PASSW}
                    fi
                 '''
             }

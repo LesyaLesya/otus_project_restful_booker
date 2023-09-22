@@ -3,32 +3,8 @@
 import allure
 import pytest
 
-from helpers.schemas import GET_BOOKING_IDS_SCHEMA
+from helpers.schemas import GetBookingIds
 from helpers.urls_helper import Params, Paths
-
-
-@pytest.fixture
-def fixture_create_delete_booking_data_firstname(create_test_booking, delete_test_booking, get_params):
-    booking = create_test_booking(firstname=get_params)
-    booking_id = booking['bookingid']
-    yield booking_id
-    delete_test_booking(booking_id)
-
-
-@pytest.fixture
-def fixture_create_delete_booking_data_lastname(create_test_booking, delete_test_booking, get_params):
-    booking = create_test_booking(lastname=get_params)
-    booking_id = booking['bookingid']
-    yield booking_id
-    delete_test_booking(booking_id)
-
-
-@pytest.fixture
-def fixture_create_delete_booking_data_fullname(create_test_booking, delete_test_booking, get_params):
-    booking = create_test_booking(firstname=get_params['first'], lastname=get_params['last'])
-    booking_id = booking['bookingid']
-    yield booking_id
-    delete_test_booking(booking_id)
 
 
 @pytest.mark.get_booking_ids
@@ -52,7 +28,7 @@ class TestGetBookingIds:
 
         check_response_status_code(response, 200)
         check_response_time(response)
-        validate_json(booking_data, GET_BOOKING_IDS_SCHEMA)
+        validate_json(booking_data, GetBookingIds)
 
         with allure.step(response_body_msg(booking_data)):
             assert len(booking_data) != 0, 'Нет ни одной сущности'
@@ -61,27 +37,26 @@ class TestGetBookingIds:
     @allure.title('Валидные значения firstname - {get_params}')
     @pytest.mark.parametrize('get_params', ['Sometest1', 'Olivia12'])
     def test_get_by_valid_firstname(
-            self, booker_api, fixture_create_delete_booking_data_firstname,
+            self, booker_api, fixture_create_delete_booking_data,
             validate_json, check_response_status_code, response_body_msg, get_params,
             check_response_time):
         """Тестовая функция для проверки получения брони с валидными значениями параметра firstname.
 
         :param booker_api: фикстура, создающая и возвращающая экземпляр класса ApiClient
-        :param fixture_create_delete_booking_data_firstname: фикстура для создания и удаления тестовых данных
+        :param fixture_create_delete_booking_data: фикстура для создания и удаления тестовых данных
         :param validate_json: фикстура для валидации JSON схемы
         :param check_response_status_code: фикстура, проверки кода ответа
         :param response_body_msg: фикстура, возвращающая текст проверки тела ответа
         :param check_response_time: фикстура проверки времени ответа
         """
-        booking_id = fixture_create_delete_booking_data_firstname
-
+        booking_id, booking_data = fixture_create_delete_booking_data(firstname=get_params)
         payload = {Params.FIRSTNAME: get_params}
         response = booker_api.get(path=Paths.BOOKING, params=payload)
         booking_data = response.json()
 
         check_response_status_code(response, 200)
         check_response_time(response)
-        validate_json(booking_data, GET_BOOKING_IDS_SCHEMA)
+        validate_json(booking_data, GetBookingIds)
 
         with allure.step(response_body_msg(booking_data)):
             assert len(booking_data) == 1, f'Количество броней с именем {get_params} - {len(booking_data)}'
@@ -115,18 +90,18 @@ class TestGetBookingIds:
     @pytest.mark.parametrize('get_params', ['SomeTest_2', 'Lalala'])
     def test_get_by_valid_lastname(
             self, booker_api, check_response_status_code, response_body_msg,
-            validate_json, fixture_create_delete_booking_data_lastname, get_params,
+            validate_json, fixture_create_delete_booking_data, get_params,
             check_response_time):
         """Тестовая функция для проверки получения брони с существующими значениями параметра lastname.
 
         :param booker_api: фикстура, создающая и возвращающая экземпляр класса ApiClient
-        :param fixture_create_delete_booking_data_lastname: фикстура для создания и удаления тестовых данных
+        :param fixture_create_delete_booking_data: фикстура для создания и удаления тестовых данных
         :param validate_json: фикстура для валидации JSON схемы
         :param check_response_status_code: фикстура, проверки кода ответа
         :param response_body_msg: фикстура, возвращающая текст проверки тела ответа
         :param check_response_time: фикстура проверки времени ответа
         """
-        booking_id = fixture_create_delete_booking_data_lastname
+        booking_id, booking_data = fixture_create_delete_booking_data(lastname=get_params)
 
         payload = {Params.LASTNAME: get_params}
         response = booker_api.get(path=Paths.BOOKING, params=payload)
@@ -134,7 +109,7 @@ class TestGetBookingIds:
 
         check_response_status_code(response, 200)
         check_response_time(response)
-        validate_json(booking_data, GET_BOOKING_IDS_SCHEMA)
+        validate_json(booking_data, GetBookingIds)
 
         with allure.step(response_body_msg(booking_data)):
             assert len(booking_data) == 1, f'Количество броней с фамилией {get_params} - {len(booking_data)}'
@@ -164,33 +139,33 @@ class TestGetBookingIds:
             assert len(booking_data) == 0, f'У {value} есть бронь. Тело ответа {booking_data}'
 
     @allure.story('Проверка нескольких параметров')
-    @allure.title('Существующие значения firstname и lastname - {get_params}')
-    @pytest.mark.parametrize('get_params', [({'first': 'test2', 'last': 'tester12'})])
+    @allure.title('Существующие значения firstname {first} и lastname {last}')
+    @pytest.mark.parametrize('first, last', [('test2', 'tester12')])
     def test_get_by_valid_fullname(
             self, booker_api, check_response_status_code, validate_json, response_body_msg,
-            fixture_create_delete_booking_data_fullname, get_params, check_response_time):
+            fixture_create_delete_booking_data, first, last, check_response_time):
         """Тестовая функция для проверки получения брони с существующими значениями параметров firstname и lastname.
 
         :param booker_api: фикстура, создающая и возвращающая экземпляр класса ApiClient
-        :param fixture_create_delete_booking_data_fullname: фикстура для создания и удаления тестовых данных
+        :param fixture_create_delete_booking_data: фикстура для создания и удаления тестовых данных
         :param validate_json: фикстура для валидации JSON схемы
         :param check_response_status_code: фикстура, проверки кода ответа
         :param response_body_msg: фикстура, возвращающая текст проверки тела ответа
         :param check_response_time: фикстура проверки времени ответа
         """
-        booking_id = fixture_create_delete_booking_data_fullname
+        booking_id, booking_data = fixture_create_delete_booking_data(firstname=first, lastname=last)
 
-        payload = {Params.FIRSTNAME: get_params['first'], Params.LASTNAME: get_params['last']}
+        payload = {Params.FIRSTNAME: first, Params.LASTNAME: last}
         response = booker_api.get(path=Paths.BOOKING, params=payload)
         booking_data = response.json()
 
         check_response_status_code(response, 200)
         check_response_time(response)
-        validate_json(booking_data, GET_BOOKING_IDS_SCHEMA)
+        validate_json(booking_data, GetBookingIds)
 
         with allure.step(response_body_msg(booking_data)):
             assert len(booking_data) == 1, \
-                f'Количество броней с фамилией {get_params["l"]} и именем {get_params["f"]} - {len(booking_data)}'
+                f'Количество броней с фамилией {last} и именем {first} - {len(booking_data)}'
             assert booking_data[0]['bookingid'] == booking_id, f'Тело ответа {booking_data}'
 
     @allure.story('Проверка нескольких параметров')
@@ -243,7 +218,7 @@ class TestGetBookingIds:
 
     @allure.story('Проверка параметра checkin')
     @allure.title('Невалидные значения checkin - {value}')
-    @pytest.mark.parametrize('value', ['11-11-2023', '11.11.2023'])
+    @pytest.mark.parametrize('value', ['2222', '11-11-2023'])
     def test_get_by_invalid_checkin(
             self, booker_api, value, check_response_status_code, response_body_msg, check_response_time):
         """Тестовая функция для проверки получения брони с валидными значениями параметра checkin.

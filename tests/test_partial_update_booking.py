@@ -5,7 +5,7 @@ import allure
 import pytest
 
 from helpers.base_functions import get_xml_response_data
-from helpers.schemas import GET_BOOKING_SCHEMA, GET_BOOKING_SCHEMA_XSD
+from helpers.schemas import GetBookingSchema, XSDSchemas
 from helpers.urls_helper import Paths
 
 
@@ -31,7 +31,7 @@ class TestPartialUpdateBooking:
         :param response_body_msg: фикстура, возвращающая текст проверки тела ответа
         :param check_response_time: фикстура проверки времени ответа
         """
-        booking_id, booking_data = fixture_create_delete_booking_data
+        booking_id, booking_data = fixture_create_delete_booking_data()
 
         data = {'firstname': first, 'lastname': last}
         response = booker_api.patch(f'{Paths.BOOKING}{booking_id}', data)
@@ -39,7 +39,7 @@ class TestPartialUpdateBooking:
 
         check_response_status_code(response, 200)
         check_response_time(response)
-        validate_json(booking_data, GET_BOOKING_SCHEMA)
+        validate_json(booking_data, GetBookingSchema)
 
         with allure.step(response_body_msg(booking_data_new)):
             assert booking_data_new['firstname'] == first, f'Имя - {booking_data_new["firstname"]}'
@@ -73,7 +73,7 @@ class TestPartialUpdateBooking:
         :param generate_body_booking: фикстура, создающая тело для запроса
         :param check_response_time: фикстура проверки времени ответа
         """
-        booking_id, booking_data = fixture_create_delete_booking_data
+        booking_id, booking_data = fixture_create_delete_booking_data()
 
         data = generate_body_booking(
             'Andrea', 'Jackson', 232, False, '2022-05-01', '2022-06-01', 'Breakfast, Dinner')
@@ -82,7 +82,7 @@ class TestPartialUpdateBooking:
 
         check_response_status_code(response, 200)
         check_response_time(response)
-        validate_json(booking_data, GET_BOOKING_SCHEMA)
+        validate_json(booking_data, GetBookingSchema)
 
         with allure.step(response_body_msg(booking_data_new)):
             assert booking_data_new['firstname'] == data['firstname'], \
@@ -115,14 +115,14 @@ class TestPartialUpdateBooking:
         :param response_body_msg: фикстура, возвращающая текст проверки тела ответа
         :param check_response_time: фикстура проверки времени ответа
         """
-        booking_id, booking_data = fixture_create_delete_booking_data
+        booking_id, booking_data = fixture_create_delete_booking_data()
 
         response = booker_api.patch(f'{Paths.BOOKING}{booking_id}', {})
         booking_data_new = response.json()
 
         check_response_status_code(response, 200)
         check_response_time(response)
-        validate_json(booking_data, GET_BOOKING_SCHEMA)
+        validate_json(booking_data, GetBookingSchema)
 
         with allure.step(response_body_msg(booking_data_new)):
             assert booking_data_new['firstname'] == booking_data['firstname'], \
@@ -178,7 +178,7 @@ class TestPartialUpdateBooking:
         :param generate_body_booking: фикстура генерации тела для запроса
         :param check_response_time: фикстура проверки времени ответа
         """
-        booking_id, booking_data = fixture_create_delete_booking_data
+        booking_id, booking_data = fixture_create_delete_booking_data()
 
         data_xml, data = generate_body_booking(first, last, convert='xml')
 
@@ -189,7 +189,7 @@ class TestPartialUpdateBooking:
 
         check_response_status_code(response, 200)
         check_response_time(response)
-        validate_xml(booking_data_new, GET_BOOKING_SCHEMA_XSD)
+        validate_xml(booking_data_new, XSDSchemas.GET_BOOKING_SCHEMA_XSD)
 
         with allure.step(response_body_msg(booking_data_new)):
             firstname_new, lastname_new, totalprice_new, depositpaid_new, checkin_new, \
@@ -220,7 +220,7 @@ class TestPartialUpdateBooking:
         :param generate_body_booking: фикстура, создающая тело для запроса
         :param check_response_time: фикстура проверки времени ответа
         """
-        booking_id, booking_data = fixture_create_delete_booking_data
+        booking_id, booking_data = fixture_create_delete_booking_data()
         data = generate_body_booking()
         response = booker_api.patch(
             f'{Paths.BOOKING}{booking_id}', data,

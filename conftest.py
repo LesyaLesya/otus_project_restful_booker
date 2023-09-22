@@ -7,7 +7,6 @@ import logging
 import pytest
 import yaml
 from io import StringIO
-from dataclasses import asdict
 from jsonschema import validate
 from lxml import etree
 
@@ -158,18 +157,23 @@ def generate_body_booking():
     def _generate_body_booking(
             firstname='Susan', lastname='Brown', totalprice=1, depositpaid=True,
             checkin='2018-01-01', checkout='2019-01-01', additionalneeds='Breakfast',
-            key_to_del=None, convert=None):
-        data = asdict(BookingData(
-            firstname, lastname, totalprice, depositpaid, BookingDates(checkin, checkout), additionalneeds))
-        if key_to_del:
-            for i in key_to_del:
-                data.pop(i)
+            convert=None):
+        data = BookingData(
+            firstname=firstname, lastname=lastname, totalprice=totalprice,
+            depositpaid=depositpaid,
+            bookingdates=BookingDates(checkin=checkin, checkout=checkout),
+            additionalneeds=additionalneeds)
+        d = data.model_dump(exclude_none=True)
         if convert == 'xml':
-            return convert_dict_to_xml(data), data
+            x = convert_dict_to_xml(d)
+            with allure.step(f'Тело запроса - {x}'):
+                return x, d
         if convert == 'urlencoded':
-            return convert_dict_to_urlencoded(data), data
-        with allure.step(f'Тело запроса - {data}'):
-            return data
+            u = convert_dict_to_urlencoded(d)
+            with allure.step(f'Тело запроса - {u}'):
+                return u, d
+        with allure.step(f'Тело запроса - {d}'):
+            return d
     return _generate_body_booking
 
 
@@ -218,13 +222,21 @@ def get_params(request):
 
 
 @pytest.fixture
-def fixture_create_delete_booking_data(create_test_booking, delete_test_booking):
+def fixture_create_delete_booking_data(create_test_booking, delete_test_booking, request):
     """Фикстура создания дефолтной тестовой брони и ее удаления."""
-    booking = create_test_booking()
-    booking_id = booking['bookingid']
-    booking_data = booking['booking']
-    yield booking_id, booking_data
-    delete_test_booking(booking_id)
+    def _create_delete(
+            firstname='Susan', lastname='Brown', totalprice=1, depositpaid=True,
+            checkin='2018-01-01', checkout='2019-01-01', additionalneeds='Breakfast'):
+        booking = create_test_booking(
+            firstname, lastname, totalprice, depositpaid, checkin, checkout, additionalneeds)
+        booking_id = booking['bookingid']
+        booking_data = booking['booking']
+
+        def teardown():
+            delete_test_booking(booking_id)
+        request.addfinalizer(teardown)
+        return booking_id, booking_data
+    return _create_delete
 
 
 @pytest.fixture
@@ -233,8 +245,9 @@ def validate_json(logger_test):
     @allure.step('Провалидировать схему для тела ответа {json_data}')
     def _validate(json_data, base_schema):
         try:
-            logger_test.info(f'Валидация схемы для тела {json_data}, схема: {base_schema}')
-            validate(instance=json_data, schema=base_schema)
+            schema = base_schema.model_json_schema()
+            logger_test.info(f'Валидация схемы для тела {json_data}, схема: {schema}')
+            validate(instance=json_data, schema=schema)
         except jsonschema.exceptions.ValidationError:
             assert False
         assert True
