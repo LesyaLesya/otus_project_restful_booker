@@ -1,14 +1,6 @@
 pipeline {
     agent any
 
-    parameters {
-    string(defaultValue: "https", description: "", name: "SCHEMA")
-    string(defaultValue: "default", description: "", name: "HOST")
-    string(defaultValue: "login", description: "", name: "LOGIN")
-    string(defaultValue: "password", description: "", name: "PASSW")
-
-  }
-
     stages {
         stage('DockerBuild') {
             steps {
