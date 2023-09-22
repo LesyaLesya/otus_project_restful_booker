@@ -14,9 +14,9 @@ pipeline {
                 sh '''
                    if [ "$MARKER" == "all_tests" ]
                    then
-                   ${DOCKER_PATH} run --name my_container tests -n ${NODES} --schema ${params.SCHEMA} --host ${params.HOST} --login ${params.LOGIN} --passw ${params.PASSW}
+                   ${DOCKER_PATH} run --name my_container tests -n ${NODES} --schema ${SCHEMA} --host ${HOST} --login ${LOGIN} --passw ${PASSW}
                    else
-                   ${DOCKER_PATH} run --name my_container tests -n ${NODES}  -m ${MARKER} --schema ${params.SCHEMA} --host ${params.HOST} --login ${params.LOGIN} --passw ${params.PASSW}
+                   ${DOCKER_PATH} run --name my_container tests -n ${NODES}  -m ${MARKER} --schema ${SCHEMA} --host ${HOST} --login ${LOGIN} --passw ${PASSW}
                    fi
                 '''
             }
