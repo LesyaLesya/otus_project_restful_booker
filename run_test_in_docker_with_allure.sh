@@ -2,8 +2,7 @@
 
 SCHEMA="${3:-https}"
 HOST="${4:-default}"
-LOGIN="${5:-login}"
-PASSW="${6:-password}"
+USER="${5:-admin}"
 
 # Собираем image с тегом tests
 docker build -t tests .
@@ -14,9 +13,9 @@ docker build -t tests .
 
 if [ $2 ]
 then
-  docker run --name my_container tests -m $2 --schema $SCHEMA --host $HOST --login $LOGIN --passw $PASSW
+  docker run --name my_container tests -m $2 --schema $SCHEMA --host $HOST --user $USER
 else
-  docker run --name my_container tests --schema $SCHEMA --host $HOST --login $LOGIN --passw $PASSW
+  docker run --name my_container tests --schema $SCHEMA --host $HOST --user $USER
 fi
 
 

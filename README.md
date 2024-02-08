@@ -70,8 +70,7 @@ pytest -n 2 -m marker tests/
 Дополнительные параметры (см. config.yml):
 - --schema=http|https - по-умолчанию https
 - --host - по-умолчанию default (restful-booker.herokuapp.com)
-- --login- по-умолчанию login
-- --passw- по-умолчанию password
+- --user- по-умолчанию admin
 
 #### Получить отчет Allure 
 
@@ -91,8 +90,7 @@ pytest -n 2 -m marker tests/
 Дополнительные параметры:
 - --schema=http|https - по-умолчанию https
 - --host - по-умолчанию default (restful-booker.herokuapp.com)
-- --login- по-умолчанию login
-- --passw- по-умолчанию password
+- --user- по-умолчанию admin
 
 ```
 ./run_test_in_docker_with_allure.sh  /path/to/allure/bin marker

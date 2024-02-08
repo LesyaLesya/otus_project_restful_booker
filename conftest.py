@@ -20,8 +20,7 @@ from helpers.urls_helper import Paths
 def pytest_addoption(parser):
     parser.addoption('--schema', action='store', default='https', choices=['https', 'http'])
     parser.addoption('--host', action='store', default='default')
-    parser.addoption('--login', action='store', default='login')
-    parser.addoption('--passw', action='store', default='password')
+    parser.addoption('--user', action='store', default='admin')
 
 
 @pytest.fixture(scope='session')
@@ -35,13 +34,8 @@ def parser_host(request):
 
 
 @pytest.fixture(scope='session')
-def parser_login(request):
-    return request.config.getoption('--login')
-
-
-@pytest.fixture(scope='session')
-def parser_password(request):
-    return request.config.getoption('--passw')
+def parser_user(request):
+    return request.config.getoption('--user')
 
 
 @pytest.fixture(scope='session', autouse=True)
@@ -65,17 +59,18 @@ def log_module_description(request, logger_test):
 
 
 @pytest.fixture(scope='session')
-def booker_api(get_host, get_schema, get_admin_login, get_admin_password, headers, logger_test):
+def booker_api(get_host, get_schema, get_login, get_password, headers, logger_test, parser_user):
     """Фикстура, создающая и возвращающая экземпляр класса ApiClient."""
     host = get_host
     schema = get_schema
-    login = get_admin_login
-    passw = get_admin_password
-    headers = headers
+    login = get_login
+    passw = get_password
+    header = headers
+    user = parser_user
     logger_test.info(
         f'Инициализация экземпляра АПИ клиента: host {host}, '
-        f'schema {schema}, login {login}, password {passw}, headers {headers}')
-    return ApiClient(host, schema, login, passw, headers)
+        f'schema {schema}, user {user}, login {login}, password {passw}, headers {header}')
+    return ApiClient(host, schema, header, user, get_login, get_password)
 
 
 @pytest.fixture(scope='session')
@@ -96,20 +91,20 @@ def get_schema(cfg, parser_schema):
 
 
 @pytest.fixture(scope='session')
-def get_admin_login(cfg, parser_login):
-    return cfg['admin'][parser_login]
+def get_login(cfg, parser_user):
+    return cfg['users'][parser_user]['login']
 
 
 @pytest.fixture(scope='session')
-def get_admin_password(cfg, parser_password):
-    return cfg['admin'][parser_password]
+def get_password(cfg, parser_user):
+    return cfg['users'][parser_user]['password']
 
 
 @pytest.fixture(scope='session')
-def encode_login_pass(get_admin_login, get_admin_password):
+def encode_login_pass(get_login, get_password):
     """Кодирование логина и пароля в base64."""
-    login = get_admin_login
-    passw = get_admin_password
+    login = get_login
+    passw = get_password
     for_token = f'{login}:{passw}'
     sample_string_bytes = for_token.encode('ascii')
     base64_bytes = base64.b64encode(sample_string_bytes)

@@ -11,30 +11,28 @@ from helpers.urls_helper import Paths
 class ApiClient:
     """Класс для выполнения запросов к API."""
 
-    def __init__(self, host, schema, login, passw, headers):
+    def __init__(self, host, schema, headers, user, get_login, get_password):
         """Конструктор класса.
 
         :param host: адрес хоста
         :param schema: схема
-        :param login: логин для получения auth token
-        :param passw: пароль для получения auth token
         :param headers: заголовки запроса
+        :param user: пользователь
         """
         self.host = host
         self.schema = schema
-        self.__login = login
-        self.__passw = passw
         self.headers = headers
         self.session = requests.Session()
         self.logger = logging.getLogger('requests')
-        self.__token = self.__get_token()
+        self.__token = self.__get_token(get_login, get_password)
+        self.user = user
 
     def _get_url(self, path):
         return f'{self.schema}://{self.host}/{path}'
 
-    def __get_token(self):
+    def __get_token(self, get_login, get_password):
         """Метод передачи в запросе учетных данных и получения auth token."""
-        payload = {'username': self.__login, 'password': self.__passw}
+        payload = {'username': get_login, 'password': get_password}
         url = self._get_url(Paths.AUTH)
         response = self.session.post(url=url, data=payload)
         self.__token = json.loads(response.text)['token']
